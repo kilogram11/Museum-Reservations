@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.IdentityMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Identity">
+        <id column="_id" property="id" />
+        <result column="IDENTITY_ID" property="identityId" />
+        <result column="USER_ID" property="userId" />
+        <result column="IDENTITY_NAME" property="identityName" />
+        <result column="IDENTITY_CARD" property="identityCard" />
+        <result column="IDENTITY_MOBILE" property="identityMobile" />
+        <result column="IDENTITY_OBJ" property="identityObj" />
+        <result column="IDENTITY_STATUS" property="identityStatus" />
+        <result column="BLACK_START_TIME" property="blackStartTime" />
+        <result column="BLACK_END_TIME" property="blackEndTime" />
+        <result column="USER_BAN_NUM" property="userBanNum" />
+        <result column="USER_CHECK_TYPE" property="userCheckType" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+    <!-- Custom queries -->
+    <select id="selectByIdCard" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM identity WHERE IDENTITY_CARD = #{idCard} LIMIT 1
+    </select>
+    <select id="selectBlacklist" resultMap="BaseResultMap" parameterType="map">
+        SELECT * FROM identity WHERE IDENTITY_STATUS = 0 ORDER BY BLACK_START_TIME DESC
+    </select>
+    <update id="updateBanCount" parameterType="map">
+        UPDATE identity SET USER_BAN_NUM = USER_BAN_NUM + #{increment} WHERE IDENTITY_ID = #{identityId}
+    </update>
+    <update id="updateBanStatistics">
+        UPDATE identity i
+        SET USER_BAN_NUM = (
+            SELECT COUNT(*)
+            FROM `join` j
+            WHERE j.IDENTITY_ID = i.IDENTITY_ID
+              AND j.JOIN_IS_CHECKIN = 3
+              AND j.JOIN_MEET_DAY >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d')
+        )
+    </update>
+
+    <update id="doBan">
+        UPDATE identity
+        SET IDENTITY_STATUS = 0,
+            BLACK_START_TIME = #{startTime},
+            BLACK_END_TIME = #{endTime},
+            USER_CHECK_TYPE = 1
+        WHERE IDENTITY_STATUS = 1
+          AND USER_BAN_NUM > 5
+    </update>
+
+    <update id="autoUnban">
+        UPDATE identity
+        SET IDENTITY_STATUS = 1,
+            USER_BAN_NUM = 0
+        WHERE IDENTITY_STATUS = 0
+          AND BLACK_END_TIME &lt; #{now}
+    </update>
+</mapper>

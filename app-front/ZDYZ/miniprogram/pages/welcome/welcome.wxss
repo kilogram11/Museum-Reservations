@@ -1,0 +1,55 @@
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20rpx;
+  background-color: #f5f0e8;
+}
+
+/* 标题区域：设置为垂直布局 */
+.title-area {
+  text-align: center;
+  margin-bottom: 100rpx;
+  /* 核心：让子元素（两个文本）垂直排列 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 主标题样式 */
+.main-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #8B0000;
+  /* 确保独占一行 */
+  display: block;
+}
+
+/* 副标题样式：与主标题分开一行，增加间距 */
+.sub-title {
+  font-size: 28rpx;
+  color: #8B4513;
+  margin-top: 10rpx; /* 主标题和副标题之间的间距 */
+  display: block;
+}
+
+.btn-red {
+  width: 80%;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #8B0000;
+  color: #fff;
+  border-radius: 10rpx;
+  text-align: center;
+  font-size: 32rpx;
+  margin: 30rpx auto;
+}
+
+.version {
+  font-size: 24rpx;
+  color: #8B4513;
+  position: fixed;
+  bottom: 30rpx;
+}

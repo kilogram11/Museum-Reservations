@@ -1,0 +1,295 @@
+page {
+  background-color: #f9f5ec;
+  padding-bottom: 40rpx;
+}
+/* === 顶部标签栏 === */
+.tabs {
+  display: flex;
+  background: #fff;
+  padding: 20rpx 0;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+.tab-item {
+  flex: 1;
+  text-align: center;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+  padding-bottom: 10rpx;
+}
+.tab-item.active {
+  color: #8b0000;
+  font-weight: bold;
+}
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 4rpx;
+  background: #8b0000;
+  border-radius: 2rpx;
+}
+
+.container {
+  padding: 30rpx;
+}
+
+/* === 订单卡片 === */
+.order-card {
+  background: #efe6d8;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+}
+
+/* 左侧装饰条 */
+.left-bar {
+  width: 12rpx;
+  background: rgba(74, 107, 109, 0.8);
+  flex-shrink: 0;
+}
+.gray-theme .left-bar {
+  background: rgba(139, 0, 0, 0.6);
+}
+.blue-theme .left-bar {
+  background: rgba(74, 107, 109, 0.8);
+} /* 附件中绿色那个也可以单独写类名 */
+
+.card-content {
+  flex: 1;
+  padding: 30rpx;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.user-name {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #6b5a3e;
+}
+
+/* 状态标签 */
+.status-tag {
+  padding: 4rpx 16rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+}
+.tag-pending {
+  background: #e6f7ff;
+  color: #1890ff;
+} /* 待核销 */
+.tag-verified {
+  background: #e8eaed;
+  color: #666;
+} /* 已核销(模拟附件样式) */
+.tag-cancelled {
+  background: #f5f5f5;
+  color: #999;
+} /* 已取消 */
+.tag-expired {
+  background: #f5f5f5;
+  color: #999;
+} /* 已逾期 */
+
+.info-row {
+  font-size: 28rpx;
+  color: #6b5a3e;
+  margin-bottom: 8rpx;
+  opacity: 0.9;
+}
+
+/* 按钮区 */
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 30rpx;
+}
+.action-buttons button {
+  flex: 1;
+  font-size: 26rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  border-radius: 10rpx;
+  margin: 0;
+}
+.btn-qr {
+  background: #e6d6b8;
+  color: #5a4626;
+  border: 1px solid #8b6a2e;
+}
+.btn-cancel {
+  background: transparent;
+  color: #8a7a63;
+  border: 1px solid #c8bba3;
+}
+
+/* === 弹窗通用 === */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-box {
+  background: #efe6d8;
+  border-radius: 16rpx;
+  width: 600rpx;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+}
+.modal-box .left-bar {
+  flex-shrink: 0;
+  width: 12rpx;
+  background: rgba(74, 107, 109, 0.8);
+}
+.modal-box .card-content {
+  flex: 1;
+  padding: 40rpx;
+}
+
+/* 二维码弹窗特定 */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+.modal-title {
+  font-weight: bold;
+  font-size: 34rpx;
+  color: #6b5a3e;
+}
+.close-btn {
+  font-size: 48rpx;
+  color: #8b4513;
+  line-height: 32rpx;
+  padding: 0 10rpx;
+}
+.qr-info {
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+.qr-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+  color: #333;
+}
+.qr-time {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.qr-img-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20rpx 0;
+  position: relative;
+}
+
+/* “到这去” 链接样式 */
+.location-link {
+  margin-bottom: 20rpx;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+.location-link text {
+  font-size: 30rpx;
+  color: #1890ff; /* Blue link color */
+  font-weight: bold;
+}
+.link-underline {
+  width: 100%;
+  height: 2rpx;
+  background: #1890ff;
+  margin-top: 4rpx;
+}
+
+.qr-img {
+  width: 360rpx;
+  height: 360rpx;
+  display: block;
+}
+
+.qr-placeholder {
+  width: 360rpx;
+  height: 360rpx;
+  background: #f8f9fa;
+  margin: 0 auto;
+  border: 4rpx solid #e0d6c6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #8b4513;
+}
+
+.qr-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 10rpx;
+}
+.btn-close-modal {
+  display: none;
+}
+
+/* 取消确认弹窗特定 */
+.confirm-title {
+  font-weight: bold;
+  font-size: 34rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+}
+.confirm-content {
+  font-size: 30rpx;
+  color: #666;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+.confirm-actions {
+  display: flex;
+  gap: 30rpx;
+}
+.confirm-actions button {
+  flex: 1;
+  font-size: 30rpx;
+  border-radius: 12rpx;
+}
+.btn-modal-back {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+}
+.btn-modal-confirm {
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 200rpx;
+  color: #999;
+}

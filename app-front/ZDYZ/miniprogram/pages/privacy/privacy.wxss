@@ -1,0 +1,52 @@
+page {
+  background-color: #f9f5ec;
+  color: #333;
+  line-height: 1.6;
+}
+.container {
+  padding: 40rpx;
+}
+.header {
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+.title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #8b0000;
+  margin-bottom: 20rpx;
+}
+.date {
+  font-size: 24rpx;
+  color: #999;
+}
+.section {
+  margin-bottom: 40rpx;
+}
+.h2 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #6b5a3e;
+  margin: 30rpx 0 20rpx;
+  border-left: 8rpx solid #8b0000;
+  padding-left: 20rpx;
+}
+.h3 {
+  font-size: 30rpx;
+  font-weight: bold;
+  margin: 20rpx 0 10rpx;
+  color: #333;
+}
+.p {
+  font-size: 28rpx;
+  margin-bottom: 16rpx;
+  text-align: justify;
+}
+.strong {
+  font-weight: bold;
+  color: #8b4513;
+}
+.br {
+  height: 20rpx;
+}

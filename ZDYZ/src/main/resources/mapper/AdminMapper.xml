@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.AdminMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Admin">
+        <id column="_id" property="id" />
+        <result column="ADMIN_ID" property="adminId" />
+        <result column="ADMIN_NAME" property="adminName" />
+        <result column="ADMIN_PASSWORD" property="adminPassword" />
+        <result column="ADMIN_TOKEN" property="adminToken" />
+        <result column="ADMIN_TOKEN_TIME" property="adminTokenTime" />
+        <result column="ADMIN_ADD_TIME" property="adminAddTime" />
+        <result column="_pid" property="pid" />
+        <result column="ADMIN_NICKNAME" property="adminNickname" />
+        <result column="ADMIN_INTRO" property="adminIntro" />
+        <result column="ADMIN_AVATAR" property="adminAvatar" />
+        <result column="ADMIN_INFO_UPDATE_TIME" property="adminInfoUpdateTime" />
+    </resultMap>
+
+    <!-- Insert -->
+    <insert id="insert" parameterType="com.museum.entity.Admin">
+        INSERT INTO admin (
+            _id, ADMIN_ID, ADMIN_NAME, ADMIN_PASSWORD, ADMIN_TOKEN, ADMIN_TOKEN_TIME,
+            ADMIN_ADD_TIME, _pid, ADMIN_NICKNAME, ADMIN_INTRO, ADMIN_AVATAR, ADMIN_INFO_UPDATE_TIME
+        ) VALUES (
+            #{id}, #{adminId}, #{adminName}, #{adminPassword}, #{adminToken}, #{adminTokenTime},
+            #{adminAddTime}, #{pid}, #{adminNickname}, #{adminIntro}, #{adminAvatar}, #{adminInfoUpdateTime}
+        )
+    </insert>
+
+    <!-- Select by ID -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM admin WHERE _id = #{id}
+    </select>
+
+    <!-- Update by ID -->
+    <!-- MyBatis-Plus wraps updateById entity in 'et' map -->
+    <update id="updateById" parameterType="com.museum.entity.Admin">
+        UPDATE admin SET
+            ADMIN_ID = #{et.adminId},
+            ADMIN_NAME = #{et.adminName},
+            ADMIN_PASSWORD = #{et.adminPassword},
+            ADMIN_TOKEN = #{et.adminToken},
+            ADMIN_TOKEN_TIME = #{et.adminTokenTime},
+            ADMIN_ADD_TIME = #{et.adminAddTime},
+            _pid = #{et.pid},
+            ADMIN_NICKNAME = #{et.adminNickname},
+            ADMIN_INTRO = #{et.adminIntro},
+            ADMIN_AVATAR = #{et.adminAvatar},
+            ADMIN_INFO_UPDATE_TIME = #{et.adminInfoUpdateTime}
+        WHERE _id = #{et.id}
+    </update>
+
+    <!-- Delete by ID -->
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM admin WHERE _id = #{id}
+    </delete>
+
+    <!-- Existing custom query -->
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT * FROM admin WHERE ADMIN_NAME = #{username} LIMIT 1
+    </select>
+</mapper>

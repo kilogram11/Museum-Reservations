@@ -1,0 +1,38 @@
+<view class="login-container">
+  <view class="title-area">
+    <text class="title-level1">欢迎来到博物馆</text>
+    <text class="sub-title">手机号验证码登录</text>
+  </view>
+
+  <view class="input-item">
+    <icon type="phone" size="28" color="#8B0000" class="input-icon"/>
+    <input 
+      placeholder="请输入手机号" 
+      placeholder-class="input-placeholder"
+      maxlength="11"
+      bindinput="onPhoneInput"
+    />
+  </view>
+
+  <view class="input-item">
+    <icon type="safe-success" size="28" color="#8B0000" class="input-icon"/>
+    <input 
+      placeholder="请输入验证码" 
+      placeholder-class="input-placeholder"
+      maxlength="6"
+      bindinput="onCodeInput"
+    />
+    <!-- 核心修改：根据倒计时状态显示不同内容 -->
+    <button 
+      class="send-code-btn {{!canSendCode ? 'send-code-disabled' : ''}}"
+      bindtap="sendCode"
+      disabled="{{!canSendCode}}"
+    >
+      {{countDown > 0 ? countDown + 's后重新发送' : '发送验证码'}}
+    </button>
+  </view>
+
+  <view class="btn-red" bindtap="doLogin">
+    登录
+  </view>
+</view>

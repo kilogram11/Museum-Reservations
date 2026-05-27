@@ -1,0 +1,241 @@
+page {
+  background-color: #f9f5ec;
+  padding-bottom: 150rpx;
+}
+.container {
+  padding: 20rpx;
+}
+
+/* 头部 */
+.header-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+.museum-icon {
+  font-size: 50rpx;
+  margin-right: 20rpx;
+  color: rgba(139, 0, 0, 0.8);
+}
+.m-name {
+  font-weight: bold;
+  font-size: 32rpx;
+}
+.m-date {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 6rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin: 30rpx 0 16rpx 10rpx;
+  color: #333;
+}
+
+/* 日期滚动 */
+.date-scroll {
+  width: 100%;
+  white-space: nowrap;
+  height: 180rpx;
+}
+.date-list {
+  display: flex;
+}
+.date-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140rpx;
+  height: 160rpx;
+  background: #fff;
+  margin-right: 16rpx;
+  border-radius: 12rpx;
+  border: 1px solid #eee;
+  color: #333;
+}
+.d-month {
+  font-size: 20rpx;
+  color: #888;
+}
+.d-day {
+  font-size: 40rpx;
+  font-weight: bold;
+  margin: 4rpx 0;
+}
+.d-week {
+  font-size: 24rpx;
+}
+.d-status {
+  font-size: 20rpx;
+  color: #07c160;
+  margin-top: 4rpx;
+}
+
+/* 选中态 & 禁用态 */
+.date-item.selected {
+  background: rgba(139, 0, 0, 0.8);
+  color: #fff;
+  border-color: rgba(139, 0, 0, 0.8);
+}
+.date-item.selected .d-month,
+.date-item.selected .d-status {
+  color: #ccc;
+}
+.date-item.disabled {
+  background: #f5f5f5;
+  color: #bbb;
+  pointer-events: none;
+}
+.date-item.disabled .d-status {
+  color: #d9534f;
+}
+
+/* 时段列表 */
+.slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.slot-item {
+  background: #efe6d8;
+  padding: 30rpx;
+  border-radius: 8rpx;
+  display: flex;
+  justify-content: space-between;
+  border: none; /* 去除边框以匹配新背景 */
+  color: #6b5a3e;
+}
+.slot-item.selected {
+  background: rgba(139, 0, 0, 0.8);
+  color: #fff;
+}
+.slot-item.disabled {
+  background: #f5f5f5;
+  color: #bbb;
+  pointer-events: none;
+}
+.s-remain {
+  font-size: 24rpx;
+  color: #6b5a3e;
+  opacity: 0.8;
+}
+.slot-item.selected .s-remain {
+  color: #ddd;
+}
+
+/* 访客 */
+.visitor-box {
+  background: #efe6d8;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  color: #6b5a3e;
+}
+.v-select-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1px solid #eee;
+}
+.v-name {
+  font-weight: bold;
+  font-size: 30rpx;
+  margin-right: 10rpx;
+}
+.v-id {
+  font-size: 24rpx;
+  color: rgba(107, 90, 62, 0.6);
+  display: block;
+  margin-top: 6rpx;
+}
+.v-tag {
+  font-size: 20rpx;
+  background: #d9534f;
+  color: #fff;
+  padding: 2rpx 6rpx;
+  border-radius: 4rpx;
+}
+.error-msg {
+  font-size: 22rpx;
+  color: #d9534f;
+  margin-bottom: 10rpx;
+}
+.disabled-row {
+  opacity: 0.6;
+}
+
+.circle {
+  width: 40rpx;
+  height: 40rpx;
+  border: 1px solid rgba(139, 0, 0, 0.8);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.add-more {
+  text-align: center;
+  font-size: 26rpx;
+  color: rgba(139, 0, 0, 0.8);
+  margin-top: 20rpx;
+  padding: 10rpx;
+  font-weight: bold;
+}
+
+.warning-bar {
+  background: #fffbe6;
+  color: #d48806;
+  font-size: 24rpx;
+  padding: 20rpx;
+  margin-top: 30rpx;
+  border-radius: 8rpx;
+  border: 1px solid #ffe58f;
+}
+
+/* 底部栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120rpx;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+.total-info {
+  flex: 1;
+  font-size: 28rpx;
+}
+.highlight {
+  font-weight: bold;
+  font-size: 34rpx;
+  color: rgba(139, 0, 0, 0.8);
+}
+.btn-submit {
+  background: rgba(139, 0, 0, 0.8);
+  color: #fff;
+  font-size: 30rpx;
+  padding: 0 60rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 8rpx;
+}
+/* pages/reserve/reserve.wxss */
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 20rpx 30rpx;
+  margin: 20rpx;
+  border-radius: 8rpx;
+  border-left: 6rpx solid #dc3545;
+  font-size: 26rpx;
+  line-height: 1.4;
+}

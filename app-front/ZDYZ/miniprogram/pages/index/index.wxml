@@ -1,0 +1,93 @@
+<view class="index-container">
+  <!-- 1. 顶部轮播图 -->
+  <swiper class="banner-swiper" indicator-dots autoplay interval="3000" circular>
+    <swiper-item wx:for="{{bannerList}}" wx:key="index">
+      <image src="{{item}}" class="banner-img" mode="widthFix"/>
+    </swiper-item>
+  </swiper>
+  
+  <!-- 2. 馆内公告滚动条 -->
+  <view class="notice-bar" wx:if="{{noticeList.length > 0}}">
+    <view class="notice-label">馆内公告</view>
+    <swiper class="notice-swiper" vertical autoplay interval="3000" circular>
+      <swiper-item wx:for="{{noticeList}}" wx:key="id" bindtap="goToNoticeDetail" data-id="{{item.id}}">
+        <view class="notice-item">{{item.title}}</view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 2.5 今日开放信息栏 -->
+  <view class="open-info">
+    <text class="open-date">今日{{isOpen ? '开放' : '闭馆'}} {{todayDate}}</text>
+    <text class="open-time" wx:if="{{isOpen}}">开放时间 {{openTime}}</text>
+  </view>
+
+  <!-- 3. 功能按钮区 (1大+2小 + 横向全宽) -->
+  <view class="func-section">
+    <view class="func-grid">
+      <!-- 左侧大卡片 -->
+      <view class="grid-left func-btn red-btn" bindtap="goToReserve">
+        <image class="btn-icon-img" src="/images/reserve.png" mode="widthFix"></image>
+        <text class="btn-text-main">参观预约</text>
+      </view>
+      <!-- 右侧两个小卡片 -->
+      <view class="grid-right">
+        <view class="func-btn yellow-btn small-btn" bindtap="goToActivity">
+          <image class="btn-icon-img" src="/images/activity_3.png" mode="widthFix"></image>
+          <text class="btn-text-sub">活动查看</text>
+        </view>
+        <view class="func-btn blue-btn small-btn" bindtap="goToNotice">
+          <image class="btn-icon-img" src="/images/news-1.png" mode="widthFix"></image>
+          <text class="btn-text-sub">公告查看</text>
+        </view>
+      </view>
+    </view>
+    <!-- 下方横向全宽地图按键 (改为灰色以适配地图图标) -->
+    <view class="map-wide-btn grey-btn" bindtap="goMap">
+      <view class="map-content">
+        <image class="btn-icon-img" src="/images/go-map.png" mode="widthFix"></image>
+        <text class="map-text">查看地图前往</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 4. 博物馆信息卡片 -->
+  <view class="museum-info" wx:if="{{museum}}">
+    <text class="museum-title">{{museum.title}}</text>
+    <view class="info-item" wx:if="{{museum.address}}">
+      <text class="info-icon">📍</text>
+      <text class="info-text">地址：{{museum.address}}</text>
+    </view>
+    <view class="info-item" wx:if="{{museum.openTimeStr}}">
+      <text class="info-icon">⏰</text>
+      <text class="info-text">开放时间：9:00-17:00（全周开放）</text>
+    </view>
+    <view class="info-item">
+      <text class="info-icon">📞</text>
+      <text class="info-text">咨询电话：400-950-1925</text>
+    </view>
+    <text class="museum-desc">
+      {{museum.desc}}
+    </text>
+  </view>
+
+  <!-- 5. 馆内精选活动区域 (图1样式) -->
+  <view class="act-section" wx:if="{{activityList.length > 0}}">
+    <view class="act-header">
+      <view class="act-title">
+        <image class="act-title-icon" src="/images/activity_3.png" mode="aspectFit"></image>
+        <text class="act-title-text">馆内精选活动</text>
+      </view>
+      <text class="act-more" bindtap="goToActivity">全部 ></text>
+    </view>
+    <scroll-view class="act-scroll" scroll-x enable-flex>
+      <view class="act-item" wx:for="{{activityList}}" wx:key="id" bindtap="goToActivityDetail" data-id="{{item.id}}">
+        <!-- 备选方案：由于模拟器限制 HTTP 协议，尝试使用背景图写法 -->
+        <view class="act-img-box" style="background-image: url('{{item.image}}');"></view>
+        <view class="act-name">{{item.title}}</view>
+      </view>
+    </scroll-view>
+  </view>
+  
+  <floating-ai-btn />
+</view>
