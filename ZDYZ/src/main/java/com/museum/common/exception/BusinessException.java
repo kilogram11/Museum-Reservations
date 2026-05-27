@@ -1,6 +1,4 @@
 package com.museum.common.exception;
-//自定义业务异常（如"用户名不存在"）
-
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,12 +23,25 @@ public class BusinessException extends RuntimeException {
         this.code = code;
     }
 
-    // 快捷方法
+    public BusinessException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.code = errorCode.getCode();
+    }
+
+    public BusinessException(ErrorCode errorCode, String detail) {
+        super(detail);
+        this.code = errorCode.getCode();
+    }
+
     public static BusinessException of(String message) {
         return new BusinessException(message);
     }
 
     public static BusinessException of(Integer code, String message) {
         return new BusinessException(code, message);
+    }
+
+    public static BusinessException of(ErrorCode errorCode) {
+        return new BusinessException(errorCode);
     }
 }

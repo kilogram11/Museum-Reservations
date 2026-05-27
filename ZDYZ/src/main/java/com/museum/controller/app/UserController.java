@@ -19,9 +19,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    /**
-     * 手机号登录
-     */
     @PostMapping("/login")
     public Result login(@RequestBody Map<String, String> params) {
         String mobile = params.get("mobile");
@@ -32,27 +29,18 @@ public class UserController {
         return Result.success("登录成功", data);
     }
 
-    /**
-     * 获取用户信息
-     */
     @GetMapping("/info")
     public Result info() {
         User user = userService.getUserInfo();
         return Result.success("获取成功", user);
     }
 
-    /**
-     * 修改用户信息
-     */
     @PostMapping("/update")
     public Result update(@RequestBody User user) {
         userService.updateUserInfo(user);
         return Result.success("修改成功");
     }
 
-    /**
-     * 获取所有可用头像
-     */
     @GetMapping("/heads")
     public Result getHeads() {
         return Result.success("获取成功", userService.getHeadList());
