@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="detail-card {{type === 1 ? 'booking-theme' : 'activity-theme'}}">
+    <view class="header">
+      <view class="title-row">
+        <text class="title">{{title}}</text>
+      </view>
+      <text class="time">{{createTime}}</text>
+    </view>
+    
+    <view class="divider"></view>
+
+    <view class="content">
+      <text user-select="true">{{content}}</text>
+    </view>
+  </view>
+</view>

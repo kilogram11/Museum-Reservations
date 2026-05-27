@@ -1,0 +1,88 @@
+<view class="container">
+  <view class="notice-title">观众预约须知</view>
+  <view class="notice-content">
+    <view class="notice-section">
+      <view class="section-text">为提升服务质量、保护文物安全，本馆实行预约参观制度。请您阅读如下须知，明晰预约流程､参观规则及相关注意事项。祝您参观愉快！</view>
+    </view>
+
+    <view class="notice-section">
+      <view class="section-header">一、开放时间：</view>
+      <view class="section-text">本馆每日<text class="important">9:00-17:00（16:00停止入馆）</text>，全周开放｡观众需求高峰期6月1日至10月31日延长开放至17:30（16:30停止入馆）｡</view>
+    </view>
+
+    <view class="notice-section">
+      <view class="section-header">二、预约规则：</view>
+      <view class="section-text">1.观众须使用有效身份证件完成预约账号实名认证后进行免费预约｡未满14周岁（含）的未成年人，须由成年人代为预约，并与预约人同步核验入馆｡</view>
+      <view class="section-text"><text class="important">2.每个账号每周最多预约1次，每次最多预约3人；同一证件号每月最多预约4次，每天仅可预约1次。</text></view>
+      <view class="section-text">3.预约后退票不计入预约次数。<text class="important">每个证件号累积5次未履约将被限制预约30日</text>｡用户自行注销账号后，该账号30日内将无法再次登录和重新注册｡</view>
+    </view>
+
+    <view class="notice-section">
+      <view class="section-header">三、预约渠道：</view>
+      <view class="section-text">观众可提前<text class="important">7日内</text>在博物馆官微信小程序预约｡预约放票时间为每日<text class="important">00:00</text>，退票截止时间为参观当日24:00｡预约成功后，系统自动发送预约成功消息通知，请妥善保存｡</view>
+    </view>
+
+    <view class="notice-section">
+      <view class="section-header">四、核验方式：</view>
+      <view class="section-text">观众凭<text class="important">本人预约证件原件和预约成功信息</text>，按预约时段从北门观众参观入口有序排队核验入馆，未预约､身份证件信息不符及错过预约时段的观众将无法核验入馆｡60周岁（含）以上老人以及残障人士､现役军人､退役军人､军烈属、消防救援人员，凭本人预约证件原件､预约成功信息和优待证件，在所预约时段内从北门绿色通道核验入馆｡</view>
+    </view>
+
+    <view class="notice-section">
+      <view class="section-header">五、生效日期：</view>
+      <view class="section-text">本预约须知自<text class="important">2025年8月1日起实施</text>｡</view>
+    </view>
+
+    <view class="notice-title sub-title">文明参观须知</view>
+    <view class="notice-section">
+      <view class="section-header">一、入馆</view>
+      <view class="section-text">1．观众入馆须自觉接受安全检查，<text class="important">醉酒者、仪容不整者（包含穿着过于暴露、穿着拖鞋等）谢绝入馆</text>；</view>
+      <view class="section-text">2．未满14周岁（含）的青少年须在成年人陪伴下入馆；</view>
+      <view class="section-text">3．禁止携带入馆物品详见清单，电动代步工具禁止入馆；</view>
+      <view class="section-header">二、观展</view>
+      <view class="section-text">4．馆内禁止追逐打闹、大声喧哗、攀爬躺卧、随意丢弃杂物等不文明行为；</view>
+      <view class="section-text">5．禁止音响外放、长时间占用公共设施及公共空间等影响其他观众观展的行为；</view>
+      <view class="section-text">6．禁止翻越围挡护栏，触摸、污损、毁坏展品等行为；</view>
+      <view class="section-text">7．禁止在标有禁拍标识的区域拍照，未经允许禁止使用闪光灯、自拍杆和支架类摄影器材；</view>
+      <view class="section-text">8. <text class="important">展厅内请勿使用充电宝</text>；</view>
+      <view class="section-header">三、活动</view>
+      <view class="section-text">9．禁止乞讨、卖艺、打小旗、拉横幅，禁止散发、悬挂、粘贴广告等行为；</view>
+      <view class="section-text">10．未经批准，禁止进行讲学、表演、采访、商业性拍摄、自媒体直播等非参观活动；</view>
+      <view class="section-text">11．展厅层级非餐饮区禁止饮食；</view>
+      <view class="section-header">四、安全与责任</view>
+      <view class="section-text">12．馆舍内外全部区域禁止吸烟；</view>
+      <view class="section-text">13．严格遵守电梯、安全规定；14．由于禁止随意挪用、损坏消防器材；</view>
+      <view class="section-text">16．违反本规定的，安全保卫人员有权责令离馆；17．造成损失的，依法追究法律责任。</view>
+    </view>
+
+    <view class="notice-title sub-title">禁限带物品清单</view>
+    <view class="notice-section">
+        <view class="section-text">1. 各类枪支(含主要零部件)及仿真品；</view>
+        <view class="section-text">2. 管制刀具、军警械具及具有一定杀伤力的钝器、锐器；</view>
+        <view class="section-text">3. 各类弹药、易燃易爆物（含打火机、火柴、酒精、喷雾、压缩气体等）；</view>
+        <view class="section-text">4. 各类文物及仿制品、字画等艺术品；</view>
+        <view class="section-text">5. 露营装备（帐篷、吊床、折叠桌、露营车等）及体育用品；</view>
+        <view class="section-text">6. 除老幼病残孕必要使用的代步轮椅、婴儿车以外的其他代步工具；</view>
+        <view class="section-text">7. <text class="important">单一充电宝容量不超过20000毫安时（mAh）</text>。标识不清、破损的充电宝不得携带入馆；</view>
+        <view class="section-text">8. 自热类食品及其他可能危害文物安全与秩序的物品。</view>
+    </view>
+
+    <view class="notice-title sub-title">观众存包须知</view>
+    <view class="notice-section">
+      <view class="section-text">1. 仅限本馆观众使用，行李箱及尺寸大于40厘米的包裹须寄存，提供有偿寄存；</view>
+      <view class="section-text">2. <text class="important">现金、首饰等贵重物品不予寄存</text>，特殊物品需如实登记；</view>
+      <view class="section-text">3. 物品请于当日<text class="important">17:00前取出</text>，逾期将按标准计费，存放超过一周视为丢弃。</view>
+      <view class="section-text">4. 存包收费：30cm以下2元；30-60cm为5元；60cm以上10元。</view>
+    </view>
+
+    <view class="notice-title sub-title">展品拍照须知</view>
+    <view class="notice-section">
+      <view class="section-text">陈列展览欢迎拍照留念，但<text class="important">严禁使用闪光灯、自拍杆和脚架</text>。临时性展览依据办展协议确定，请注意查看现场提示标识。</view>
+    </view>
+  </view>
+
+  <view class="footer-btn">
+    <button class="btn {{countdown > 0 ? 'disabled' : ''}}" bindtap="confirmNotice" disabled="{{countdown > 0}}">
+      {{countdown > 0 ? '我已知晓 (' + countdown + 's)' : '我已知晓'}}
+    </button>
+  </view>
+</view>

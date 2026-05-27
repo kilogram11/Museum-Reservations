@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 文物展示</title>
+    <!-- 引入 model-viewer -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f5f0e8;
+            /* 恢复原来的米色背景 */
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .viewer-container {
+            flex: 1.5;
+            /* 增加模型区域比例，使其更靠中间 */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            --poster-color: transparent;
+        }
+
+        /* 下方文字区域 */
+        .info-panel {
+            flex: 0.8;
+            /* 缩小文字区域，配合模型居中 */
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 20%, rgba(255, 255, 255, 0.95) 100%);
+            padding: 20px 25px;
+            /* 减小内边距 */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 5px;
+        }
+
+        .relic-name {
+            font-size: 30px;
+            font-weight: bold;
+            color: #8B4513;
+            letter-spacing: 2px;
+        }
+
+        .lang-icon {
+            width: 26px;
+            height: 26px;
+            border: 1px solid #8B4513;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            color: #8B4513;
+            opacity: 0.7;
+        }
+
+        .english-name {
+            font-size: 15px;
+            color: #a0522d;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, #8B4513 0%, rgba(139, 69, 19, 0.1) 100%);
+        }
+
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding-right: 5px;
+        }
+
+        /* 美化滚动条 */
+        .content-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: rgba(139, 69, 19, 0.3);
+            border-radius: 2px;
+        }
+
+        .description {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #5d4037;
+            text-align: justify;
+            padding-bottom: 30px;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(232, 176, 66, 0.1);
+            border-top: 2px solid #e8b042;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-text">数字藏品加载中...</div>
+    </div>
+
+    <div class="container">
+        <div class="viewer-container">
+            <model-viewer id="viewer" src="" alt="3D Relic Model" camera-controls auto-rotate shadow-intensity="1"
+                touch-action="pan-y" ar exposure="1.5" environment-image="neutral" camera-orbit="0deg 75deg 105%">
+            </model-viewer>
+        </div>
+
+        <div class="info-panel">
+            <div class="header">
+                <div class="title-row">
+                    <div id="name" class="relic-name">文物名称</div>
+                    <div class="lang-icon">EN</div>
+                </div>
+                <div id="en-name" class="english-name">Cultural Heritage</div>
+                <div class="divider"></div>
+            </div>
+
+            <div class="content-scroll">
+                <div id="desc" class="description">
+                    获取文物介绍中...
+                </div>
+            </div>
+            <div class="divider" style="margin-top: 10px; opacity: 0.2;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 解析 URL 参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelPath = urlParams.get('model');
+
+        // 修复乱码：必须手动解码 URL 参数
+        const getDecodedParam = (key) => {
+            const val = urlParams.get(key);
+            if (!val) return null;
+            try {
+                return decodeURIComponent(val);
+            } catch (e) {
+                return val;
+            }
+        };
+
+        const relicName = getDecodedParam('name') || '未知文物';
+        const relicDesc = getDecodedParam('desc') || '识别结果库中暂无该文物的详细背景资料。';
+
+        const viewer = document.getElementById('viewer');
+        const loading = document.getElementById('loading');
+        const nameEl = document.getElementById('name');
+        const enNameEl = document.getElementById('en-name');
+        const descEl = document.getElementById('desc');
+
+        // 更新内容
+        nameEl.innerText = relicName;
+        descEl.innerText = relicDesc;
+
+        // 简单的中英对照映射
+        const enMap = {
+            '剑齿虎': 'Machairodus (Saber-toothed Tiger)',
+            '马踏飞燕': 'Galloping Horse Treading on a Flying Swallow',
+            '司母戊鼎': 'Simuwu Rectangular Ding',
+            '越王勾践剑': 'Sword of Goujian',
+            '金缕玉衣': 'Jade Burial Suit with Gold Wire'
+        };
+        enNameEl.innerText = enMap[relicName] || 'Ancient Cultural Relic';
+
+        if (modelPath) {
+            viewer.src = modelPath;
+        } else {
+            document.getElementById('loading-text').innerText = '参数缺失，无法展示模型';
+        }
+
+        // 监听加载事件
+        viewer.addEventListener('load', () => {
+            console.log('Model loaded');
+            loading.style.opacity = '0';
+            setTimeout(() => {
+                loading.style.display = 'none';
+            }, 500);
+        });
+
+        viewer.addEventListener('error', (e) => {
+            console.error('Loader error:', e);
+            document.getElementById('loading-text').innerText = '模型资源加载失败';
+        });
+    </script>
+</body>
+
+</html>

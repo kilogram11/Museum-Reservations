@@ -1,0 +1,69 @@
+<view class="container">
+  <view class="header">
+    <text class="title">博物馆预约小程序 常见问题 Q&A</text>
+  </view>
+
+  <view class="content">
+    <view class="section">
+      <view class="h2">一、 预约与门票</view>
+      
+      <view class="qa-item">
+        <view class="q">Q：我需要提前多久预约？</view>
+        <view class="a">A：为了保证您的参观体验，我们建议您至少提前 1-7天 进行预约。系统每天 0:00 开放未来 7 天的预约名额。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：可以帮家人或朋友代预约吗？</view>
+        <view class="a">A：可以。在预约页面点击“预约人登记”，输入参观者的真实姓名和身份证号即可。每个账号每天最多可预约 3 人。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：预约成功后行程有变，如何取消？</view>
+        <view class="a">A：请进入小程序“我的-待使用”中找到对应订单点击“取消预约”。请至少在参观当日前取消，无故爽约累计 5 次将被纳入黑名单，一个月内无法再次预约。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：老年人或儿童没有手机怎么预约？</view>
+        <view class="a">A：可由亲友代为预约。同时，我们也为 60岁以上老人 提供现场人工登记通道，请携带身份证原件前往服务台办理。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="h2">二、 入馆与核验</view>
+      
+      <view class="qa-item">
+        <view class="q">Q：入馆需要携带什么证件？</view>
+        <view class="a">A：本馆实行实名制核验入馆。请务必携带预约时使用的身份证原件（或电子身份证），在闸机处刷证入馆。使用护照/港澳台通行证预约的观众，请走人工通道。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：错过了预约时间段还能进去吗？</view>
+        <view class="a">A：请您严格按照预约时间段入馆。迟到超过将无法检票入馆，此时您需要取消原订单（如未过取消时限）并重新预约其他时间段。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：截屏的二维码可以入馆吗？</view>
+        <view class="a">A：为了安全起见，我们不支持截屏二维码核验。建议您现场打开小程序出示动态二维码，或直接刷二代身份证入馆。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="h2">三、 参观服务与设施</view>
+      
+      <view class="qa-item">
+        <view class="q">Q：馆内有存包处吗？</view>
+        <view class="a">A：有的。我们在 正门入口左侧 设有免费寄存柜。大件行李（尺寸超过 150 cm）严禁带入展厅，必须寄存。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：可以带宠物入馆吗？</view>
+        <view class="a">A：除导盲犬外，其他宠物均禁止入馆。</view>
+      </view>
+
+      <view class="qa-item">
+        <view class="q">Q：馆内允许拍照吗？</view>
+        <view class="a">A：大部分展厅允许拍照，但严禁使用闪光灯、三脚架和自拍杆，以免对文物造成损害或影响他人参观。特殊特展如有禁止拍照规定，请留意现场标识。</view>
+      </view>
+    </view>
+  </view>
+</view>

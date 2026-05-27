@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.HeadMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Head">
+        <id column="_id" property="id" />
+        <result column="HEAD_PIC_ID" property="headPicId" />
+        <result column="HEAD_PIC_URL" property="headPicUrl" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+    <!-- Insert -->
+    <insert id="insert" parameterType="com.museum.entity.Head">
+        INSERT INTO head (
+            _id, HEAD_PIC_ID, HEAD_PIC_URL, _pid
+        ) VALUES (
+            #{id}, #{headPicId}, #{headPicUrl}, #{pid}
+        )
+    </insert>
+
+    <!-- Select by ID -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM head WHERE _id = #{id}
+    </select>
+
+    <!-- Update by ID -->
+    <update id="updateById" parameterType="com.museum.entity.Head">
+        UPDATE head SET
+            HEAD_PIC_ID = #{headPicId},
+            HEAD_PIC_URL = #{headPicUrl},
+            _pid = #{pid}
+        WHERE _id = #{id}
+    </update>
+
+    <!-- Delete by ID -->
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM head WHERE _id = #{id}
+    </delete>
+</mapper>

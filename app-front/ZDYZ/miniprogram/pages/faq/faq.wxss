@@ -1,0 +1,52 @@
+page {
+  background-color: #f9f5ec;
+  color: #333;
+}
+.container {
+  padding: 40rpx;
+}
+.header {
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #8b0000;
+}
+.section {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(139, 69, 19, 0.05);
+}
+.h2 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #6b5a3e;
+  margin-bottom: 30rpx;
+  border-bottom: 2rpx dashed #eee;
+  padding-bottom: 20rpx;
+}
+.qa-item {
+  margin-bottom: 30rpx;
+}
+.qa-item:last-child {
+  margin-bottom: 0;
+}
+.q {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #8b0000;
+  margin-bottom: 10rpx;
+  display: flex;
+}
+.a {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  text-align: justify;
+  padding-left: 20rpx;
+  border-left: 4rpx solid #e0d6c6;
+}

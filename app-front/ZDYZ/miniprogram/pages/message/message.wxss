@@ -1,0 +1,100 @@
+page {
+  background-color: #f9f5ec;
+  padding-bottom: 40rpx;
+}
+
+.container {
+  padding: 30rpx;
+}
+
+/* === 消息卡片 (复用 Order Record 风格) === */
+.msg-card {
+  background: #efe6d8;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+}
+
+/* 左侧装饰条 */
+.left-bar {
+  width: 12rpx;
+  background: #ccc; /* fallback */
+  flex-shrink: 0;
+}
+
+/* 主题色区分 */
+.booking-theme .left-bar {
+  background: rgba(74, 107, 109, 0.8); /* 青绿色 - 预约 */
+}
+.activity-theme .left-bar {
+  background: rgba(139, 0, 0, 0.6); /* 宫廷红 - 活动 */
+}
+
+.card-content {
+  flex: 1;
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #6b5a3e;
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+/* 状态标签 */
+.status-tag {
+  padding: 4rpx 16rpx;
+  border-radius: 30rpx;
+  font-size: 22rpx;
+  flex-shrink: 0;
+}
+.tag-unread {
+  background: #ff4d4f;
+  color: #fff;
+}
+.tag-read {
+  background: #e8eaed;
+  color: #999;
+}
+
+/* 消息内容 */
+.msg-body {
+  font-size: 28rpx;
+  color: #6b5a3e;
+  opacity: 0.9;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+  text-align: justify;
+}
+
+/* 底部时间 */
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  margin-top: 100rpx;
+  font-size: 28rpx;
+}

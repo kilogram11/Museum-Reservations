@@ -1,0 +1,28 @@
+b063664,2026-01-13 14:23:22 +0800,wanpeiyao,Merge remote-tracking branch 'origin/appFront' into appFront
+1166f3d,2026-01-13 14:23:11 +0800,wanpeiyao,修复小程序端定位不准问题
+c512db3,2026-01-13 14:07:34 +0800,yangjinyi,小程序端跳转逻辑优化、界面美化
+4965fda,2026-01-13 00:13:13 +0800,yangjinyi,3D文物查看界面美化
+04f4b49,2026-01-12 16:37:31 +0800,yangjinyi,Merge branch 'appFront' of http://118.195.226.124:9000/23-ruangong-tuandui/ZDYZ into appFront
+f57037c,2026-01-12 16:37:22 +0800,yangjinyi,优化了首页布局
+a9c9015,2026-01-12 16:20:47 +0800,wanpeiyao,美化二维码界面，新增超链接，可跳转地图功能
+4db0fea,2026-01-12 16:04:48 +0800,wanpeiyao,美化个人界面，新增隐私条款和常见问题
+61be159,2026-01-12 11:49:24 +0800,liudongjian,feat: 小程序端新增场馆地图页面与定位跳转
+6f76105,2026-01-11 23:02:42 +0800,liudongjian,修复/修改小程序app.json和首页index相关文件
+a99d484,2026-01-09 16:33:04 +0800,wanpeiyao,Merge remote-tracking branch 'origin/appFront' into appFront
+d5d72e5,2026-01-09 16:32:53 +0800,wanpeiyao,新增消息模块
+d2dfb54,2026-01-09 16:31:35 +0800,chenfei,Merge branch 'appFront' of http://118.195.226.124:9000/23-ruangong-tuandui/ZDYZ into appFront
+b961883,2026-01-09 16:30:58 +0800,chenfei,美化活动界面
+6e03f95,2026-01-09 13:50:39 +0800,yangjinyi,“马踏飞燕”实现3D查看
+cbfebf7,2026-01-09 11:45:29 +0800,wanpeiyao,新增ai对话模块
+73418f8,2026-01-08 11:11:08 +0800,yangjinyi,将首页联系电话改成固定格式
+1e472ac,2026-01-08 09:39:24 +0800,yangjinyi,修改添加预约界面用户提示消失问题
+6c161e9,2026-01-07 16:48:56 +0800,wanpeiyao,更改新增预约人姓名显示错误
+74fd55e,2026-01-07 15:50:45 +0800,wanpeiyao,美化界面
+ee3ff82,2026-01-07 15:43:08 +0800,wanpeiyao,美化界面
+6.39E+43,2026-01-07 14:40:09 +0800,wanpeiyao,美化界面
+82d6e04,2026-01-07 14:39:42 +0800,yangjinyi,新增拍照识别文物
+aebabed,2026-01-07 11:39:34 +0800,wanpeiyao,美化界面
+6ad4e3b,2026-01-07 11:00:01 +0800,yangjinyi,新增预约须知界面
+0556b25,2026-01-07 10:47:01 +0800,wanpeiyao,修复活动显示问题
+57d662c,2026-01-07 10:30:36 +0800,wanpeiyao,修复上传图片问题
+64b54da,2026-01-06 15:28:03 +0800,yangjinyi,feat: 博物馆预约系统前端初始提交

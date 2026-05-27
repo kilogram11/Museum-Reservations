@@ -1,0 +1,78 @@
+a34fa4f,2026-01-13 14:22:23 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+8cf197f,2026-01-13 14:22:13 +0800,wanpeiyao,修复管理端插入地图
+7200302,2026-01-13 14:19:48 +0800,yangjinyi,修复小程序端无法查看地图问题
+ef8e74f,2026-01-13 14:06:46 +0800,yangjinyi,3D文物查看界面美化
+1922ff9,2026-01-13 13:58:37 +0800,wanpeiyao,修复管理端插入地图
+7c3b4d1,2026-01-13 00:12:41 +0800,yangjinyi,3D文物查看界面美化
+80ff3fc,2026-01-13 00:03:01 +0800,wu.jiayue,管理端个人信息界面
+94033f4,2026-01-12 14:30:33 +0800,yangjinyi,地图查看功能新增数据库
+dceaf92,2026-01-12 13:53:02 +0800,yangjinyi,地图查看功能新增数据库
+36c7eea,2026-01-12 11:44:08 +0800,liudongjian,Merge remote-tracking branch 'origin/master'
+c805edd,2026-01-12 11:43:22 +0800,liudongjian,地图功能后端修改
+b74bb57,2026-01-09 17:14:08 +0800,chenfei,Merge branch 'master' of http://118.195.226.124:9000/23-ruangong-tuandui/ZDYZ
+13fe739,2026-01-09 17:13:39 +0800,chenfei,更新数据库配置，修改 MySQL 密码为新密码
+b55b318,2026-01-09 17:07:00 +0800,wanpeiyao,管理员端消息模块
+314f9f8,2026-01-09 17:02:52 +0800,chenfei,解决合并冲突，保留本地数据库密码配置
+c94c340,2026-01-09 17:02:17 +0800,chenfei,修改数据库密码配置
+5286ef4,2026-01-09 16:55:55 +0800,wanpeiyao,修复消息模版初始化数据库问题
+19d166f,2026-01-09 16:54:34 +0800,wanpeiyao,修复消息模版初始化数据库问题
+7c11824,2026-01-09 16:31:41 +0800,wanpeiyao,新增消息模块
+f983293,2026-01-09 15:01:41 +0800,lijiahui,Merge remote-tracking branch 'origin/master'
+f64432d,2026-01-09 14:59:57 +0800,lijiahui,导出功能实现
+1.77E+17,2026-01-09 13:49:57 +0800,yangjinyi,“马踏飞燕”文物实现3D查看
+fc5d247,2026-01-09 11:44:19 +0800,wanpeiyao,新增ai对话模块
+9468589,2026-01-08 23:50:23 +0800,yangjinyi,修复了预约界面时间段乱序、小程序端用户预约记录时间显示为 null等问题：1.在获取预约时间段接口中增加了内存排序逻辑；2.在 JoinMapper 中新增了 selectUserJoinList 方法，专门用于获取用户预约列表。该方法使用 LEFT JOIN time 表，确保能正确拉取到 TIME_START 和 TIME_END，解决了页面显示 "null-null" 的问题。
+0dc5895,2026-01-08 22:10:58 +0800,yangjinyi,修复了预约核销界面预约日期时段无法正常显示问题
+c01db69,2026-01-08 14:26:18 +0800,wanpeiyao,新增博物馆唯一展示
+e22e1d4,2026-01-08 13:52:01 +0800,yangjinyi,修复了预约日期获取逻辑错误问题。
+f4723fd,2026-01-08 11:13:02 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+e1b828b,2026-01-08 11:12:49 +0800,wanpeiyao,删除了冗余数据库字段
+576c99b,2026-01-08 10:05:05 +0800,yangjinyi,新增管理员注册功能，注册密钥是e7g6s679Ty67N9fTh98
+3e13863,2026-01-07 16:24:31 +0800,wanpeiyao,首页图表优化
+712096b,2026-01-07 16:08:57 +0800,yangjinyi,新增管理员端首页图表展示功能
+534f6de,2026-01-07 14:37:11 +0800,yangjinyi,实现拍照识别文物功能
+9d49821,2026-01-07 10:29:27 +0800,wanpeiyao,修复前后端联调问题
+a77416b,2026-01-06 23:47:08 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+e2a950b,2026-01-06 23:46:52 +0800,wanpeiyao,修复前后端联调问题
+e9585af,2026-01-06 16:24:45 +0800,yangjinyi,用户小程序端前后端链接成功
+e5d50db,2026-01-06 15:10:02 +0800,yangjinyi,Merge remote-tracking branch 'origin/master'
+029491e,2026-01-06 15:09:37 +0800,yangjinyi,用户小程序端前后端链接成功
+254ea49,2026-01-06 10:21:36 +0800,wanpeiyao,修复接口文档板块描述问题
+0af31ed,2026-01-06 09:57:43 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+f3c4da7,2026-01-06 09:57:29 +0800,wanpeiyao,修复接口文档newsedit板块描述问题
+85c5a3d,2026-01-05 14:27:40 +0800,yangjinyi,更新了API接口文档
+aa88f85,2026-01-04 16:30:03 +0800,wanpeiyao,完成了redis并发处理
+7600bb0,2026-01-03 17:32:20 +0800,wanpeiyao,修改API接口文档
+e758bd2,2026-01-01 16:52:33 +0800,wanpeiyao,新增黑名单模块，包括自动逾期，自动拉黑，手动拉黑
+75ec205,2025-12-31 21:24:15 +0800,wanpeiyao,修复登录返回json，新增注册管理员、场馆和活动的修改。
+a239a2e,2025-12-31 16:39:44 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+e64b315,2025-12-31 16:39:30 +0800,wanpeiyao,新增核销板块
+ba9c3ca,2025-12-31 16:38:48 +0800,yangjinyi,基本功能完成
+e2763cd,2025-12-31 15:44:46 +0800,yangjinyi,Merge remote-tracking branch 'origin/master'
+2cbfad6,2025-12-31 15:44:35 +0800,yangjinyi,新增预约模块
+fddaa8f,2025-12-31 15:06:57 +0800,wanpeiyao,新增news修改公告板块
+e9a5f0b,2025-12-31 14:58:33 +0800,wanpeiyao,新增news板块
+bb18041,2025-12-31 14:11:27 +0800,yangjinyi,Merge remote-tracking branch 'origin/master'
+20c9716,2025-12-31 14:10:06 +0800,yangjinyi,提交增删改预约人功能
+e41b01c,2025-12-31 12:05:58 +0800,yangjinyi,合并
+d34e0a1,2025-12-31 12:03:28 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+009a90e,2025-12-31 12:03:19 +0800,wanpeiyao,新增activityDTO
+4818998,2025-12-31 12:00:41 +0800,yangjinyi,Merge remote-tracking branch 'origin/master'
+1a5465c,2025-12-31 12:00:24 +0800,yangjinyi,完成了用户登录注册与修改信息功能
+232d821,2025-12-31 11:43:38 +0800,wanpeiyao,做好了新增活动和博物馆，活动临时保存以及再次上架的逻辑
+9ea2298,2025-12-31 00:02:39 +0800,wanpeiyao,新增博物馆
+6b398ad,2025-12-30 22:57:14 +0800,wanpeiyao,实现了首页查询
+79356f9,2025-12-30 20:56:39 +0800,wanpeiyao,修复依赖问题
+5c2b24a,2025-12-30 16:40:07 +0800,wanpeiyao,修复问题
+806e1e0,2025-12-30 16:32:14 +0800,wanpeiyao,修复问题
+9f9cc8d,2025-12-30 15:13:47 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+c2cfd24,2025-12-30 15:10:12 +0800,yangjinyi,Merge remote-tracking branch 'origin/master'
+b5d8681,2025-12-30 15:02:08 +0800,yangjinyi,统一了返回数据格式
+eeb748d,2025-12-30 15:01:41 +0800,wanpeiyao,编写实体类
+3f6fc5a,2025-12-30 14:53:40 +0800,yangjinyi,编写了用户登录逻辑
+95f5f38,2025-12-30 14:52:52 +0800,wanpeiyao,编写部分公共类
+8d972a8,2025-12-30 14:40:09 +0800,wanpeiyao,修复了覆盖失误
+0ff0a30,2025-12-30 14:22:00 +0800,wanpeiyao,Merge remote-tracking branch 'origin/master'
+9.95E+126,2025-12-30 14:21:04 +0800,wanpeiyao,创建了基础JAVA文件
+fb56b59,2025-12-30 14:10:35 +0800,yangjinyi,v1.1.1
+d99ee6c,2025-12-30 10:46:23 +0800,yangjinyi,架构设计

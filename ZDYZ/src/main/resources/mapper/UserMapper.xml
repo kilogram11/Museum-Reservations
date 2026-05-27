@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.UserMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.User">
+        <id column="_id" property="id" />
+        <result column="USER_ID" property="userId" />
+        <result column="USER_MINI_OPENID" property="userMiniOpenid" />
+        <result column="USER_NAME" property="userName" />
+        <result column="USER_MOBILE" property="userMobile" />
+        <result column="USER_PIC" property="userPic" />
+        <result column="USER_ADD_TIME" property="userAddTime" />
+        <result column="USER_EDIT_TIME" property="userEditTime" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+    <!-- 
+      移除手动实现的 insert, selectById, updateById, deleteById
+      因为 UserMapper 继承了 BaseMapper，MyBatis-Plus 会自动注入这些方法的实现。
+      手动在 XML实现会导致参数绑定异常 (BindingException: Parameter 'userId' not found)，
+      因为 BaseMapper 传递的参数通常被包裹在 "et" (entity) Map 中，而手动 XML 往往直接引用属性。
+    -->
+
+    <update id="updateUserInfo">
+        UPDATE user
+        <set>
+            <if test="userName != null">USER_NAME = #{userName},</if>
+            <if test="userPic != null">USER_PIC = #{userPic},</if>
+            <if test="userEditTime != null">USER_EDIT_TIME = #{userEditTime},</if>
+        </set>
+        WHERE _id = #{id}
+    </update>
+</mapper>

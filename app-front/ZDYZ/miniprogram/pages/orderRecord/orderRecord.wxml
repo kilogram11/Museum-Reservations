@@ -1,0 +1,67 @@
+<view class="container">
+  <!-- 顶部标签栏 -->
+  <view class="tabs">
+    <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{0}}">全部</view>
+    <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{1}}">待使用</view>
+    <view class="tab-item {{currentTab === 2 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{2}}">已核销</view>
+    <view class="tab-item {{currentTab === 3 ? 'active' : ''}}" bindtap="onTabChange" data-index="{{3}}">退款/售后</view>
+  </view>
+
+  <view wx:if="{{orderList.length === 0 && !loading}}" class="empty-state">
+    <text>暂无预约记录</text>
+  </view>
+
+  <block wx:for="{{orderList}}" wx:key="id">
+    <view class="order-card {{item.isCheckIn === 3 || item.status === 2 ? 'gray-theme' : 'blue-theme'}}">
+      <view class="left-bar"></view>
+      
+      <view class="card-content">
+        <view class="card-header">
+          <text class="user-name">{{item.identityName}}</text>
+          
+          <view class="status-tag">
+            {{item.isCheckIn === 1 ? '已核销' : (item.isCheckIn === 3 ? '已逾期' : (item.status === 2 ? '已取消' : '待核销'))}}
+          </view>
+        </view>
+
+        <view class="info-row">{{item.meetDay}}</view>
+        <view class="info-row">{{item.meetTimeStart}}-{{item.meetTimeEnd}}</view>
+
+        <view class="action-buttons" wx:if="{{item.status === 1 && item.isCheckIn === 0}}">
+          <button class="btn-qr" bindtap="showQR" data-id="{{item.joinId}}">显示预约二维码</button>
+          <button class="btn-cancel" bindtap="onCancel" data-id="{{item.joinId}}" data-name="{{item.identityName}}">取消预约</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="modal-mask" wx:if="{{showQRModal}}" bindtap="closeModals">
+    <view class="modal-box order-card" catchtap="stopProp">
+      <view class="left-bar"></view>
+      <view class="card-content">
+        <view class="modal-header">
+          <text class="modal-title">预约二维码</text>
+          <text class="close-btn" bindtap="closeModals">×</text>
+        </view>
+        
+        <view class="qr-info">
+          <view class="qr-name">{{currentOrder.identityName}}</view>
+          <view class="qr-time">{{currentOrder.meetDay}} {{currentOrder.meetTimeStart}}-{{currentOrder.meetTimeEnd}}</view>
+        </view>
+
+        <view class="qr-img-box">
+          <!-- “到这去” 链接 -->
+          <view class="location-link" bindtap="goToLocation">
+             <text>到这去</text>
+             <view class="link-underline"></view>
+          </view>
+          
+          <image src="{{currentOrder.joinQr}}" mode="widthFix" class="qr-img" wx:if="{{currentOrder.joinQr}}"></image>
+          <view class="qr-placeholder" wx:else>二维码加载中...</view>
+        </view>
+
+        <view class="qr-tip">请在入场时出示此二维码</view>
+      </view>
+    </view>
+  </view>
+</view>

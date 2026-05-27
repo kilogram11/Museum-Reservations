@@ -1,0 +1,49 @@
+page {
+  background-color: #f9f5ec;
+  padding: 30rpx;
+}
+
+.detail-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.booking-theme {
+  border-top: 8rpx solid rgba(74, 107, 109, 0.8);
+}
+
+.activity-theme {
+  border-top: 8rpx solid rgba(139, 0, 0, 0.6);
+}
+
+.header {
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.time {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.divider {
+  height: 1px;
+  background: #eee;
+  margin: 30rpx 0;
+}
+
+.content {
+  font-size: 30rpx;
+  color: #555;
+  line-height: 1.8;
+  text-align: justify;
+}

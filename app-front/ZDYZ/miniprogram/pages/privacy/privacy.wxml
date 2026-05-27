@@ -1,0 +1,56 @@
+<view class="container">
+  <view class="header">
+    <text class="title">隐私说明</text>
+    <text class="date">更新日期：2026年1月1日 生效日期：2026年1月1日</text>
+  </view>
+
+  <view class="content">
+    <view class="p">欢迎您使用 博物馆预约小程序（以下简称“本小程序”）。本小程序由 自定义科技公司（以下简称“我们”）开发并运营。我们非常重视您的个人信息保护。</view>
+    <view class="p">本指引将帮助您了解我们如何收集、使用和存储您的个人信息。</view>
+
+    <view class="section">
+      <view class="h2">1. 我们收集哪些信息</view>
+      <view class="p">为了向您提供博物馆预约及相关服务，我们需要收集以下信息：</view>
+      
+      <view class="h3">1.1 基础用户信息</view>
+      <view class="p">为了进行账号登录和身份识别，我们会收集您的微信昵称、头像。</view>
+
+      <view class="h3">1.2 预约与实名认证信息</view>
+      <view class="p">根据相关法规及场馆安全管理要求，在您使用“门票预约”或“活动报名”功能时，我们需要收集您的真实姓名、手机号码、身份证件号码。这些信息仅用于核验身份及入馆闸机验证，不会用于其他用途。</view>
+
+      <view class="h3">1.3 位置信息</view>
+      <view class="p">当您使用“场馆导航”、“周边服务”或“地图选点”功能时，我们需要申请获取您的地理位置权限。我们会使用第三方地图服务（如百度地图/腾讯地图）来展示位置，该权限仅在您使用相关功能时调用，您可以在系统设置中随时关闭。</view>
+    </view>
+
+    <view class="section">
+      <view class="h2">2. 信息的存储与保护</view>
+      <view class="p"><text class="strong">存储地点：</text> 我们依照法律规定，将您的个人信息存储于中华人民共和国境内。</view>
+      <view class="p"><text class="strong">存储期限：</text> 我们仅在提供服务所必需的期限内保留您的个人信息。预约结束后，除法律法规另有规定外，我们会对敏感信息进行脱敏或删除处理。</view>
+    </view>
+
+    <view class="section">
+      <view class="h2">3. 第三方SDK使用说明</view>
+      <view class="p">为了实现相关功能，我们需要接入第三方服务。第三方收集和处理信息如下：</view>
+      <view class="p"><text class="strong">第三方名称：</text> 百度地图</view>
+      <view class="p"><text class="strong">使用目的：</text> 用于提供场馆定位及路线规划服务。</view>
+      <view class="p"><text class="strong">收集数据类型：</text> 设备信息、位置信息、网络状态。</view>
+      <view class="br"></view>
+      <view class="p"><text class="strong">第三方名称：</text> 微信支付</view>
+      <view class="p"><text class="strong">使用目的：</text> 用于门票或商品支付。</view>
+      <view class="p"><text class="strong">收集数据类型：</text> 订单信息、支付状态。</view>
+    </view>
+
+    <view class="section">
+      <view class="h2">4. 您的权利</view>
+      <view class="p"><text class="strong">查阅与更正：</text> 您可以在“我的-个人中心”中查阅或修改您的预约联系人信息。</view>
+      <view class="p"><text class="strong">删除与撤回：</text> 您可以联系客服申请删除您的历史预约记录，或在微信设置页面的“授权管理”中撤回对本小程序的授权。</view>
+    </view>
+
+    <view class="section">
+      <view class="h2">5. 联系我们</view>
+      <view class="p">如您对本隐私政策有任何疑问，可通过以下方式联系我们：</view>
+      <view class="p">联系邮箱：2114546746@hfut.com</view>
+      <view class="p">联系电话：400-560-452</view>
+    </view>
+  </view>
+</view>

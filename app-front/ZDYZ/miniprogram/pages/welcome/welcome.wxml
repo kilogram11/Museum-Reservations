@@ -1,0 +1,13 @@
+<view class="welcome-container">
+  <view class="title-area">
+    <text class="title-level1">博物馆预约系统</text>
+    <text class="sub-title">探索千年文化 · 感悟历史变革</text>
+  </view>
+
+  <!-- 登录按钮（点击跳转到登录页） -->
+  <view class="btn-red" bindtap="goToLogin">
+    登录
+  </view>
+
+  <text class="version">版本 2.4.12 · 2025</text>
+</view>

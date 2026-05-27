@@ -1,0 +1,353 @@
+数据库生成代码
+USE museum_book;
+
+-- ==========================================
+-- 1. 管理员表 (admin)
+-- ==========================================
+DROP TABLE IF EXISTS `admin`;
+CREATE TABLE `admin` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `ADMIN_NAME` VARCHAR(50) DEFAULT NULL COMMENT '管理员用户名',
+  `ADMIN_PASSWORD` VARCHAR(255) DEFAULT NULL COMMENT '加密后的密码 hash + salt',
+  `ADMIN_ID` VARCHAR(64) DEFAULT NULL COMMENT '业务主键 ID，用于日志记录',
+  `ADMIN_TOKEN` VARCHAR(255) DEFAULT NULL COMMENT '登录令牌',
+  `ADMIN_TOKEN_TIME` BIGINT DEFAULT NULL COMMENT '令牌生成时间戳',
+  `ADMIN_ADD_TIME` BIGINT DEFAULT NULL COMMENT '创建时间戳',
+  `ADMIN_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员表';
+
+-- ==========================================
+-- 2. 预约项目/博物馆表 (museum)
+-- ==========================================
+DROP TABLE IF EXISTS `museum`;
+CREATE TABLE `museum` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `MUSEUM_ID` VARCHAR(64) DEFAULT NULL COMMENT '预约项目业务 ID',
+  `MUSEUM_TITLE` VARCHAR(255) DEFAULT NULL COMMENT '博物馆标题',
+  `ADMIN_ID` VARCHAR(64) DEFAULT NULL COMMENT '创建管理员 ID（外键）',
+  `MUSEUM_OBJ` TEXT COMMENT '详情对象 (包含 desc, cover, content 等 JSON)',
+  `MUSEUM_FORMS` TEXT COMMENT '项目本身的表单配置 (JSON Array)',
+  `MUSEUM_PIC` TEXT COMMENT '封面图片列表 (JSON Array)',
+  `MUSEUM_MAX_JOIN_CNT` INT DEFAULT NULL COMMENT '最大预约人数/次数限制',
+  `MUSEUM_BOOK_SET` INT DEFAULT NULL COMMENT '可提前x天预约',
+  `MUSEUM_STATUS` TINYINT DEFAULT 1 COMMENT '状态 (1: 启用)',
+  `MUSEUM_ADD_TIME` BIGINT DEFAULT NULL COMMENT '创建时间戳',
+  `MUSEUM_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约项目表';
+
+-- ==========================================
+-- 3. 项目/活动表 (activity)
+-- ==========================================
+DROP TABLE IF EXISTS `activity`;
+CREATE TABLE `activity` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `ACTIVITY_ID` VARCHAR(64) DEFAULT NULL COMMENT '活动业务 ID',
+  `ACTIVITY_TITLE` VARCHAR(255) DEFAULT NULL COMMENT '活动标题',
+  `ADMIN_ID` VARCHAR(64) DEFAULT NULL COMMENT '创建管理员 ID（外键）',
+  `ACTIVITY_OBJ` TEXT COMMENT '详情对象 (JSON)',
+  `ACTIVITY_FORMS` TEXT COMMENT '项目本身的表单配置 (JSON Array)',
+  `ACTIVITY_PIC` TEXT COMMENT '封面图片列表 (JSON Array)',
+  `ACTIVITY_STATUS` TINYINT DEFAULT 1 COMMENT '状态 (1: 启用)',
+  `ACTIVITY_ADD_TIME` BIGINT DEFAULT NULL COMMENT '创建时间戳',
+  `ACTIVITY_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  `ACTIVITY_ADD_IP` VARCHAR(64) DEFAULT NULL COMMENT '创建 IP',
+  `ACTIVITY_EDIT_IP` VARCHAR(64) DEFAULT NULL COMMENT '修改 IP',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='活动表';
+
+-- ==========================================
+-- 4. 账号用户表 (user)
+-- ==========================================
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `USER_ID` VARCHAR(64) DEFAULT NULL COMMENT '用户业务 ID',
+  `USER_MINI_OPENID` VARCHAR(128) DEFAULT NULL COMMENT '小程序 OpenID',
+  `USER_NAME` VARCHAR(100) DEFAULT NULL COMMENT '用户昵称/姓名',
+  `USER_MOBILE` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+  `USER_SEX` VARCHAR(10) DEFAULT NULL COMMENT '性别',
+  `USER_PIC` INT DEFAULT NULL COMMENT '头像',
+  `USER_OBJ` TEXT COMMENT '扩展信息对象 (JSON)',
+  `USER_ADD_TIME` BIGINT DEFAULT NULL COMMENT '注册时间戳',
+  `USER_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  `USER_ADD_IP` VARCHAR(64) DEFAULT NULL COMMENT '注册 IP',
+  `USER_EDIT_IP` VARCHAR(64) DEFAULT NULL COMMENT '修改 IP',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='账号用户表';
+
+-- ==========================================
+-- 5. 身份用户/预约人员表 (identity)
+-- ==========================================
+DROP TABLE IF EXISTS `identity`;
+CREATE TABLE `identity` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `IDENTITY_ID` VARCHAR(64) DEFAULT NULL COMMENT '身份用户 ID',
+  `USER_ID` TEXT COMMENT '拥有这个身份信息的账户ID数组 (JSON Array)',
+  `IDENTITY_NAME` VARCHAR(50) DEFAULT NULL COMMENT '姓名',
+  `IDENTITY_CARD` VARCHAR(30) DEFAULT NULL COMMENT '身份证',
+  `IDENTITY_MOBILE` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+  `IDENTITY_OBJ` TEXT COMMENT '扩展信息 (JSON)',
+  `IDENTITY_STATUS` TINYINT DEFAULT 1 COMMENT '状态 (1: 正常，0：黑名单)',
+  `BLACK_START_TIME` BIGINT DEFAULT NULL COMMENT '拉黑开始时间戳',
+  `BLACK_END_TIME` BIGINT DEFAULT NULL COMMENT '拉黑结束时间戳',
+  `USER_BAN_NUM` INT DEFAULT 0 COMMENT '用户违约次数',
+  `USER_CHECK_TYPE` TINYINT DEFAULT 1 COMMENT '1：自动，0：手动拉黑',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`),
+  UNIQUE KEY `idx_identity_card` (`IDENTITY_CARD`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='身份用户表';
+
+-- ==========================================
+-- 6. 每日排期查询表 (day)
+-- ==========================================
+DROP TABLE IF EXISTS `day`;
+CREATE TABLE `day` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `DAY_ID` VARCHAR(64) DEFAULT NULL COMMENT '主键',
+  `DAY` VARCHAR(20) DEFAULT NULL COMMENT '日期（YYYY-MM-DD）',
+  `MUSEUM_ID` VARCHAR(64) DEFAULT NULL COMMENT '场馆 ID（外键）',
+  `ACTIVITY_ID` VARCHAR(64) DEFAULT NULL COMMENT '活动 ID（外键）',
+  `STATUS` TINYINT DEFAULT 1 COMMENT '1=可预约，0=闭馆',
+  `DAY_LIMIT_CNT` INT DEFAULT NULL COMMENT '当天总预约上限',
+  `ADD_TIME` BIGINT DEFAULT NULL COMMENT '创建时间戳',
+  `EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`),
+  INDEX `idx_day_museum_date` (`MUSEUM_ID`, `DAY`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='每日排期表';
+
+-- ==========================================
+-- 7. 每日排期时间段表 (time)
+-- ==========================================
+DROP TABLE IF EXISTS `time`;
+CREATE TABLE `time` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `TIME_ID` VARCHAR(64) DEFAULT NULL COMMENT '主键',
+  `DAY_ID` VARCHAR(64) DEFAULT NULL COMMENT '关联 day（外键）',
+  `MUSEUM_ID` VARCHAR(64) DEFAULT NULL COMMENT '场馆 ID（外键）',
+  `ACTIVITY_ID` VARCHAR(64) DEFAULT NULL COMMENT '活动 ID（外键）',
+  `TIME_START` VARCHAR(10) DEFAULT NULL COMMENT '时段开始（09:00）',
+  `TIME_END` VARCHAR(10) DEFAULT NULL COMMENT '时段结束（11:00）',
+  `TIME_MARK` VARCHAR(64) DEFAULT NULL COMMENT '时段唯一标识',
+  `LIMIT_CNT` INT DEFAULT NULL COMMENT '时段最大名额',
+  `SUCC_CNT` INT DEFAULT 0 COMMENT '已预约人数',
+  `STATUS` TINYINT DEFAULT 1 COMMENT '1=启用，0=禁用',
+  `IS_LIMIT` TINYINT DEFAULT 1 COMMENT '是否开启限流 (0/1)',
+  `ADD_TIME` BIGINT DEFAULT NULL COMMENT '创建时间',
+  `EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`),
+  UNIQUE KEY `uk_time_mark` (`TIME_MARK`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='排期时间段表';
+
+-- ==========================================
+-- 8. 预约记录表 (join)
+-- ==========================================
+DROP TABLE IF EXISTS `join`;
+CREATE TABLE `join` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `JOIN_ID` VARCHAR(64) DEFAULT NULL COMMENT '预约记录业务 ID',
+  `IDENTITY_ID` VARCHAR(64) DEFAULT NULL COMMENT '关联人员 ID（外键）',
+  `USER_ID` VARCHAR(64) DEFAULT NULL COMMENT 'User主键',
+  `JOIN_MEET_DAY` VARCHAR(20) DEFAULT NULL COMMENT '预约参观日期',
+  `JOIN_MEET_TIME_START` VARCHAR(10) DEFAULT NULL COMMENT '时段开始时间',
+  `JOIN_MEET_TIME_END` VARCHAR(10) DEFAULT NULL COMMENT '时段结束时间',
+  `TIME_MARK` VARCHAR(64) DEFAULT NULL COMMENT '时段唯一标识',
+  `JOIN_START_TIME` BIGINT DEFAULT NULL COMMENT '预约生效时间戳',
+  `JOIN_COMPLETE_END_TIME` VARCHAR(50) DEFAULT NULL COMMENT '完整结束时间字符串',
+  `JOIN_STATUS` TINYINT DEFAULT 1 COMMENT '状态 (1: 预约成功 ，2：取消预约 )',
+  `JOIN_FORMS` TEXT COMMENT '用户填写的表单数据 (JSON Array)',
+  `JOIN_OBJ` TEXT COMMENT '表单数据的键值对形式 (JSON)',
+  `JOIN_IS_CHECKIN` TINYINT DEFAULT 0 COMMENT '是否签到 (0: 未核销，1：已核销，3逾期）',
+  `JOIN_QR` TEXT DEFAULT NULL COMMENT '二维码内容（Base64）',
+  `JOIN_ADD_TIME` BIGINT DEFAULT NULL COMMENT '下单时间戳',
+  `JOIN_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  `JOIN_ADD_IP` VARCHAR(64) DEFAULT NULL COMMENT '下单 IP',
+  `JOIN_EDIT_IP` VARCHAR(64) DEFAULT NULL COMMENT '修改 IP',
+  PRIMARY KEY (`_id`),
+  INDEX `idx_join_identity` (`IDENTITY_ID`),
+  INDEX `idx_join_user` (`USER_ID`),
+  INDEX `idx_join_identity_time` (`IDENTITY_ID`, `JOIN_START_TIME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='预约记录表';
+
+-- ==========================================
+-- 9. 公告表 (news)
+-- ==========================================
+DROP TABLE IF EXISTS `news`;
+CREATE TABLE `news` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `NEWS_ID` VARCHAR(64) DEFAULT NULL COMMENT '资讯业务 ID',
+  `NEWS_TITLE` VARCHAR(255) DEFAULT NULL COMMENT '标题',
+  `NEWS_DESC` TEXT COMMENT '简介（内容）',
+  `NEWS_STATUS` TINYINT DEFAULT 1 COMMENT '状态 (1: 正常展示，0: 下线)',
+  `NEWS_VIEW_CNT` INT DEFAULT 0 COMMENT '浏览量',
+  `NEWS_ADD_TIME` BIGINT DEFAULT NULL COMMENT '创建时间戳',
+  `NEWS_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  `NEWS_ADD_IP` VARCHAR(64) DEFAULT NULL COMMENT 'IP',
+  `NEWS_EDIT_IP` VARCHAR(64) DEFAULT NULL COMMENT 'IP',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公告表';
+
+-- ==========================================
+-- 10. 日志表 (log)
+-- ==========================================
+DROP TABLE IF EXISTS `log`;
+CREATE TABLE `log` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `LOG_ID` VARCHAR(64) DEFAULT NULL COMMENT '日志业务 ID',
+  `LOG_CONTENT` TEXT COMMENT '日志内容',
+  `LOG_TYPE` INT DEFAULT 99 COMMENT '日志类型 (0: 登录, 99: 操作)',
+  `LOG_ADMIN_ID` VARCHAR(64) DEFAULT NULL COMMENT '操作管理员 ID',
+  `LOG_ADMIN_NAME` VARCHAR(50) DEFAULT NULL COMMENT '操作管理员名称',
+  `LOG_ADD_TIME` BIGINT DEFAULT NULL COMMENT '记录时间戳',
+  `LOG_EDIT_TIME` BIGINT DEFAULT NULL COMMENT '修改时间戳',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='日志表';
+
+-- ==========================================
+-- 11. 头像数据表 (head)
+-- ==========================================
+DROP TABLE IF EXISTS `head`;
+CREATE TABLE `head` (
+  `_id` VARCHAR(64) NOT NULL COMMENT '记录系统唯一标识符',
+  `HEAD_PIC_ID` VARCHAR(64) DEFAULT NULL COMMENT '头像业务 ID',
+  `HEAD_PIC_URL` VARCHAR(255) DEFAULT NULL COMMENT '头像云服务器地址',
+  `_pid` VARCHAR(64) DEFAULT NULL COMMENT '项目标识',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='头像数据表';
+
+ALTER TABLE `join` MODIFY COLUMN `JOIN_QR` TEXT;
+
+-- ==========================================
+-- 12. 头像插入语句 (head)
+-- ==========================================
+TRUNCATE TABLE head;
+INSERT INTO head (_id, HEAD_PIC_ID, HEAD_PIC_URL, _pid) VALUES
+('1', 'head_1', '/images/avatars/1.png', '1'),
+('2', 'head_2', '/images/avatars/2.png', '1'),
+('3', 'head_3', '/images/avatars/3.png', '1'),
+('4', 'head_4', '/images/avatars/4.png', '1'),
+('5', 'head_5', '/images/avatars/5.png', '1'),
+('6', 'head_6', '/images/avatars/6.png', '1'),
+('7', 'head_7', '/images/avatars/7.png', '1'),
+('8', 'head_8', '/images/avatars/8.png', '1'),
+('9', 'head_9', '/images/avatars/9.png', '1'),
+('10', 'head_10', '/images/avatars/10.png', '1'),
+('11', 'head_11', '/images/avatars/11.png', '1'),
+('12', 'head_12', '/images/avatars/12.png', '1');
+
+ALTER TABLE activity MODIFY COLUMN ACTIVITY_OBJ LONGTEXT;
+ALTER TABLE activity MODIFY COLUMN ACTIVITY_PIC LONGTEXT;
+ALTER TABLE museum MODIFY COLUMN MUSEUM_OBJ LONGTEXT;
+ALTER TABLE museum MODIFY COLUMN MUSEUM_PIC LONGTEXT;
+
+-- 1. 创建文物信息表 (根据用户需求，专注于名称和图文介绍)
+DROP TABLE IF EXISTS `relic`;
+CREATE TABLE `relic` (
+  `_id` varchar(64) NOT NULL COMMENT '主键ID (对应模型识别结果ID)',
+  `RELIC_NAME` varchar(255) DEFAULT NULL COMMENT '文物名称',
+  `RELIC_DESC` longtext COMMENT '文物详细介绍 (支持HTML/Markdown长图文)',
+  `RELIC_IMAGE` varchar(500) DEFAULT NULL COMMENT '文物标准照URL (用于展示)',
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文物信息表';
+
+-- 2. 插入初始化数据
+-- ID 必须与 predict.py 中的 Class ID (0-4) 对应
+-- 0: Bronze Galloping Horse Treading on a Flying Swallow (马踏飞燕)
+-- 1: Bronze Square Zun Decorated with Four Rams (四羊方尊)
+-- 2: Gilt Bronze Human-Shaped Lamp (长信宫灯)
+-- 3: Houmuwu ding (后母戊鼎)
+-- 4: Tang Tri-Color Glazed Ceramics (唐三彩)
+
+INSERT INTO `relic` (`_id`, `RELIC_NAME`, `RELIC_DESC`, `RELIC_IMAGE`) VALUES 
+('0', '马踏飞燕 (Bronze Galloping Horse)', '东汉时期青铜器。1969年出土于甘肃省武威市雷台汉墓。骏马三足腾空、飞驰向前，一足踏于飞燕之上。', '/images/relics/0.png'),
+('1', '四羊方尊', '商朝晚期青铜礼器，祭祀用品。1938年出土于湖南省宁乡市。是中国现存商代青铜方尊中最大的一件。', '/images/relics/1.png'),
+('2', '长信宫灯', '西汉青铜器。1968年出土于河北省满城县（今保定市满城区）中山靖王刘胜妻窦绾墓。宫灯灯体为一通体鎏金、双手执灯跽坐的宫女。', '/images/relics/2.png'),
+('3', '后母戊鼎', '商周时期青铜器。是现存最重的青铜器。器腹部内壁铸有“后母戊”三字，故名。', '/images/relics/3.png'),
+('4', '唐三彩', '唐代低温釉陶器的总称。颜色以黄、绿、白三色为主，故人们习惯称之为“唐三彩”。', '/images/relics/4.png');
+
+-- 3. 删除无用字段 (Cleanup)
+ALTER TABLE `admin` DROP COLUMN `ADMIN_EDIT_TIME`;
+ALTER TABLE `museum` DROP COLUMN `MUSEUM_FORMS`;
+ALTER TABLE `activity` DROP COLUMN `ACTIVITY_FORMS`;
+ALTER TABLE `activity` DROP COLUMN `ACTIVITY_ADD_IP`;
+ALTER TABLE `activity` DROP COLUMN `ACTIVITY_EDIT_IP`;
+ALTER TABLE `user` DROP COLUMN `USER_SEX`;
+ALTER TABLE `user` DROP COLUMN `USER_OBJ`;
+ALTER TABLE `user` DROP COLUMN `USER_ADD_IP`;
+ALTER TABLE `user` DROP COLUMN `USER_EDIT_IP`;
+ALTER TABLE `join` DROP COLUMN `JOIN_MEET_TIME_START`;
+ALTER TABLE `join` DROP COLUMN `JOIN_MEET_TIME_END`;
+ALTER TABLE `join` DROP COLUMN `JOIN_OBJ`;
+ALTER TABLE `join` DROP COLUMN `JOIN_ADD_IP`;
+ALTER TABLE `join` DROP COLUMN `JOIN_EDIT_IP`;
+
+-- ==========================================
+-- 13. 系统消息表 (sys_message) - ID使用USER_ID作为关联
+-- ==========================================
+DROP TABLE IF EXISTS `sys_message`;
+CREATE TABLE `sys_message` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` varchar(64) NOT NULL COMMENT '接收用户ID (关联 user.USER_ID)',
+  `title` varchar(100) DEFAULT NULL COMMENT '消息标题',
+  `content` text COMMENT '消息内容',
+  `type` tinyint(2) DEFAULT '0' COMMENT '消息类型: 0=系统, 1=预约, 2=活动',
+  `is_read` tinyint(1) DEFAULT '0' COMMENT '是否已读: 0=未读, 1=已读',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统消息表';
+
+-- ==========================================
+-- 14. 消息模版表 (sys_message_template)
+-- ==========================================
+DROP TABLE IF EXISTS `sys_message_template`;
+CREATE TABLE `sys_message_template` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL COMMENT '模版编码',
+  `title_template` varchar(100) NOT NULL COMMENT '标题模版',
+  `content_template` text NOT NULL COMMENT '内容模版',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息模版表';
+
+-- 初始化模版数据
+INSERT INTO `sys_message_template` (`code`, `title_template`, `content_template`, `update_time`) VALUES
+('BOOKING_SUCCESS', '预约成功通知', '{0}，时间：{1}。请准时参观。', NOW()),
+('BOOKING_CANCEL', '预约取消通知', '您预约的 {0} 已成功取消。', NOW()),
+('ACTIVITY_NEW', '新活动通知', '新活动 {0} 已经上线，快来查看吧！', NOW()),
+('MUSEUM_NEW', '新展览发布', '博物馆有新的展览：{0}，欢迎预约参观。', NOW());
+
+ALTER TABLE museum
+ADD COLUMN latitude DOUBLE COMMENT '纬度',
+ADD COLUMN longitude DOUBLE COMMENT '经度';
+ADD COLUMN `ADDRESS` varchar(550) DEFAULT NULL COMMENT '地址';
+
+--  给 admin 表新增个人信息字段
+ALTER TABLE `admin`
+ADD COLUMN `ADMIN_NICKNAME` VARCHAR(50) COMMENT '显示用用户名（如“李生”）',
+ADD COLUMN `ADMIN_INTRO` TEXT COMMENT '用户简介',
+ADD COLUMN `ADMIN_AVATAR` VARCHAR(255) COMMENT '头像图片URL路径',
+ADD COLUMN `ADMIN_INFO_UPDATE_TIME` BIGINT DEFAULT NULL COMMENT '个人信息更新时间戳';
+
+-- 给现有数据设置默认值
+UPDATE `admin`
+SET
+-- 无昵称时默认用登录账号
+`ADMIN_NICKNAME` = COALESCE(`ADMIN_NICKNAME`, `ADMIN_NAME`),
+-- 无头像时赋值固定图片地址
+`ADMIN_AVATAR` = COALESCE(`ADMIN_AVATAR`, '/src/assets/avatars/1.jpg'),
+-- 无简介时默认值改为【管理员，负责场馆预约系统管理】
+`ADMIN_INTRO` = COALESCE(`ADMIN_INTRO`, '管理员，负责场馆预约系统管理'),
+-- 信息更新时间戳默认用当前时间戳
+`ADMIN_INFO_UPDATE_TIME` = COALESCE(`ADMIN_INFO_UPDATE_TIME`, UNIX_TIMESTAMP() * 1000);

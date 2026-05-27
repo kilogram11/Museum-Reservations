@@ -1,0 +1,45 @@
+<view class="container">
+  <view class="swiper-container">
+    <swiper class="swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="5000" duration="500" bindchange="onSwiperChange" circular="{{true}}">
+      <block wx:for="{{swiperList}}" wx:key="id">
+        <swiper-item data-id="{{item.id}}" bindtap="goToDetail">
+          <image src="{{item.imageUrl}}" mode="aspectFill" class="slide-image" />
+          <view class="swiper-title-mask">
+            <text class="swiper-title">{{item.title}}</text>
+            <text class="swiper-sub">{{item.subTitle}}</text>
+          </view>
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <view class="list-section">
+    <view class="section-header">
+      <text class="section-title">近期活动</text>
+    </view>
+
+    <view class="activity-list">
+      <block wx:for="{{activityList}}" wx:key="id">
+        <view class="activity-card" data-id="{{item.id}}" bindtap="goToDetail">
+          <image class="card-img" src="{{item.imageUrl}}" mode="aspectFill"></image>
+          
+          <view class="card-content">
+            <view class="card-title">{{item.title}}</view>
+            <view class="card-info-row">
+              <!-- <text class="icon">🕒</text> -->
+               <text class="info-text">{{item.time}}</text>
+            </view>
+            <view class="card-info-row">
+              <!-- <text class="icon">📍</text> -->
+              <text class="info-text">{{item.location}}</text>
+            </view>
+            
+            <view class="card-thumbnails" wx:if="{{item.thumbnails && item.thumbnails.length > 0}}">
+               <image wx:for="{{item.thumbnails}}" wx:for-item="thumb" wx:key="*this" src="{{thumb}}" mode="aspectFill" class="thumb-img"></image>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

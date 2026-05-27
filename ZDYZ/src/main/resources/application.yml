@@ -1,0 +1,27 @@
+# 服务器配置
+server:
+  port: 8081 # 小程序端换成8081避免冲突
+
+# Spring 全局配置
+spring:
+  # 1. 数据库连接配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 驱动
+    # URL 包含：协议 + IP端口 + 数据库名 + 时区/编码设置
+    url: jdbc:mysql://localhost:3306/museum_book?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password:
+
+  # 2. Redis 配置 (我们选择了 Redis 依赖，必须配置，否则启动报错)
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+#      password: # 如果没设密码就留空
+
+# 3. MyBatis-Plus 配置 (让程序知道去哪里找你的 SQL)
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 在控制台打印打印 SQL 语句
+    map-underscore-to-camel-case: true # 自动将数据库下划线字段(USER_NAME)转为Java驼峰(userName)
+  mapper-locations: classpath*:/mapper/**/*.xml # 扫描 resources/mapper 下的所有 SQL 文件

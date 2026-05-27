@@ -1,0 +1,69 @@
+<view class="container">
+  <!-- 头部导航 -->
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <icon type="back" size="20" color="#333"></icon>
+    </view>
+    <text class="header-title">编辑个人信息</text>
+  </view>
+
+  <view class="card">
+    <view class="section-title">头像</view>
+    <view class="avatar-grid">
+      <block wx:for="{{avatarList}}" wx:key="id">
+        <view 
+          class="avatar-item {{selectedAvatarUrl === item.url ? 'active' : ''}}" 
+          bindtap="selectAvatar" 
+          data-url="{{item.url}}"
+          data-id="{{item.id}}"
+        >
+          <image class="avatar-img" src="{{item.url}}" mode="aspectFill"></image>
+          <view class="check-badge" wx:if="{{selectedAvatarUrl === item.url}}">
+            <icon type="success_no_circle" size="10" color="#fff"></icon>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view class="avatar-tip">
+      当前选中头像ID: {{selectedAvatarId}}
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">基本信息</view>
+    <view class="input-label">用户名</view>
+    <view class="input-box">
+      <!-- 使用icon组件代替图片 -->
+      <icon type="person" size="40" color="#999" class="icon-user"></icon>
+      <input 
+        class="name-input" 
+        placeholder="请输入用户名" 
+        value="{{userName}}" 
+        bindinput="onUserNameInput"
+        maxlength="20"
+      />
+    </view>
+    <view class="input-tip">最多20个字符</view>
+  </view>
+
+  <button class="btn-save" bindtap="saveProfile" loading="{{loading}}" disabled="{{loading}}">
+    {{loading ? '保存中...' : '保存修改'}}
+  </button>
+  
+  <!-- 用户信息预览 -->
+  <view class="card preview-card" wx:if="{{userInfo.userId}}">
+    <view class="section-title">当前账户信息</view>
+    <view class="info-row">
+      <text class="info-label">用户ID:</text>
+      <text class="info-value">{{userInfo.userId}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">手机号:</text>
+      <text class="info-value">{{userInfo.userMobile || userInfo.phone || '未绑定'}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">创建时间:</text>
+      <text class="info-value">{{userInfo.createTime || '未知'}}</text>
+    </view>
+  </view>
+</view>

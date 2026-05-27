@@ -1,0 +1,99 @@
+/* 1. 基础背景与全局动画 */
+page {
+  background-color: #f2e4e1; /* 宣纸米白，极具质感 */
+  background-image: radial-gradient(#b6b2a8 1.5rpx, transparent 0); /* 极细微的纹理 */
+  background-size: 40rpx 40rpx;
+}
+
+.container {
+  padding: 50rpx 40rpx;
+  animation: fadeInMove 0.8s ease-out; /* 进场动画 */
+}
+
+@keyframes fadeInMove {
+  from { opacity: 0; transform: translateY(30rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. 标题区美化：增加朱砂红装饰 */
+.title {
+  font-size: 52rpx;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.4;
+  letter-spacing: 2rpx;
+  position: relative;
+  margin-bottom: 30rpx;
+}
+
+.title::after {
+  content: "";
+  display: block;
+  width: 80rpx;
+  height: 8rpx;
+  background: #8b262a; /* 崇德朱砂红 */
+  margin-top: 24rpx;
+  border-radius: 4rpx;
+}
+
+.meta {
+  font-size: 26rpx;
+  color: #8a7e6d;
+  padding: 30rpx 0;
+  border-bottom: 2rpx solid rgba(139, 38, 42, 0.1);
+  margin-bottom: 50rpx;
+}
+
+.author {
+  color: #8b262a;
+  font-weight: 600;
+  margin-right: 20rpx;
+}
+
+/* 3. 图片展示美化：模拟博物馆装裱效果 */
+.content-img {
+  width: 100%;
+  display: block;
+  border-radius: 4rpx; /* 方正更显稳重 */
+  margin: 40rpx 0;
+  /* 多层微阴影，营造悬浮感 */
+  box-shadow: 0 20rpx 40rpx rgba(0,0,0,0.08), 0 5rpx 15rpx rgba(0,0,0,0.05);
+  border: 10rpx solid #ffffff; /* 白色画框边 */
+  box-sizing: border-box;
+}
+
+/* 4. 正文排版美化：提升易读性 */
+.article-text {
+  font-size: 34rpx;
+  line-height: 2.2; /* 极宽行距，体现高级感 */
+  color: #333333;
+  margin-bottom: 40rpx;
+  text-align: justify;
+  letter-spacing: 1rpx;
+  /* 增加段落间距 */
+  padding: 10rpx 0;
+}
+
+/* 5. 底部装饰：印章感 */
+.footer-msg {
+  margin-top: 80rpx;
+  padding: 40rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #8b262a;
+  background: rgba(139, 38, 42, 0.03);
+  border-radius: 12rpx;
+  font-style: italic;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-msg::before {
+  content: "崇德";
+  position: absolute;
+  right: -20rpx;
+  top: -20rpx;
+  font-size: 100rpx;
+  opacity: 0.05;
+  transform: rotate(-15deg);
+}

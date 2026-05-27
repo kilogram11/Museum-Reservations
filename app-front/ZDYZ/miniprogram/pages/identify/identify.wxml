@@ -1,0 +1,37 @@
+<view class="container">
+  
+  <!-- 顶部提示区 -->
+  <view class="header-box" wx:if="{{!result}}">
+    <view class="title">📸 拍照识文物</view>
+    <view class="desc">请将摄像头对准文物，点击下方按钮开始识别</view>
+  </view>
+
+  <!-- 图片展示区 -->
+  <view class="image-box {{result ? 'has-result' : ''}}">
+    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFit" class="preview-img"></image>
+    <view wx:else class="placeholder" bindtap="chooseImage">
+      <image src="/images/scan-large.png" class="icon-camera"></image>
+      <text>点击拍照 / 上传图片</text>
+    </view>
+  </view>
+
+  <!-- 识别结果区 -->
+  <view class="result-box" wx:if="{{result}}">
+    <view class="result-title">{{result.name}}</view>
+    
+    <view class="result-content">
+      <rich-text nodes="{{result.desc}}"></rich-text>
+    </view>
+    
+    <!-- 重新识别按钮 -->
+    <button class="btn-retry" bindtap="reset">再次识别</button>
+  </view>
+
+  <!-- 底部操作区 (未识别时显示) -->
+  <view class="footer-action" wx:if="{{!result}}">
+    <button class="btn-capture" bindtap="chooseImage" loading="{{loading}}">
+      {{loading ? '识别中...' : '开始识别'}}
+    </button>
+  </view>
+
+</view>

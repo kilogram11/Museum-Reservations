@@ -1,0 +1,49 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+.cache/
+coverage/
+
+# WeChat Mini Program private/local config
+project.private.config.json
+*.local
+*.local.*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+AccessKey.csv
+*AccessKey*
+*accesskey*
+*secret*
+*Secret*
+*.pem
+*.key
+
+# Local runtime upload/generated files
+ZDYZ/files/
+
+# Office temporary files
+~$*

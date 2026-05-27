@@ -1,0 +1,267 @@
+/* 2. 今日开放信息栏 */
+.open-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff9e8;
+  padding: 20rpx 30rpx;
+  margin: 20rpx;
+  border-radius: 12rpx;
+}
+.open-date {
+  font-size: 28rpx;
+  color: #8b4513;
+  font-weight: bold;
+}
+.open-time {
+  font-size: 28rpx;
+  color: #8b0000;
+  font-weight: bold;
+}
+
+/* 2.5 馆内公告条 */
+.notice-bar {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  margin: 20rpx 20rpx 20rpx; /* 增加上间距，避免与轮播图太近 */
+  padding: 12rpx 25rpx;
+  border-radius: 40rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+.notice-label {
+  background-color: #8B0000; /* 修改为红色以适配整体界面 */
+  color: #f5f0e8;
+  font-size: 24rpx;
+  padding: 6rpx 18rpx;
+  border-radius: 20rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.notice-swiper {
+  flex: 1;
+  height: 40rpx;
+}
+.notice-item {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 40rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 3. 功能按钮区 (1大+2小 + 横向全宽) */
+.func-section {
+  padding: 0 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.func-grid {
+  display: flex;
+  height: 380rpx;
+  gap: 15rpx;
+  margin-bottom: 15rpx;
+}
+
+.grid-left {
+  flex: 1;
+  height: 100%;
+}
+
+.grid-right {
+  flex: 1.8;
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  height: 100%;
+}
+
+.func-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  color: #fff;
+}
+
+.grid-left.func-btn {
+  flex-direction: column;
+}
+
+.small-btn {
+  flex: 1;
+  justify-content: flex-start;
+  padding: 0 40rpx;
+  gap: 20rpx;
+}
+
+/* 统一图标大小 */
+.btn-icon-img {
+  width: 70rpx;
+}
+
+.grid-left .btn-icon-img {
+  margin-bottom: 20rpx;
+  width: 90rpx; /* 大按钮图标稍大一点以保持平衡 */
+}
+
+.btn-text-main {
+  font-size: 34rpx;
+  font-weight: bold;
+}
+
+.btn-text-sub {
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+/* 下方横向全宽地图按键 */
+.map-wide-btn {
+  border-radius: 50rpx;
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+  color: #fff; /* 文字改为白色以适配背景色 */
+}
+
+.map-content {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.map-text {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+/* 恢复原来的纯色 */
+.red-btn {
+  background-color: #8b0000;
+}
+.yellow-btn {
+  background-color: #E8B042; /* 琉璃金 */
+}
+.blue-btn {
+  background-color: #4A6B6D; /* 故宫青 */
+}
+.grey-btn {
+  background-color: #8a8a8a; /* 适配图标的灰色 */
+}
+
+/* 4. 博物馆信息卡片 */
+.museum-info {
+  background-color: #fff;
+  margin: 20rpx;
+  padding: 30rpx;
+  border-radius: 16rpx;
+}
+.museum-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #8b0000;
+  display: block;
+  margin-bottom: 20rpx;
+}
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.info-icon {
+  font-size: 28rpx;
+  margin-right: 16rpx;
+  color: #8b4513;
+}
+.info-text {
+  font-size: 28rpx;
+  color: #333;
+}
+.museum-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-top: 20rpx;
+  display: block;
+}
+/* 页面容器 */
+.index-container {
+  background-color: #f5f0e8;
+  min-height: 100vh;
+  padding-bottom: 100rpx; /* 给底部tabbar留空间 */
+}
+
+/* 1. 轮播图样式 */
+.banner-swiper {
+  width: 100%;
+  height: 400rpx;
+}
+.banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 5. 馆内精选活动区域 */
+.act-section {
+  background-color: #fff;
+  margin: 20rpx;
+  padding: 30rpx;
+  border-radius: 16rpx;
+}
+.act-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+.act-title {
+  display: flex;
+  align-items: center;
+}
+.act-title-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 12rpx;
+}
+.act-title-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+.act-more {
+  font-size: 26rpx;
+  color: #999;
+}
+.act-scroll {
+  display: flex;
+  white-space: nowrap;
+}
+.act-item {
+  display: inline-block;
+  width: 500rpx;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+.act-img-box {
+  width: 500rpx;
+  height: 300rpx;
+  border-radius: 12rpx;
+  background-color: #f5f5f5;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.act-name {
+  font-size: 28rpx;
+  color: #333;
+  margin-top: 16rpx;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}

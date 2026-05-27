@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "首页",
+  "usingComponents": {
+    "floating-ai-btn": "/components/floating-ai-btn/floating-ai-btn"
+  }
+}

@@ -1,0 +1,36 @@
+<view class="container" wx:if="{{!loading}}">
+  <view class="header">
+    <view class="title">{{detail.title}}</view>
+    <view class="meta">
+      <text class="author">{{detail.museumName}}</text>
+      <text class="date">{{detail.publishTime}}</text>
+      <text class="location-tag" style="margin-left:20rpx; opacity:0.6"># {{detail.province}}</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <block wx:for="{{detail.contentList}}" wx:key="index">
+      <view class="article-text" wx:if="{{item.type === 'text'}}">
+        <text decode="{{true}}" user-select="{{true}}">{{item.val}}</text>
+      </view>
+
+      <image 
+        class="content-img" 
+        wx:if="{{item.type === 'img' || item.type === 'image'}}" 
+        src="{{item.val}}" 
+        mode="widthFix"
+        lazy-load
+        show-menu-by-longpress="{{true}}"
+      ></image>
+    </block>
+    
+    <view class="footer-msg">
+      <text>—— {{detail.footerNote}} ——</text>
+    </view>
+  </view>
+</view>
+
+<view class="loading-state" wx:if="{{loading}}">
+  <view class="dot-jump"></view>
+  <text>拾取历史记忆中...</text>
+</view>

@@ -1,0 +1,89 @@
+<view class="container">
+  <view wx:if="{{errorMessage}}" class="error-message">
+    <text>{{errorMessage}}</text>
+  </view>
+  
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-mask">
+    <view class="loading-content">
+      <text>加载中...</text>
+    </view>
+  </view>
+  
+  <view class="header-card">
+    <view class="museum-icon">🏛️</view>
+    <view class="museum-info">
+      <view class="m-name">欢迎预约博物馆</view>
+      <view class="m-date">当前选择: {{selectedDateFull}}</view>
+    </view>
+  </view>
+
+  <view class="section-title">选择参观日期 ({{currentMonth}}月)</view>
+  <scroll-view class="date-scroll" scroll-x="{{true}}">
+    <view class="date-list">
+      <block wx:for="{{dateList}}" wx:key="dateStr">
+        <view class="date-item {{item.status === 'closed' || item.status === 'full' ? 'disabled' : ''}} {{selectedDateIndex === index ? 'selected' : ''}}" 
+              data-index="{{index}}" 
+              bindtap="selectDate">
+          <view class="d-month">{{item.monthStr}}</view>
+          <view class="d-day">{{item.dayStr}}</view>
+          <view class="d-week">{{item.weekStr}}</view>
+          <view class="d-status">{{item.statusText}}</view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <view class="section-title">选择入场时段</view>
+  <view class="slot-list">
+    <block wx:for="{{timeSlots}}" wx:key="time">
+      <view class="slot-item {{item.remaining <= 0 ? 'disabled' : ''}} {{selectedSlotIndex === index ? 'selected' : ''}}"
+            data-index="{{index}}"
+            bindtap="selectSlot">
+        <view class="s-time">{{item.time}}</view>
+        <view class="s-remain">
+          <text wx:if="{{item.remaining > 0}}">剩余{{item.remaining}}位</text>
+          <text wx:else style="color:#d9534f">已满，不可预约</text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="section-title">选择访客 ({{selectedVisitorIds.length}}/3)</view>
+  <view class="visitor-box">
+    <view wx:if="{{visitors.length === 0}}" class="empty-tip" bindtap="goToAddVisitor">
+      + 暂无常用访客，去添加
+    </view>
+
+    <block wx:for="{{visitors}}" wx:key="id">
+      <view class="v-select-item {{item.isBlacklisted ? 'disabled-row' : ''}}" bindtap="toggleVisitor" data-id="{{item.id}}">
+        <view class="v-info">
+          <view class="v-top">
+            <text class="v-name">{{item.name}}</text>
+            <text wx:if="{{item.isBlacklisted}}" class="v-tag">黑名单</text>
+          </view>
+          <text class="v-id">{{item.idCardMasked}}</text>
+        </view>
+        <view class="checkbox">
+          <icon wx:if="{{item.selected}}" type="success" color="rgba(139, 0, 0, 0.8)" size="24"></icon>
+          <view wx:else class="circle"></view>
+        </view>
+      </view>
+      <view wx:if="{{item.isBlacklisted}}" class="error-msg">该用户近期有逾期行为，已被列入黑名单，不可预约</view>
+    </block>
+    
+    <view class="add-more" bindtap="goToAddVisitor"> 管理预约人 > </view>
+  </view>
+
+  <view class="warning-bar">
+    ⚠️ 请注意：一个账号最多可预约3人，入馆请携带身份证备查。
+  </view>
+
+  <view class="bottom-bar">
+    <view class="total-info">
+      已选中者 <text class="highlight">共 {{selectedVisitorIds.length}} 人</text>
+    </view>
+    <button class="btn-submit" bindtap="submitReserve">立即预约</button>
+  </view>
+
+</view>

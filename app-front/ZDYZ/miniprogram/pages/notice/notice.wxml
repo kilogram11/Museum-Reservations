@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="notice-list">
+    <block wx:for="{{noticeList}}" wx:key="id">
+      <view class="notice-card" data-id="{{item.id}}" bindtap="goToDetail">
+        
+        <view class="card-title">{{item.title}}</view>
+        
+        <view class="card-summary">{{item.summary}}</view>
+        
+        <view class="card-date">
+          <text class="icon">📅</text> <text>{{item.date}}</text>
+        </view>
+      
+      </view>
+    </block>
+  </view>
+</view>

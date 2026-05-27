@@ -1,0 +1,75 @@
+<view class="container">
+  <view class="add-bar">
+    <button class="btn-add-main" bindtap="showAddForm">+ 添加预约人</button>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view class="modal-mask" wx:if="{{showForm}}">
+    <view class="card form-popup">
+      <view class="modal-header">
+        <view class="card-title">{{isEditing ? '修改联系方式' : '新增预约人'}}</view>
+        <text class="close-icon" bindtap="closeForm">×</text>
+      </view>
+      
+      <view class="input-group">
+        <text class="input-label" wx:if="{{isEditing}}">姓名</text>
+        <input 
+          class="input-field {{isEditing ? 'disabled-input' : ''}}" 
+          placeholder="请输入姓名" 
+          model:value="{{newName}}" 
+          disabled="{{isEditing}}"
+        />
+      </view>
+      <view class="input-group">
+        <text class="input-label" wx:if="{{isEditing}}">手机号</text>
+        <input 
+          class="input-field" 
+          type="number" 
+          maxlength="11" 
+          placeholder="请输入11位手机号" 
+          model:value="{{newPhone}}" 
+        />
+      </view>
+      <view class="input-group">
+        <text class="input-label" wx:if="{{isEditing}}">身份证号</text>
+        <input 
+          class="input-field {{isEditing ? 'disabled-input' : ''}}" 
+          type="idcard" 
+          maxlength="18" 
+          placeholder="请输入18位身份证号" 
+          model:value="{{newIdCard}}" 
+          disabled="{{isEditing}}"
+        />
+      </view>
+
+      <view class="tip-text" wx:if="{{isEditing}}">* 姓名与身份证号不可变更，仅支持更新手机号</view>
+
+      <button class="btn-primary" bindtap="addVisitor">{{isEditing ? '确认修改' : '确认添加'}}</button>
+    </view>
+  </view>
+
+  <view class="card list-card">
+    <view class="card-title">已登记的人 ({{visitorList.length}}人)</view>
+    
+    <block wx:for="{{visitorList}}" wx:key="id">
+      <view class="visitor-item">
+        <view class="visitor-info">
+          <view class="v-name">{{item.name}}</view>
+          <view class="v-detail">{{item.phone}}</view>
+          <view class="v-detail">{{item.idCardMasked}}</view>
+          
+          <view wx:if="{{item.isBlacklisted}}" class="blacklist-tag">
+            ⚠️ 该预约人已被拉入黑名单
+          </view>
+        </view>
+        
+        <view class="visitor-actions">
+          <text class="action-btn edit" data-item="{{item}}" bindtap="onEdit">修改</text>
+          <text class="action-btn delete" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="deleteVisitor">删除</text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 彻底移除模拟人脸弹窗容器 -->
+</view>

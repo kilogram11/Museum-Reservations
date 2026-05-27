@@ -1,0 +1,188 @@
+.profile-container {
+  padding: 30rpx;
+  background-color: #f5f0e8;
+  min-height: 100vh;
+}
+/* 已登录-用户头部样式（匹配原型图2的红色背景） */
+.user-header {
+  background-color: #8b0000;
+  color: #fff;
+  padding: 30rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+/* 头像图片样式 */
+.avatar-img {
+  width: 120rpx; /* 根据原型调整大小 */
+  height: 120rpx;
+  border-radius: 50%; /* 关键：变成圆形 */
+  background-color: #f0f0f0;
+  margin-right: 30rpx;
+  border: 2rpx solid #fff; /* 可选：加个白边更好看 */
+}
+/* 我的订单卡片 */
+.order-card-section {
+  background: #fff;
+  border-radius: 16rpx;
+  margin: 30rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+.section-more {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.order-grid {
+  display: flex;
+  justify-content: space-between;
+}
+.grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.grid-icon {
+  width: 56rpx;
+  height: 56rpx;
+  margin-bottom: 12rpx;
+}
+.grid-text {
+  font-size: 24rpx;
+  color: #333;
+}
+
+.icon-wrap {
+  position: relative;
+}
+.badge-dot {
+  position: absolute;
+  top: -4rpx;
+  right: -4rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background: #ff4d4f;
+  border-radius: 50%;
+  border: 2rpx solid #fff;
+}
+
+/* 旧样式覆盖或兼容 */
+.user-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  display: block;
+}
+.edit-tip {
+  font-size: 24rpx;
+  color: #f5f0e8;
+  display: block;
+}
+/* 未登录样式 */
+.unlogin-tip {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+.unlogin-text {
+  color: #8b0000;
+  font-weight: bold;
+  margin-right: 10rpx;
+}
+.login-btn {
+  color: #8b4513;
+  text-decoration: underline;
+}
+/* 菜单通用样式 (旧样式保留，新卡片样式如下) */
+.menu-card {
+  background: #fff;
+  border-radius: 16rpx;
+  margin: 30rpx;
+  padding: 0 30rpx; /* 左右padding，上下由item撑开 */
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  padding-bottom: 10rpx;
+}
+.card-title {
+  padding: 30rpx 0 20rpx 0;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.menu-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+.menu-list-item:last-child {
+  border-bottom: none;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+.menu-text {
+  font-size: 30rpx;
+  color: #333;
+  margin-left: 20rpx;
+}
+.menu-icon-img {
+  width: 40rpx;
+  height: 40rpx;
+}
+.arrow-icon {
+  width: 32rpx;
+  height: 32rpx;
+  opacity: 0.3; /* 灰色透明度，使其看起来像#999 */
+}
+.arrow-icon-small {
+  width: 24rpx;
+  height: 24rpx;
+  opacity: 0.5;
+}
+
+/* 覆盖旧的 menu-item 样式 */
+.menu-item {
+  display: none;
+}
+
+.btn-red {
+  width: auto;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #8b0000;
+  color: #fff;
+  border-radius: 10rpx;
+  text-align: center;
+  font-size: 32rpx;
+  margin-top: 40rpx; /* 增加一点间距 */
+  margin-left: 30rpx;
+  margin-right: 30rpx;
+}
+.version {
+  font-size: 24rpx;
+  color: #8b4513;
+  text-align: center;
+  margin-top: 50rpx;
+  padding-bottom: 40rpx;
+}

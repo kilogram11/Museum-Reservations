@@ -1,0 +1,23 @@
+0934c6e|2026-01-12 23:59:30 +0800|wu.jiayue|管理端个人界面
+8d385a7|2026-01-12 23:56:50 +0800|wu.jiayue|管理端个人信息界面
+2614618|2026-01-12 20:59:38 +0800|wanpeiyao|修复管理端无法显示地图问题
+cf33e17|2026-01-12 14:45:39 +0800|liudongjian|新增百度地图选择器组件 BaiduMapPicker.vue
+103fc8f|2026-01-12 11:57:19 +0800|liudongjian|Merge branch 'admin-frontend' of http://118.195.226.124:9000/23-ruangong-tuandui/ZDYZ into admin-frontend
+16fae36|2026-01-11 17:50:34 +0800|liudongjian|管理员端添加地图
+f2689c3|2026-01-09 16:32:12 +0800|wanpeiyao|新增消息界面
+43d5543|2026-01-09 15:57:06 +0800|lijiahui|导出实现
+5a560a7|2026-01-08 23:18:36 +0800|yangjinyi|再次修改输入框间距
+4449f9d|2026-01-08 22:33:25 +0800|yangjinyi|Merge branch 'admin-frontend' of http://118.195.226.124:9000/23-ruangong-tuandui/ZDYZ into admin-frontend
+6589984|2026-01-08 16:24:54 +0800|yangjinyi|优化博物馆编辑界面；修复活动预览功能无法正常使用问题。
+079c099|2026-01-08 16:24:54 +0800|yangjinyi|Merge branch 'admin-frontend' of http://118.195.226.124:9000/23-ruangong-tuandui/ZDYZ into admin-frontend
+cebf27b|2026-01-08 16:24:35 +0800|yangjinyi|更正管理员注册时显示失败问题
+106b4d2|2026-01-08 15:36:27 +0800|wanpeiyao|美化界面
+00d56f9|2026-01-08 14:27:16 +0800|wanpeiyao|Merge remote-tracking branch 'origin/admin-frontend' into admin-frontend
+6eda9bf|2026-01-08 14:27:03 +0800|wanpeiyao|博物馆启用按钮逻辑修复
+bf4b3f5|2026-01-08 10:04:14 +0800|yangjinyi|新增管理员注册功能，注册密钥是e7g6s679Ty67N9fTh98
+2ac27c2|2026-01-08 09:05:47 +0800|wanpeiyao|首页图表优化
+85e617c|2026-01-07 15:54:48 +0800|yangjinyi|新增图表展示
+9938562|2026-01-07 10:33:23 +0800|wanpeiyao|修复图片上传问题
+b403350|2026-01-07 10:31:31 +0800|wanpeiyao|修复图片上传问题
+2e71534|2026-01-06 23:52:06 +0800|wanpeiyao|修复前端字段名问题，新增博物馆逻辑问题，黑名单管理问题，登录问题等
+d05d99e|2026-01-06 17:13:29 +0800|wu.jiayue|feat: 博物馆预约系统前端初始提交
