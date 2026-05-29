@@ -27,10 +27,10 @@ public class AdminLoginController {
     @PostMapping("/login")
     public Result login(@RequestBody AdminLoginDTO loginDTO) {
         Admin admin = adminService.login(loginDTO);
-        Map<String, String> map = new HashMap<>();
-        map.put("token", admin.getAdminToken());
-        map.put("adminId", admin.getAdminId());
-        return Result.success("登录成功", map);
+        Map<String, String> loginResult = new HashMap<>();
+        loginResult.put("token", admin.getAdminToken());
+        loginResult.put("adminId", admin.getAdminId());
+        return Result.success("登录成功", loginResult);
     }
 
     /**
@@ -74,28 +74,28 @@ public class AdminLoginController {
         Admin profile = adminService.getAdminInfo();
 
         // 组装前端所需数据格式，确保即使数据库字段为空也有保底显示
-        Map<String, Object> data = new HashMap<>();
-        data.put("userName",
+        Map<String, Object> profileData = new HashMap<>();
+        profileData.put("userName",
                 StrUtil.isNotBlank(profile.getAdminNickname()) ? profile.getAdminNickname() : profile.getAdminName());
-        data.put("userIntro", StrUtil.isNotBlank(profile.getAdminIntro()) ? profile.getAdminIntro() : "管理员");
-        data.put("currentAvatar",
+        profileData.put("userIntro", StrUtil.isNotBlank(profile.getAdminIntro()) ? profile.getAdminIntro() : "管理员");
+        profileData.put("currentAvatar",
                 StrUtil.isNotBlank(profile.getAdminAvatar()) ? profile.getAdminAvatar() : "/src/assets/avatars/1.jpg");
 
-        return Result.success("获取成功", data);
+        return Result.success("获取成功", profileData);
     }
 
     /**
      * 2. 更新用户名和简介（前端编辑后调用）
      */
     @PostMapping("/profile/update")
-    public Result updateAdminProfile(@RequestBody Map<String, String> params) {
+    public Result updateAdminProfile(@RequestBody Map<String, String> requestParams) {
         Admin currentAdmin = adminService.getAdminInfo();
         String adminId = currentAdmin.getAdminId();
 
         Admin admin = new Admin();
         admin.setAdminId(adminId);
-        admin.setAdminNickname(params.get("userName"));
-        admin.setAdminIntro(params.get("userIntro"));
+        admin.setAdminNickname(requestParams.get("userName"));
+        admin.setAdminIntro(requestParams.get("userIntro"));
 
         boolean success = adminService.updateAdminProfile(admin);
         return success ? Result.success("个人信息修改成功") : Result.error("修改失败");
@@ -105,10 +105,10 @@ public class AdminLoginController {
      * 3. 更新头像（前端切换头像后调用）
      */
     @PostMapping("/profile/update-avatar")
-    public Result updateAdminAvatar(@RequestBody Map<String, String> params) {
+    public Result updateAdminAvatar(@RequestBody Map<String, String> requestParams) {
         Admin currentAdmin = adminService.getAdminInfo();
         String adminId = currentAdmin.getAdminId();
-        String avatarUrl = params.get("avatarUrl");
+        String avatarUrl = requestParams.get("avatarUrl");
 
         boolean success = adminService.updateAdminAvatar(adminId, avatarUrl);
         return success ? Result.success("头像修改成功", avatarUrl) : Result.error("头像修改失败");

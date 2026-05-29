@@ -2,8 +2,10 @@ package com.museum.controller.admin;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.museum.common.result.Result;
+import com.museum.common.utils.PageParamUtil;
 import com.museum.entity.Join;
 import com.museum.service.JoinService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +30,7 @@ import java.util.Map;
 /**
  * 预约核销管理 Controller
  */
+@Slf4j
 @RestController
 @RequestMapping("/admin/join")
 public class JoinManageController {
@@ -39,13 +42,13 @@ public class JoinManageController {
      * 预约列表搜索
      */
     @PostMapping("/list")
-    public Result list(@RequestBody Map<String, Object> params) {
-        String keyword = (String) params.getOrDefault("keyword", "");
+    public Result list(@RequestBody Map<String, Object> requestParams) {
+        String keyword = (String) requestParams.getOrDefault("keyword", "");
 
         // 兼容前端传参：如果 keyword 为空，尝试取 name 或 idCard
         if (keyword.isEmpty()) {
-            String name = (String) params.get("name");
-            String idCard = (String) params.get("idCard");
+            String name = (String) requestParams.get("name");
+            String idCard = (String) requestParams.get("idCard");
             if (name != null && !name.isEmpty()) {
                 keyword = name;
             } else if (idCard != null && !idCard.isEmpty()) {
@@ -53,8 +56,8 @@ public class JoinManageController {
             }
         }
 
-        Integer page = (Integer) params.getOrDefault("page", 1);
-        Integer limit = (Integer) params.getOrDefault("limit", 10);
+        int page = PageParamUtil.defaultPage(requestParams.get("page"));
+        int limit = PageParamUtil.defaultLimit(requestParams.get("limit"));
 
         Page<Join> result = joinService.adminList(keyword, page, limit);
         return Result.success("获取成功", result);
@@ -64,9 +67,9 @@ public class JoinManageController {
      * 核销
      */
     @PostMapping("/checkin")
-    public Result checkin(@RequestBody Map<String, String> params) {
-        String id = params.get("id");
-        joinService.checkin(id);
+    public Result checkin(@RequestBody Map<String, String> requestParams) {
+        String joinId = requestParams.get("id");
+        joinService.checkin(joinId);
         return Result.success("核销成功");
     }
 
@@ -148,7 +151,7 @@ public class JoinManageController {
             IoUtil.close(out);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("导出预约记录失败", e);
         }
     }
 }

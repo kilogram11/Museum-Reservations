@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.museum.common.constant.AdminBusinessConstant;
+import com.museum.common.constant.BookingConstant;
 import com.museum.common.dto.MuseumAddDTO;
 import com.museum.common.exception.BusinessException;
 import com.museum.entity.Day;
@@ -75,7 +77,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         }
 
         long now = System.currentTimeMillis();
-        String museumId = "museum_" + IdUtil.fastSimpleUUID();
+        String museumId = AdminBusinessConstant.MUSEUM_ID_PREFIX + IdUtil.fastSimpleUUID();
 
         // 2. 构建并插入 Museum
         Museum museum = new Museum();
@@ -106,25 +108,25 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         museum.setMuseumStatus(status);
         museum.setMuseumAddTime(now);
         museum.setMuseumEditTime(now);
-        museum.setPid("1");
+        museum.setPid(BookingConstant.DEFAULT_PID);
 
         // 2.1 组装 museumObj
         // 关键变更：将排期配置（startDate, endDate, times）也存入 obj，以便后续启用时读取
-        Map<String, Object> objMap = new HashMap<>();
-        objMap.put("desc", dto.getMuseumDesc());
-        objMap.put("cover", dto.getMuseumCover());
-        objMap.put("content", dto.getMuseumContent());
-        objMap.put("address", dto.getMuseumAddress());
-        objMap.put("phone", dto.getMuseumPhone());
-        objMap.put("traffic", dto.getMuseumTraffic());
+        Map<String, Object> museumExtraInfo = new HashMap<>();
+        museumExtraInfo.put("desc", dto.getMuseumDesc());
+        museumExtraInfo.put("cover", dto.getMuseumCover());
+        museumExtraInfo.put("content", dto.getMuseumContent());
+        museumExtraInfo.put("address", dto.getMuseumAddress());
+        museumExtraInfo.put("phone", dto.getMuseumPhone());
+        museumExtraInfo.put("traffic", dto.getMuseumTraffic());
 
         // --- Store Schedule Params ---
-        objMap.put("startDate", dto.getStartDate());
-        objMap.put("endDate", dto.getEndDate());
-        objMap.put("times", dto.getTimes());
+        museumExtraInfo.put("startDate", dto.getStartDate());
+        museumExtraInfo.put("endDate", dto.getEndDate());
+        museumExtraInfo.put("times", dto.getTimes());
         // -----------------------------
 
-        museum.setMuseumObj(JSONUtil.toJsonStr(objMap));
+        museum.setMuseumObj(JSONUtil.toJsonStr(museumExtraInfo));
 
         // 2.2 组装 museumPic
         if (CollUtil.isNotEmpty(dto.getMuseumImgs())) {
@@ -133,7 +135,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
             // 如果只有封面，将其包装为数组存入
             museum.setMuseumPic(JSONUtil.toJsonStr(CollUtil.newArrayList(dto.getMuseumCover())));
         } else {
-            museum.setMuseumPic("[]");
+            museum.setMuseumPic(BookingConstant.EMPTY_JSON_ARRAY);
         }
 
         // --- 【日志打印位置】 ---
@@ -166,7 +168,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         Date current = start;
         while (!current.after(end)) {
             String dayStr = DateUtil.format(current, "yyyy-MM-dd");
-            String dayId = "day_" + IdUtil.fastSimpleUUID();
+            String dayId = AdminBusinessConstant.DAY_ID_PREFIX + IdUtil.fastSimpleUUID();
 
             Day day = new Day();
             day.setId(IdUtil.fastSimpleUUID());
@@ -177,13 +179,13 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
             day.setDayLimitCnt((int) dayLimitTotal);
             day.setAddTime(System.currentTimeMillis());
             day.setEditTime(System.currentTimeMillis());
-            day.setPid("1");
+            day.setPid(BookingConstant.DEFAULT_PID);
             dayMapper.insert(day);
 
             for (MuseumAddDTO.TimeTemplate tmpl : templates) {
                 Time time = new Time();
                 time.setId(IdUtil.fastSimpleUUID());
-                time.setTimeId("time_" + IdUtil.fastSimpleUUID());
+                time.setTimeId(AdminBusinessConstant.TIME_ID_PREFIX + IdUtil.fastSimpleUUID());
                 time.setDayId(dayId);
                 time.setMuseumId(museumId);
                 time.setTimeStart(tmpl.getStart());
@@ -195,7 +197,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
                 time.setIsLimit(1);
                 time.setAddTime(System.currentTimeMillis());
                 time.setEditTime(System.currentTimeMillis());
-                time.setPid("1");
+                time.setPid(BookingConstant.DEFAULT_PID);
                 timeMapper.insert(time);
             }
             current = DateUtil.offsetDay(current, 1);
@@ -294,20 +296,20 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         // 注意：这里需要保留原有的部分排期配置(如果只需要改内容)，或者完全覆盖。
         // 根据需求 "支持更改"，通常意味着覆盖。
         // 但为了安全，排期生成逻辑(Day/Time)不在此处触发，仅更新配置和展示信息。
-        Map<String, Object> objMap = new HashMap<>();
-        objMap.put("desc", dto.getMuseumDesc());
-        objMap.put("cover", dto.getMuseumCover());
-        objMap.put("content", dto.getMuseumContent());
-        objMap.put("address", dto.getMuseumAddress());
-        objMap.put("phone", dto.getMuseumPhone());
-        objMap.put("traffic", dto.getMuseumTraffic());
+        Map<String, Object> museumExtraInfo = new HashMap<>();
+        museumExtraInfo.put("desc", dto.getMuseumDesc());
+        museumExtraInfo.put("cover", dto.getMuseumCover());
+        museumExtraInfo.put("content", dto.getMuseumContent());
+        museumExtraInfo.put("address", dto.getMuseumAddress());
+        museumExtraInfo.put("phone", dto.getMuseumPhone());
+        museumExtraInfo.put("traffic", dto.getMuseumTraffic());
 
         // 重新存入排期配置，以便后续"状态切换"时能读取到最新配置
-        objMap.put("startDate", dto.getStartDate());
-        objMap.put("endDate", dto.getEndDate());
-        objMap.put("times", dto.getTimes());
+        museumExtraInfo.put("startDate", dto.getStartDate());
+        museumExtraInfo.put("endDate", dto.getEndDate());
+        museumExtraInfo.put("times", dto.getTimes());
 
-        museum.setMuseumObj(JSONUtil.toJsonStr(objMap));
+        museum.setMuseumObj(JSONUtil.toJsonStr(museumExtraInfo));
 
         // 3. 更新图片列表
         if (CollUtil.isNotEmpty(dto.getMuseumImgs())) {
@@ -315,7 +317,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         } else if (StrUtil.isNotBlank(dto.getMuseumCover())) {
             museum.setMuseumPic(JSONUtil.toJsonStr(CollUtil.newArrayList(dto.getMuseumCover())));
         } else {
-            museum.setMuseumPic("[]");
+            museum.setMuseumPic(BookingConstant.EMPTY_JSON_ARRAY);
         }
 
         museumMapper.updateById(museum);
@@ -444,10 +446,10 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         wrapper.select("MUSEUM_ID", "MUSEUM_TITLE");
         List<Museum> list = museumMapper.selectList(wrapper);
         return list.stream().map(m -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", m.getMuseumId());
-            map.put("title", m.getMuseumTitle());
-            return map;
+            Map<String, Object> optionItem = new HashMap<>();
+            optionItem.put("id", m.getMuseumId());
+            optionItem.put("title", m.getMuseumTitle());
+            return optionItem;
         }).collect(Collectors.toList());
     }
 

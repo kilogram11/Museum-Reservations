@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.museum.common.dto.MuseumAddDTO;
 import com.museum.common.result.Result;
+import com.museum.common.utils.PageParamUtil;
 import com.museum.entity.Museum;
 import com.museum.service.MuseumService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +28,10 @@ public class MuseumManageController {
      * 获取场馆列表
      */
     @PostMapping("/list")
-    public Result list(@RequestBody Map<String, Object> params) {
-        String keyword = (String) params.get("keyword");
-        Integer page = (Integer) params.get("page");
-        Integer limit = (Integer) params.get("limit");
-        if (page == null)
-            page = 1;
-        if (limit == null)
-            limit = 10;
+    public Result list(@RequestBody Map<String, Object> requestParams) {
+        String keyword = (String) requestParams.get("keyword");
+        int page = PageParamUtil.defaultPage(requestParams.get("page"));
+        int limit = PageParamUtil.defaultLimit(requestParams.get("limit"));
         Page<Museum> list = museumService.dataList(keyword, page, limit);
         return Result.success("获取成功", list);
     }
@@ -65,11 +62,11 @@ public class MuseumManageController {
      * 删除场馆
      */
     @PostMapping("/del")
-    public Result del(@RequestBody Map<String, String> params) {
-        String id = params.get("id");
-        if (StrUtil.isBlank(id))
+    public Result del(@RequestBody Map<String, String> requestParams) {
+        String museumId = requestParams.get("id");
+        if (StrUtil.isBlank(museumId))
             return Result.error(500, "ID不能为空");
-        museumService.delMuseum(id);
+        museumService.delMuseum(museumId);
         return Result.success("删除成功");
     }
 
@@ -77,12 +74,12 @@ public class MuseumManageController {
      * 修改状态
      */
     @PostMapping("/status")
-    public Result status(@RequestBody Map<String, Object> params) {
-        String id = (String) params.get("id");
-        Integer status = (Integer) params.get("status");
-        if (StrUtil.isBlank(id) || status == null)
+    public Result status(@RequestBody Map<String, Object> requestParams) {
+        String museumId = (String) requestParams.get("id");
+        Integer status = (Integer) requestParams.get("status");
+        if (StrUtil.isBlank(museumId) || status == null)
             return Result.error(500, "参数错误");
-        museumService.status(id, status);
+        museumService.status(museumId, status);
         return Result.success("操作成功");
     }
 

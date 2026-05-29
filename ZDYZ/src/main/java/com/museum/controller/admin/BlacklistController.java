@@ -3,8 +3,10 @@ package com.museum.controller.admin;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.museum.common.result.Result;
+import com.museum.common.utils.PageParamUtil;
 import com.museum.entity.Identity;
 import com.museum.service.BlacklistService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
@@ -29,6 +30,7 @@ import java.util.Map;
 /**
  * 黑名单管理控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/admin/blacklist")
 public class BlacklistController {
@@ -40,15 +42,11 @@ public class BlacklistController {
      * 黑名单列表
      */
     @PostMapping("/list")
-    public Result list(@RequestBody Map<String, Object> params) {
-        String keyword = (String) params.get("keyword");
-        Integer page = (Integer) params.get("page");
-        Integer limit = (Integer) params.get("limit");
-        Integer status = (Integer) params.get("status"); // 新增 status 参数
-        if (page == null)
-            page = 1;
-        if (limit == null)
-            limit = 10;
+    public Result list(@RequestBody Map<String, Object> requestParams) {
+        String keyword = (String) requestParams.get("keyword");
+        int page = PageParamUtil.defaultPage(requestParams.get("page"));
+        int limit = PageParamUtil.defaultLimit(requestParams.get("limit"));
+        Integer status = (Integer) requestParams.get("status"); // 新增 status 参数
         Page<Identity> list = blacklistService.list(keyword, page, limit, status);
         return Result.success("获取成功", list);
     }
@@ -57,10 +55,10 @@ public class BlacklistController {
      * 加入黑名单
      */
     @PostMapping("/add")
-    public Result add(@RequestBody Map<String, Object> params) {
-        String identityId = (String) params.get("identityId");
-        String reason = (String) params.get("reason");
-        Object endTimeObj = params.get("endTime");
+    public Result add(@RequestBody Map<String, Object> requestParams) {
+        String identityId = (String) requestParams.get("identityId");
+        String reason = (String) requestParams.get("reason");
+        Object endTimeObj = requestParams.get("endTime");
 
         if (StrUtil.isBlank(identityId) || endTimeObj == null) {
             return Result.error(500, "参数错误: ID和结束时间必填");
@@ -82,9 +80,9 @@ public class BlacklistController {
      * 更新黑名单结束时间
      */
     @PostMapping("/updateTime")
-    public Result updateTime(@RequestBody Map<String, Object> params) {
-        String identityId = (String) params.get("identityId");
-        Object endTimeObj = params.get("endTime");
+    public Result updateTime(@RequestBody Map<String, Object> requestParams) {
+        String identityId = (String) requestParams.get("identityId");
+        Object endTimeObj = requestParams.get("endTime");
 
         if (StrUtil.isBlank(identityId) || endTimeObj == null) {
             return Result.error(500, "参数错误");
@@ -105,8 +103,8 @@ public class BlacklistController {
      * 移除黑名单
      */
     @PostMapping("/remove")
-    public Result remove(@RequestBody Map<String, String> params) {
-        String identityId = params.get("identityId");
+    public Result remove(@RequestBody Map<String, String> requestParams) {
+        String identityId = requestParams.get("identityId");
         if (StrUtil.isBlank(identityId)) {
             return Result.error(500, "参数错误");
         }
@@ -162,7 +160,7 @@ public class BlacklistController {
             IoUtil.close(out);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("导出黑名单记录失败", e);
         }
     }
 }
