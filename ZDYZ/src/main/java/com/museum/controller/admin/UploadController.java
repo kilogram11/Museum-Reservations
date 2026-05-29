@@ -3,6 +3,7 @@ package com.museum.controller.admin;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
 import com.museum.common.result.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ import java.util.Map;
 /**
  * 文件上传控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/admin/upload")
 public class UploadController {
@@ -51,15 +53,15 @@ public class UploadController {
         try {
             file.transferTo(dest);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("保存上传文件失败，fileName={}", fileName, e);
             return Result.error("文件保存失败");
         }
 
         // 返回可访问的 URL (需要在 WebMvcConfig 中配置映射)
         String url = "/files/" + fileName;
 
-        Map<String, String> map = new HashMap<>();
-        map.put("url", url);
-        return Result.success("上传成功", map);
+        Map<String, String> uploadResult = new HashMap<>();
+        uploadResult.put("url", url);
+        return Result.success("上传成功", uploadResult);
     }
 }

@@ -9,6 +9,8 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.museum.common.constant.AdminBusinessConstant;
+import com.museum.common.constant.BookingConstant;
 import com.museum.common.dto.ActivityAddDTO;
 import com.museum.common.exception.BusinessException;
 import com.museum.entity.Activity;
@@ -71,7 +73,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         }
 
         long now = System.currentTimeMillis();
-        String activityId = "act_" + IdUtil.fastSimpleUUID();
+        String activityId = AdminBusinessConstant.ACTIVITY_ID_PREFIX + IdUtil.fastSimpleUUID();
 
         // 2. 提取图片
         List<String> imgList = new ArrayList<>();
@@ -94,18 +96,18 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         activity.setActivityPic(JSONUtil.toJsonStr(imgList));
 
         // 组装 activityObj (存储排期参数)
-        Map<String, Object> objMap = new HashMap<>();
-        objMap.put("startDate", dto.getStartDate());
-        objMap.put("endDate", dto.getEndDate());
-        objMap.put("content", dto.getContent());
-        activity.setActivityObj(JSONUtil.toJsonStr(objMap));
+        Map<String, Object> activityExtraInfo = new HashMap<>();
+        activityExtraInfo.put("startDate", dto.getStartDate());
+        activityExtraInfo.put("endDate", dto.getEndDate());
+        activityExtraInfo.put("content", dto.getContent());
+        activity.setActivityObj(JSONUtil.toJsonStr(activityExtraInfo));
 
         // 状态处理：默认为0
         Integer status = dto.getStatus() != null ? dto.getStatus() : 0;
         activity.setActivityStatus(status);
         activity.setActivityAddTime(now);
         activity.setActivityEditTime(now);
-        activity.setPid("1");
+        activity.setPid(BookingConstant.DEFAULT_PID);
         activityMapper.insert(activity);
 
         // 4. 判断状态决定是否生成排期
@@ -113,7 +115,8 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
             initActivitySchedule(activityId, dto.getStartDate(), dto.getEndDate());
             // 发送广播消息
             try {
-                messageService.createMessage("ALL", "ACTIVITY_NEW", dto.getActivityTitle());
+                messageService.createMessage(AdminBusinessConstant.MESSAGE_RECEIVER_ALL,
+                        AdminBusinessConstant.MESSAGE_TEMPLATE_ACTIVITY_NEW, dto.getActivityTitle());
             } catch (Exception e) {
                 logger.error("发送新活动通知失败", e);
             }
@@ -133,7 +136,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         int count = 0;
         while (!current.after(end)) {
             String dayStr = DateUtil.format(current, "yyyy-MM-dd");
-            String dayId = "day_" + IdUtil.fastSimpleUUID();
+            String dayId = AdminBusinessConstant.DAY_ID_PREFIX + IdUtil.fastSimpleUUID();
 
             Day day = new Day();
             day.setId(IdUtil.fastSimpleUUID());
@@ -145,7 +148,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
             day.setDayLimitCnt(1000);
             day.setAddTime(System.currentTimeMillis());
             day.setEditTime(System.currentTimeMillis());
-            day.setPid("1");
+            day.setPid(BookingConstant.DEFAULT_PID);
             dayMapper.insert(day);
 
             current = DateUtil.offsetDay(current, 1);
@@ -218,11 +221,11 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         }
         activity.setActivityPic(JSONUtil.toJsonStr(imgList));
 
-        Map<String, Object> objMap = new HashMap<>();
-        objMap.put("startDate", dto.getStartDate());
-        objMap.put("endDate", dto.getEndDate());
-        objMap.put("content", dto.getContent());
-        activity.setActivityObj(JSONUtil.toJsonStr(objMap));
+        Map<String, Object> activityExtraInfo = new HashMap<>();
+        activityExtraInfo.put("startDate", dto.getStartDate());
+        activityExtraInfo.put("endDate", dto.getEndDate());
+        activityExtraInfo.put("content", dto.getContent());
+        activity.setActivityObj(JSONUtil.toJsonStr(activityExtraInfo));
 
         activityMapper.updateById(activity);
         logger.info("编辑活动: {}", activity.getActivityId());
@@ -287,7 +290,8 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
             
             // 发送广播消息 (仅当从未发送过? 这里简化为每次上架都发，或者假设管理员知道)
             try {
-                messageService.createMessage("ALL", "ACTIVITY_NEW", activity.getActivityTitle());
+                messageService.createMessage(AdminBusinessConstant.MESSAGE_RECEIVER_ALL,
+                        AdminBusinessConstant.MESSAGE_TEMPLATE_ACTIVITY_NEW, activity.getActivityTitle());
             } catch (Exception e) {
                 logger.error("发送新活动通知失败", e);
             }
