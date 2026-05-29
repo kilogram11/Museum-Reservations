@@ -58,68 +58,84 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addActivity(ActivityAddDTO dto) {
-        // 1. 校验
+        validateAddActivity(dto);
+        long now = System.currentTimeMillis();
+        String activityId = AdminBusinessConstant.ACTIVITY_ID_PREFIX + IdUtil.fastSimpleUUID();
+        Integer status = dto.getStatus() != null ? dto.getStatus() : 0;
+
+        Activity activity = buildActivityEntity(dto, activityId, now, status);
+        activityMapper.insert(activity);
+
+        publishActivityIfEnabled(activityId, dto, status);
+    }
+
+    private void validateAddActivity(ActivityAddDTO dto) {
         if (StrUtil.isBlank(dto.getActivityTitle()))
             throw new BusinessException(500, "活动标题不能为空");
         if (StrUtil.isBlank(dto.getStartDate()) || StrUtil.isBlank(dto.getEndDate())) {
             throw new BusinessException(500, "活动时间范围不能为空");
         }
+        validateDateRange(dto.getStartDate(), dto.getEndDate());
+    }
 
-        // 日期逻辑校验
-        Date start = DateUtil.parse(dto.getStartDate());
-        Date end = DateUtil.parse(dto.getEndDate());
+    private void validateDateRange(String startDate, String endDate) {
+        Date start = DateUtil.parse(startDate);
+        Date end = DateUtil.parse(endDate);
         if (start.after(end)) {
             throw new BusinessException(500, "开始日期不能晚于结束日期");
         }
+    }
 
-        long now = System.currentTimeMillis();
-        String activityId = AdminBusinessConstant.ACTIVITY_ID_PREFIX + IdUtil.fastSimpleUUID();
-
-        // 2. 提取图片
-        List<String> imgList = new ArrayList<>();
-        if (CollUtil.isNotEmpty(dto.getContent())) {
-            for (ActivityAddDTO.ContentItem item : dto.getContent()) {
-                // 前端 type 为 'image'，后端原逻辑只匹配 'img'
-                if (("img".equals(item.getType()) || "image".equals(item.getType()))
-                        && StrUtil.isNotBlank(item.getVal())) {
-                    imgList.add(item.getVal());
-                }
-            }
-        }
-
-        // 3. 插入 Activity
+    private Activity buildActivityEntity(ActivityAddDTO dto, String activityId, long now, Integer status) {
         Activity activity = new Activity();
         activity.setId(IdUtil.fastSimpleUUID());
         activity.setActivityId(activityId);
         activity.setActivityTitle(dto.getActivityTitle());
         activity.setAdminId(dto.getAdminId());
-        activity.setActivityPic(JSONUtil.toJsonStr(imgList));
-
-        // 组装 activityObj (存储排期参数)
-        Map<String, Object> activityExtraInfo = new HashMap<>();
-        activityExtraInfo.put("startDate", dto.getStartDate());
-        activityExtraInfo.put("endDate", dto.getEndDate());
-        activityExtraInfo.put("content", dto.getContent());
-        activity.setActivityObj(JSONUtil.toJsonStr(activityExtraInfo));
-
-        // 状态处理：默认为0
-        Integer status = dto.getStatus() != null ? dto.getStatus() : 0;
+        activity.setActivityPic(JSONUtil.toJsonStr(extractActivityImages(dto.getContent())));
+        activity.setActivityObj(JSONUtil.toJsonStr(buildActivityExtraInfo(dto)));
         activity.setActivityStatus(status);
         activity.setActivityAddTime(now);
         activity.setActivityEditTime(now);
         activity.setPid(BookingConstant.DEFAULT_PID);
-        activityMapper.insert(activity);
+        return activity;
+    }
 
-        // 4. 判断状态决定是否生成排期
+    private List<String> extractActivityImages(List<ActivityAddDTO.ContentItem> content) {
+        List<String> imageList = new ArrayList<>();
+        if (CollUtil.isEmpty(content)) {
+            return imageList;
+        }
+        for (ActivityAddDTO.ContentItem item : content) {
+            if (("img".equals(item.getType()) || "image".equals(item.getType()))
+                    && StrUtil.isNotBlank(item.getVal())) {
+                imageList.add(item.getVal());
+            }
+        }
+        return imageList;
+    }
+
+    private Map<String, Object> buildActivityExtraInfo(ActivityAddDTO dto) {
+        Map<String, Object> activityExtraInfo = new HashMap<>();
+        activityExtraInfo.put("startDate", dto.getStartDate());
+        activityExtraInfo.put("endDate", dto.getEndDate());
+        activityExtraInfo.put("content", dto.getContent());
+        return activityExtraInfo;
+    }
+
+    private void publishActivityIfEnabled(String activityId, ActivityAddDTO dto, Integer status) {
         if (status == 1) {
             initActivitySchedule(activityId, dto.getStartDate(), dto.getEndDate());
-            // 发送广播消息
-            try {
-                messageService.createMessage(AdminBusinessConstant.MESSAGE_RECEIVER_ALL,
-                        AdminBusinessConstant.MESSAGE_TEMPLATE_ACTIVITY_NEW, dto.getActivityTitle());
-            } catch (Exception e) {
-                logger.error("发送新活动通知失败", e);
-            }
+            sendActivityNewMessage(dto.getActivityTitle());
+        }
+    }
+
+    private void sendActivityNewMessage(String activityTitle) {
+        try {
+            messageService.createMessage(AdminBusinessConstant.MESSAGE_RECEIVER_ALL,
+                    AdminBusinessConstant.MESSAGE_TEMPLATE_ACTIVITY_NEW, activityTitle);
+        } catch (Exception e) {
+            logger.error("发送新活动通知失败", e);
         }
     }
 
@@ -160,75 +176,71 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void editActivity(com.museum.common.dto.ActivityEditDTO dto) {
-        if (StrUtil.isBlank(dto.getId()))
+        Activity activity = loadActivityForEdit(dto.getId());
+        JSONObject oldObj = JSONUtil.parseObj(activity.getActivityObj());
+        boolean scheduleChanged = isActivityScheduleChanged(dto, oldObj);
+
+        updateActivityBasicFields(activity, dto);
+        rebuildActivityScheduleIfNeeded(activity, dto, oldObj, scheduleChanged);
+        syncActivityScheduleStatusIfNeeded(activity, dto, scheduleChanged);
+        updateActivityExtraFields(activity, dto);
+
+        activityMapper.updateById(activity);
+        logger.info("编辑活动: {}", activity.getActivityId());
+    }
+
+    private Activity loadActivityForEdit(String id) {
+        if (StrUtil.isBlank(id))
             throw new BusinessException(500, "ID不能为空");
 
-        Activity activity = activityMapper.selectById(dto.getId());
+        Activity activity = activityMapper.selectById(id);
         if (activity == null)
             throw new BusinessException(500, "活动不存在");
+        return activity;
+    }
 
-        // 1. 更新基本字段
+    private void updateActivityBasicFields(Activity activity, com.museum.common.dto.ActivityEditDTO dto) {
         activity.setActivityTitle(dto.getActivityTitle());
         if (dto.getStatus() != null) {
             activity.setActivityStatus(dto.getStatus());
         }
+    }
 
-        // --- 逻辑增强: 检查排期变更 ---
-        boolean scheduleChanged = false;
-        JSONObject oldObj = JSONUtil.parseObj(activity.getActivityObj());
-
+    private boolean isActivityScheduleChanged(com.museum.common.dto.ActivityEditDTO dto, JSONObject oldObj) {
         if (StrUtil.isNotBlank(dto.getStartDate()) && !dto.getStartDate().equals(oldObj.getStr("startDate"))) {
-            scheduleChanged = true;
+            return true;
         }
-        if (StrUtil.isNotBlank(dto.getEndDate()) && !dto.getEndDate().equals(oldObj.getStr("endDate"))) {
-            scheduleChanged = true;
-        }
+        return StrUtil.isNotBlank(dto.getEndDate()) && !dto.getEndDate().equals(oldObj.getStr("endDate"));
+    }
 
-        if (scheduleChanged) {
-            logger.info("检测到活动时间变更，正在重置排期... ActivityId={}", activity.getActivityId());
-            // (1) 删除旧排期
-            dayMapper.delete(new QueryWrapper<Day>().eq("ACTIVITY_ID", activity.getActivityId()));
-
-            // (2) 重新生成 (状态判断)
-            Integer effectiveStatus = dto.getStatus() != null ? dto.getStatus() : activity.getActivityStatus();
-            if (effectiveStatus == 1) {
-                String start = StrUtil.isNotBlank(dto.getStartDate()) ? dto.getStartDate() : oldObj.getStr("startDate");
-                String end = StrUtil.isNotBlank(dto.getEndDate()) ? dto.getEndDate() : oldObj.getStr("endDate");
-                initActivitySchedule(activity.getActivityId(), start, end);
-            }
-        } else {
-            // 仅状态变更
-            if (dto.getStatus() != null) {
-                if (dto.getStatus() == 1) {
-                    updateScheduleStatus(activity.getActivityId(), 1);
-                } else {
-                    updateScheduleStatus(activity.getActivityId(), 0);
-                }
-            }
+    private void rebuildActivityScheduleIfNeeded(Activity activity, com.museum.common.dto.ActivityEditDTO dto,
+                                                 JSONObject oldObj, boolean scheduleChanged) {
+        if (!scheduleChanged) {
+            return;
         }
-        // -----------------------------
+        logger.info("检测到活动时间变更，正在重置排期... ActivityId={}", activity.getActivityId());
+        dayMapper.delete(new QueryWrapper<Day>().eq("ACTIVITY_ID", activity.getActivityId()));
+
+        Integer effectiveStatus = dto.getStatus() != null ? dto.getStatus() : activity.getActivityStatus();
+        if (effectiveStatus == 1) {
+            String start = StrUtil.isNotBlank(dto.getStartDate()) ? dto.getStartDate() : oldObj.getStr("startDate");
+            String end = StrUtil.isNotBlank(dto.getEndDate()) ? dto.getEndDate() : oldObj.getStr("endDate");
+            initActivitySchedule(activity.getActivityId(), start, end);
+        }
+    }
+
+    private void syncActivityScheduleStatusIfNeeded(Activity activity, com.museum.common.dto.ActivityEditDTO dto,
+                                                   boolean scheduleChanged) {
+        if (scheduleChanged || dto.getStatus() == null) {
+            return;
+        }
+        updateScheduleStatus(activity.getActivityId(), dto.getStatus() == 1 ? 1 : 0);
+    }
+
+    private void updateActivityExtraFields(Activity activity, com.museum.common.dto.ActivityEditDTO dto) {
         activity.setActivityEditTime(System.currentTimeMillis());
-
-        // 2. 提取图片与更新 activityObj
-        List<String> imgList = new ArrayList<>();
-        if (CollUtil.isNotEmpty(dto.getContent())) {
-            for (ActivityAddDTO.ContentItem item : dto.getContent()) {
-                if (("img".equals(item.getType()) || "image".equals(item.getType()))
-                        && StrUtil.isNotBlank(item.getVal())) {
-                    imgList.add(item.getVal());
-                }
-            }
-        }
-        activity.setActivityPic(JSONUtil.toJsonStr(imgList));
-
-        Map<String, Object> activityExtraInfo = new HashMap<>();
-        activityExtraInfo.put("startDate", dto.getStartDate());
-        activityExtraInfo.put("endDate", dto.getEndDate());
-        activityExtraInfo.put("content", dto.getContent());
-        activity.setActivityObj(JSONUtil.toJsonStr(activityExtraInfo));
-
-        activityMapper.updateById(activity);
-        logger.info("编辑活动: {}", activity.getActivityId());
+        activity.setActivityPic(JSONUtil.toJsonStr(extractActivityImages(dto.getContent())));
+        activity.setActivityObj(JSONUtil.toJsonStr(buildActivityExtraInfo(dto)));
     }
 
     @Override

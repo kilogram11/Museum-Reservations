@@ -207,24 +207,36 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
     }
 
     private void doSubmitBooking(String userId, String timeMark, List<String> identityIds) {
+        BookingContext bookingContext = loadAndValidateBookingContext(timeMark, identityIds.size());
+        List<Join> joinsToSave = buildJoinRecords(userId, timeMark, identityIds, bookingContext.getMeetDay());
+
+        persistBookingAndSendMessages(joinsToSave, bookingContext, userId);
+        deductInventory(bookingContext.getTime(), identityIds.size());
+    }
+
+    private BookingContext loadAndValidateBookingContext(String timeMark, int visitorCount) {
         Time time = validateTimeSlot(timeMark);
         Day day = validateDaySchedule(time);
-        String meetDay = day.getDay();
+        checkInventorySufficient(time, visitorCount);
+        return new BookingContext(time, day.getDay());
+    }
 
-        checkInventorySufficient(time, identityIds.size());
-
+    private List<Join> buildJoinRecords(String userId, String timeMark,
+                                         List<String> identityIds, String meetDay) {
         List<Join> joinsToSave = new ArrayList<>();
         long now = System.currentTimeMillis();
 
         for (String identityId : identityIds) {
             Identity identity = validateVisitorIdentity(identityId);
             checkDuplicateBooking(identityId, meetDay);
-            Join join = buildJoinRecord(userId, identity, timeMark, meetDay, now);
-            joinsToSave.add(join);
+            joinsToSave.add(buildJoinRecord(userId, identity, timeMark, meetDay, now));
         }
+        return joinsToSave;
+    }
 
-        saveBookingRecords(joinsToSave, time, meetDay, userId);
-        deductInventory(time, identityIds.size());
+    private void persistBookingAndSendMessages(List<Join> joinsToSave,
+                                                BookingContext bookingContext, String userId) {
+        saveBookingRecords(joinsToSave, bookingContext.getTime(), bookingContext.getMeetDay(), userId);
     }
 
     private Time validateTimeSlot(String timeMark) {
@@ -497,7 +509,7 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         try {
             Join join = findBookingById(id);
             validateCheckinAllowed(join);
-            executeCheckin(join);
+            markBookingCheckedIn(join);
         } finally {
             releaseCheckinLock(lockKey);
         }
@@ -544,7 +556,7 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         }
     }
 
-    private void executeCheckin(Join join) {
+    private void markBookingCheckedIn(Join join) {
         join.setJoinIsCheckin(CheckinStatus.CHECKED_IN.getCode());
         join.setJoinEditTime(System.currentTimeMillis());
         joinMapper.updateById(join);
@@ -608,5 +620,23 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
             return form.getStr("name", "游客");
         }
         return "游客";
+    }
+
+    private static class BookingContext {
+        private final Time time;
+        private final String meetDay;
+
+        private BookingContext(Time time, String meetDay) {
+            this.time = time;
+            this.meetDay = meetDay;
+        }
+
+        private Time getTime() {
+            return time;
+        }
+
+        private String getMeetDay() {
+            return meetDay;
+        }
     }
 }
