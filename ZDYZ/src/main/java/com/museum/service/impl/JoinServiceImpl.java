@@ -18,6 +18,7 @@ import com.museum.common.exception.ErrorCode;
 import com.museum.common.utils.QRCodeUtil;
 import com.museum.entity.*;
 import com.museum.mapper.*;
+import com.museum.service.BookingStockService;
 import com.museum.service.JoinService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
     private ActivityMapper activityMapper;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private BookingStockService bookingStockService;
 
     // ==================== 查询：可预约日期 ====================
 
@@ -211,13 +214,13 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         List<Join> joinsToSave = buildJoinRecords(userId, timeMark, identityIds, bookingContext.getMeetDay());
 
         persistBookingAndSendMessages(joinsToSave, bookingContext, userId);
-        deductInventory(bookingContext.getTime(), identityIds.size());
+        bookingStockService.deduct(bookingContext.getTime(), identityIds.size());
     }
 
     private BookingContext loadAndValidateBookingContext(String timeMark, int visitorCount) {
         Time time = validateTimeSlot(timeMark);
         Day day = validateDaySchedule(time);
-        checkInventorySufficient(time, visitorCount);
+        bookingStockService.checkSufficient(time, visitorCount);
         return new BookingContext(time, day.getDay());
     }
 
@@ -255,12 +258,6 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
             throw new BusinessException(ErrorCode.BOOKING_SCHEDULE_ERROR);
         }
         return day;
-    }
-
-    private void checkInventorySufficient(Time time, int need) {
-        if (time.getSuccCnt() + need > time.getLimitCnt()) {
-            throw new BusinessException(ErrorCode.BOOKING_SLOT_FULL);
-        }
     }
 
     private Identity validateVisitorIdentity(String identityId) {
@@ -346,11 +343,6 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         } catch (Exception e) {
             logger.error("发送预约成功消息失败", e);
         }
-    }
-
-    private void deductInventory(Time time, int need) {
-        time.setSuccCnt(time.getSuccCnt() + need);
-        timeMapper.updateById(time);
     }
 
     // ==================== 查询：我的预约 ====================
@@ -452,7 +444,7 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         joinMapper.updateById(join);
 
         sendCancelMessage(userId, join);
-        rollbackInventory(join);
+        bookingStockService.rollback(join.getTimeMark());
     }
 
     private Join findBookingOwnedByUser(String userId, String joinId) {
@@ -483,15 +475,6 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
             messageService.createMessage(userId, "BOOKING_CANCEL", titleName);
         } catch (Exception e) {
             logger.error("发送预约取消消息失败", e);
-        }
-    }
-
-    private void rollbackInventory(Join join) {
-        Time time = timeMapper.selectOne(
-                new QueryWrapper<Time>().eq("TIME_MARK", join.getTimeMark()));
-        if (time != null && time.getSuccCnt() > 0) {
-            time.setSuccCnt(time.getSuccCnt() - 1);
-            timeMapper.updateById(time);
         }
     }
 

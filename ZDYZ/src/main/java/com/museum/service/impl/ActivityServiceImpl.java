@@ -18,6 +18,7 @@ import com.museum.entity.Day;
 import com.museum.mapper.ActivityMapper;
 import com.museum.mapper.DayMapper;
 import com.museum.service.ActivityService;
+import com.museum.service.ScheduleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
 
     @Autowired
     private DayMapper dayMapper;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     @Autowired
     private com.museum.service.MessageService messageService;
@@ -125,7 +129,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
 
     private void publishActivityIfEnabled(String activityId, ActivityAddDTO dto, Integer status) {
         if (status == 1) {
-            initActivitySchedule(activityId, dto.getStartDate(), dto.getEndDate());
+            scheduleService.initActivitySchedule(activityId, dto.getStartDate(), dto.getEndDate());
             sendActivityNewMessage(dto.getActivityTitle());
         }
     }
@@ -137,40 +141,6 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         } catch (Exception e) {
             logger.error("发送新活动通知失败", e);
         }
-    }
-
-    private void initActivitySchedule(String activityId, String startDate, String endDate) {
-        Date start = DateUtil.parse(startDate);
-        Date end = DateUtil.parse(endDate);
-
-        if (start.after(end)) {
-            logger.error("排期生成失败: 开始日期晚于结束日期 {} > {}", startDate, endDate);
-            throw new BusinessException(500, "排期日期无效");
-        }
-
-        Date current = start;
-        int count = 0;
-        while (!current.after(end)) {
-            String dayStr = DateUtil.format(current, "yyyy-MM-dd");
-            String dayId = AdminBusinessConstant.DAY_ID_PREFIX + IdUtil.fastSimpleUUID();
-
-            Day day = new Day();
-            day.setId(IdUtil.fastSimpleUUID());
-            day.setDayId(dayId);
-            day.setDay(dayStr);
-            day.setMuseumId(null);
-            day.setActivityId(activityId);
-            day.setStatus(1); // 默认启用
-            day.setDayLimitCnt(1000);
-            day.setAddTime(System.currentTimeMillis());
-            day.setEditTime(System.currentTimeMillis());
-            day.setPid(BookingConstant.DEFAULT_PID);
-            dayMapper.insert(day);
-
-            current = DateUtil.offsetDay(current, 1);
-            count++;
-        }
-        logger.info("活动排期自动生成: {}, 天数: {}", activityId, count);
     }
 
     @Override
@@ -225,7 +195,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         if (effectiveStatus == 1) {
             String start = StrUtil.isNotBlank(dto.getStartDate()) ? dto.getStartDate() : oldObj.getStr("startDate");
             String end = StrUtil.isNotBlank(dto.getEndDate()) ? dto.getEndDate() : oldObj.getStr("endDate");
-            initActivitySchedule(activity.getActivityId(), start, end);
+            scheduleService.initActivitySchedule(activity.getActivityId(), start, end);
         }
     }
 
@@ -234,7 +204,7 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         if (scheduleChanged || dto.getStatus() == null) {
             return;
         }
-        updateScheduleStatus(activity.getActivityId(), dto.getStatus() == 1 ? 1 : 0);
+        scheduleService.updateActivityScheduleStatus(activity.getActivityId(), dto.getStatus() == 1 ? 1 : 0);
     }
 
     private void updateActivityExtraFields(Activity activity, com.museum.common.dto.ActivityEditDTO dto) {
@@ -292,12 +262,12 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
                     String start = obj.getStr("startDate");
                     String end = obj.getStr("endDate");
                     if (StrUtil.isAllNotBlank(start, end)) {
-                        initActivitySchedule(activity.getActivityId(), start, end);
+                        scheduleService.initActivitySchedule(activity.getActivityId(), start, end);
                     }
                 }
             } else {
                 // 有排期则启用
-                updateScheduleStatus(activity.getActivityId(), 1);
+                scheduleService.updateActivityScheduleStatus(activity.getActivityId(), 1);
             }
             
             // 发送广播消息 (仅当从未发送过? 这里简化为每次上架都发，或者假设管理员知道)
@@ -309,18 +279,8 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
             }
         } else {
             // 禁用逻辑：逻辑禁用
-            updateScheduleStatus(activity.getActivityId(), 0);
+            scheduleService.updateActivityScheduleStatus(activity.getActivityId(), 0);
         }
-    }
-
-    /**
-     * 批量更新排期状态
-     */
-    private void updateScheduleStatus(String activityId, Integer status) {
-        Day day = new Day();
-        day.setStatus(status);
-        dayMapper.update(day, new QueryWrapper<Day>().eq("ACTIVITY_ID", activityId));
-        logger.info("活动排期批量更新: actId={}, status={}", activityId, status);
     }
 
     @Override
