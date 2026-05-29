@@ -7,7 +7,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.museum.common.constant.AdminBusinessConstant;
@@ -21,6 +20,7 @@ import com.museum.mapper.DayMapper;
 import com.museum.mapper.MuseumMapper;
 import com.museum.mapper.TimeMapper;
 import com.museum.service.MuseumService;
+import com.museum.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +44,9 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
 
     @Autowired
     private TimeMapper timeMapper;
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     @Override
     public Page<Museum> dataList(String keyword, Integer page, Integer limit) {
@@ -170,63 +173,8 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
     private void initScheduleIfEnabled(String museumId, Integer status, String startDate,
                                        String endDate, List<MuseumAddDTO.TimeTemplate> times) {
         if (status == 1) {
-            initSchedule(museumId, startDate, endDate, times);
+            scheduleService.initMuseumSchedule(museumId, startDate, endDate, times);
         }
-    }
-
-    /**
-     * 初始化排期 (内部调用)
-     */
-    private void initSchedule(String museumId, String startDateStr, String endDateStr,
-            List<MuseumAddDTO.TimeTemplate> templates) {
-        Date start = DateUtil.parse(startDateStr);
-        Date end = DateUtil.parse(endDateStr);
-
-        if (start.after(end)) {
-            log.error("排期生成失败: 开始日期晚于结束日期 {} > {}", startDateStr, endDateStr);
-            throw new BusinessException(500, "排期日期无效");
-        }
-
-        long dayLimitTotal = templates.stream().mapToInt(MuseumAddDTO.TimeTemplate::getLimit).sum();
-
-        Date current = start;
-        while (!current.after(end)) {
-            String dayStr = DateUtil.format(current, "yyyy-MM-dd");
-            String dayId = AdminBusinessConstant.DAY_ID_PREFIX + IdUtil.fastSimpleUUID();
-
-            Day day = new Day();
-            day.setId(IdUtil.fastSimpleUUID());
-            day.setDayId(dayId);
-            day.setDay(dayStr);
-            day.setMuseumId(museumId);
-            day.setStatus(1); // 默认跟随场馆状态 (已启用)
-            day.setDayLimitCnt((int) dayLimitTotal);
-            day.setAddTime(System.currentTimeMillis());
-            day.setEditTime(System.currentTimeMillis());
-            day.setPid(BookingConstant.DEFAULT_PID);
-            dayMapper.insert(day);
-
-            for (MuseumAddDTO.TimeTemplate tmpl : templates) {
-                Time time = new Time();
-                time.setId(IdUtil.fastSimpleUUID());
-                time.setTimeId(AdminBusinessConstant.TIME_ID_PREFIX + IdUtil.fastSimpleUUID());
-                time.setDayId(dayId);
-                time.setMuseumId(museumId);
-                time.setTimeStart(tmpl.getStart());
-                time.setTimeEnd(tmpl.getEnd());
-                time.setTimeMark(String.format("%s_%s_%s", museumId, dayStr, tmpl.getStart()));
-                time.setLimitCnt(tmpl.getLimit());
-                time.setSuccCnt(0);
-                time.setStatus(1);
-                time.setIsLimit(1);
-                time.setAddTime(System.currentTimeMillis());
-                time.setEditTime(System.currentTimeMillis());
-                time.setPid(BookingConstant.DEFAULT_PID);
-                timeMapper.insert(time);
-            }
-            current = DateUtil.offsetDay(current, 1);
-        }
-        log.info("排期生成完成: {} -> {}, 范围: [{}, {}]", museumId, templates.size(), startDateStr, endDateStr);
     }
 
     @Override
@@ -305,7 +253,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
             String end = StrUtil.isNotBlank(dto.getEndDate()) ? dto.getEndDate() : oldObj.getStr("endDate");
             List<MuseumAddDTO.TimeTemplate> times = CollUtil.isNotEmpty(dto.getTimes()) ? dto.getTimes()
                     : oldObj.getBeanList("times", MuseumAddDTO.TimeTemplate.class);
-            initSchedule(museum.getMuseumId(), start, end, times);
+            scheduleService.initMuseumSchedule(museum.getMuseumId(), start, end, times);
         }
     }
 
@@ -314,7 +262,7 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
         if (scheduleChanged || dto.getMuseumStatus() == null) {
             return;
         }
-        updateScheduleStatus(museum.getMuseumId(), dto.getMuseumStatus() == 1 ? 1 : 0);
+        scheduleService.updateMuseumScheduleStatus(museum.getMuseumId(), dto.getMuseumStatus() == 1 ? 1 : 0);
     }
 
     private void updateMuseumExtraFields(Museum museum, com.museum.common.dto.MuseumEditDTO dto) {
@@ -383,18 +331,18 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
                     List<MuseumAddDTO.TimeTemplate> times = obj.getBeanList("times", MuseumAddDTO.TimeTemplate.class);
 
                     if (StrUtil.isAllNotBlank(start, end) && CollUtil.isNotEmpty(times)) {
-                        initSchedule(museum.getMuseumId(), start, end, times);
+                        scheduleService.initMuseumSchedule(museum.getMuseumId(), start, end, times);
                     } else {
                         log.warn("场馆启用失败: 缺少排期配置数据, ID: {}", id);
                     }
                 }
             } else {
                 // 已有排期，全部启用 (逻辑恢复)
-                updateScheduleStatus(museum.getMuseumId(), 1);
+                scheduleService.updateMuseumScheduleStatus(museum.getMuseumId(), 1);
             }
         } else {
             // 禁用逻辑：全部禁用 (逻辑删除)
-            updateScheduleStatus(museum.getMuseumId(), 0);
+            scheduleService.updateMuseumScheduleStatus(museum.getMuseumId(), 0);
         }
     }
 
@@ -418,24 +366,10 @@ public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> impleme
             museumMapper.updateById(m);
 
             // 2. 联动禁用排期
-            updateScheduleStatus(m.getMuseumId(), 0);
+            scheduleService.updateMuseumScheduleStatus(m.getMuseumId(), 0);
 
             log.info("互斥策略执行: 自动禁用场馆 {}", m.getMuseumId());
         }
-    }
-
-    private void updateScheduleStatus(String museumId, Integer status) {
-        // 更新 Day 表状态
-        Day day = new Day();
-        day.setStatus(status);
-        dayMapper.update(day, new UpdateWrapper<Day>().eq("MUSEUM_ID", museumId));
-
-        // 更新 Time 表状态
-        Time time = new Time();
-        time.setStatus(status);
-        timeMapper.update(time, new UpdateWrapper<Time>().eq("MUSEUM_ID", museumId));
-
-        log.info("批量更新排期状态: museumId={}, status={}", museumId, status);
     }
 
     @Override

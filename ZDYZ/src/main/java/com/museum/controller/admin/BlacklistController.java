@@ -6,24 +6,16 @@ import com.museum.common.result.Result;
 import com.museum.common.utils.PageParamUtil;
 import com.museum.entity.Identity;
 import com.museum.service.BlacklistService;
+import com.museum.service.ExportService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.poi.excel.ExcelUtil;
-import cn.hutool.poi.excel.ExcelWriter;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +30,9 @@ public class BlacklistController {
     @Autowired
     private BlacklistService blacklistService;
 
+    @Autowired
+    private ExportService exportService;
+
     /**
      * 黑名单列表
      */
@@ -46,7 +41,7 @@ public class BlacklistController {
         String keyword = (String) requestParams.get("keyword");
         int page = PageParamUtil.defaultPage(requestParams.get("page"));
         int limit = PageParamUtil.defaultLimit(requestParams.get("limit"));
-        Integer status = (Integer) requestParams.get("status"); // 新增 status 参数
+        Integer status = (Integer) requestParams.get("status");
         Page<Identity> list = blacklistService.list(keyword, page, limit, status);
         return Result.success("获取成功", list);
     }
@@ -68,7 +63,6 @@ public class BlacklistController {
         if (endTimeObj instanceof Long) {
             endTime = (Long) endTimeObj;
         } else if (endTimeObj instanceof String) {
-            // 简单支持时间戳字符串
             endTime = Long.parseLong((String) endTimeObj);
         }
 
@@ -119,46 +113,7 @@ public class BlacklistController {
     public void export(HttpServletResponse response) {
         try {
             List<Identity> list = blacklistService.getAllBlacklistForExport();
-            List<Map<String, Object>> rows = new ArrayList<>();
-
-            for (Identity iden : list) {
-                Map<String, Object> row = new LinkedHashMap<>();
-                row.put("name", iden.getIdentityName());
-                row.put("card", iden.getIdentityCard());
-                row.put("mobile", iden.getIdentityMobile());
-                
-                String reason = "";
-                if (StrUtil.isNotBlank(iden.getIdentityObj())) {
-                    try {
-                        cn.hutool.json.JSONObject obj = JSONUtil.parseObj(iden.getIdentityObj());
-                        reason = obj.getStr("blackReason");
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-                row.put("reason", reason);
-                
-                rows.add(row);
-            }
-
-            ExcelWriter writer = ExcelUtil.getWriter(true);
-            writer.addHeaderAlias("name", "姓名");
-            writer.addHeaderAlias("card", "身份证号");
-            writer.addHeaderAlias("mobile", "手机号");
-            writer.addHeaderAlias("reason", "拉黑原因");
-
-            writer.write(rows, true);
-            writer.autoSizeColumnAll();
-
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
-            String fileName = URLEncoder.encode("黑名单记录_" + System.currentTimeMillis(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-            response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
-
-            ServletOutputStream out = response.getOutputStream();
-            writer.flush(out, true);
-            writer.close();
-            IoUtil.close(out);
-
+            exportService.exportBlacklist(response, list);
         } catch (Exception e) {
             log.error("导出黑名单记录失败", e);
         }
