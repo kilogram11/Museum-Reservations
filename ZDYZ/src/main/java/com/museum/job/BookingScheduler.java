@@ -3,6 +3,7 @@ package com.museum.job;
 import com.museum.mapper.JoinMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,9 @@ public class BookingScheduler {
     @Autowired
     private com.museum.mapper.IdentityMapper identityMapper;
 
+    @Value("${booking.scheduler.enabled:true}")
+    private boolean schedulerEnabled;
+
     /**
      * 自动检查逾期 & 黑名单管理
      * 每5分钟执行一次: 0 5***?
@@ -30,6 +34,10 @@ public class BookingScheduler {
     @PostConstruct
     @Scheduled(cron = "0 */5 * * * ?")
     public void autoCheck() {
+        if (!schedulerEnabled) {
+            log.info("自动任务已禁用，跳过逾期检查与黑名单管理");
+            return;
+        }
         log.info("开始执行自动任务: 逾期检查 & 黑名单管理...");
         try {
             long now = System.currentTimeMillis();

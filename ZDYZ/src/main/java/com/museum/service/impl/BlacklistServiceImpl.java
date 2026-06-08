@@ -3,6 +3,7 @@ package com.museum.service.impl;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.museum.common.exception.BusinessException;
 import com.museum.entity.Identity;
@@ -98,10 +99,12 @@ public class BlacklistServiceImpl implements BlacklistService {
         if (identity == null)
             return;
 
-        identity.setIdentityStatus(1); // 恢复正常
-        identity.setBlackStartTime(null);
-        identity.setBlackEndTime(null);
-        identityMapper.updateById(identity);
+        LambdaUpdateWrapper<Identity> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Identity::getIdentityId, identityId)
+                .set(Identity::getIdentityStatus, 1)
+                .set(Identity::getBlackStartTime, null)
+                .set(Identity::getBlackEndTime, null);
+        identityMapper.update(null, wrapper);
     }
 
     @Override
