@@ -98,7 +98,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import { getStatsApi } from '@/api/stats'
+import { statsApi } from '@/api/stats'
 import { profileApi } from '@/api/profile'
 import { 
   User, CircleCheck, Clock, WarningFilled, 
@@ -144,7 +144,7 @@ const getSioColor = (i) => ['#0B2118', '#ACF44A', '#F7F8FA', '#FAC858', '#FF5E5E
 
 // 初始化趋势图
 const initTrend = async () => {
-  const res = await getStatsApi.getTrend()
+  const res = await statsApi.trend()
   if (!trendChartRef.value) return
   const chart = echarts.init(trendChartRef.value)
   chart.setOption({
@@ -164,7 +164,7 @@ const initTrend = async () => {
 
 // 初始化核销状态图
 const initCheckinStatus = async () => {
-  const res = await getStatsApi.getCheckinStatus()
+  const res = await statsApi.checkin()
   if (!checkinStatusChartRef.value) return
   const chart = echarts.init(checkinStatusChartRef.value)
   chart.setOption({
@@ -196,7 +196,7 @@ const initCheckinStatus = async () => {
 
 // 初始化资讯排行
 const initPopularNews = async () => {
-  const res = await getStatsApi.getPopularNews()
+  const res = await statsApi.popularNews()
   if (!popularNewsChartRef.value) return
   const chart = echarts.init(popularNewsChartRef.value)
   chart.setOption({
@@ -218,7 +218,7 @@ const initPopularNews = async () => {
 
 // 初始化爽约对比
 const initNoShow = async () => {
-  const res = await getStatsApi.getNoShowComparison()
+  const res = await statsApi.noShowComparison()
   if (!noShowComparisonChartRef.value) return
   const chart = echarts.init(noShowComparisonChartRef.value)
   chart.setOption({
@@ -238,7 +238,7 @@ const initNoShow = async () => {
 
 onMounted(() => {
   initAdmin()
-  getStatsApi.getHomeStats().then(res => { if (res.code === 200) stats.value = res.data })
+  statsApi.home().then(res => { if (res.code === 200) stats.value = res.data })
   setTimeout(() => {
     initTrend()
     initCheckinStatus()

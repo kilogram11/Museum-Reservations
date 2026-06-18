@@ -67,7 +67,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router' // Import router
 import { ElMessage } from 'element-plus'
-import { getTemplateListApi, updateTemplateApi } from '@/api/message'
+import { messageApi } from '@/api/message'
 
 const router = useRouter() // Use router
 const loading = ref(false)
@@ -92,7 +92,7 @@ const formatTime = (row, column, cellValue) => {
 const getList = async () => {
   try {
     loading.value = true
-    const res = await getTemplateListApi.getList({ page: 1, limit: 100 })
+    const res = await messageApi.list({ page: 1, limit: 100 })
     templateList.value = res.data.records || res.data
   } catch (err) {
     ElMessage.error('获取模版列表失败')
@@ -109,7 +109,7 @@ const handleEdit = (row) => {
 const handleSave = async () => {
   try {
     const submitData = { ...editForm }
-    await updateTemplateApi.update(submitData)
+    await messageApi.update(submitData)
     ElMessage.success('更新成功')
     editDialogVisible.value = false
     getList()

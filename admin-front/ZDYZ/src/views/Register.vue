@@ -83,7 +83,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { StarFilled } from '@element-plus/icons-vue'
-import { registerApi } from '@/api/regitser'
+import { registerApi } from '@/api/register'
 
 const router = useRouter()
 const loading = ref(false)

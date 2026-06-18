@@ -106,13 +106,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
-import {
-  getNoticeListApi,
-  addNoticeApi,
-  editNoticeApi,
-  deleteNoticeApi,
-  getNoticeDetailApi // 替换原publishNoticeApi
-} from '@/api/notice'
+import { noticeApi } from '@/api/notice'
 
 const router = useRouter()
 const isEdit = ref(false)
@@ -152,7 +146,7 @@ const getNoticeList = async () => {
   try {
     loading.value = true
     // 调用列表接口，传递搜索关键词、分页参数
-    const res = await getNoticeListApi.getList({
+    const res = await noticeApi.list({
       keyword: searchKeyword.value,
       page: 1,
       limit: 10
@@ -171,7 +165,7 @@ const getNoticeList = async () => {
 const handleRowClick = async (row) => {
   try {
     // 调用详情接口，传递行ID
-    const res = await getNoticeDetailApi.getDetail(row.id)
+    const res = await noticeApi.detail(row.id)
     if (res.code === 200) {
       // 将接口返回的详情数据赋值给currentNotice
       Object.assign(currentNotice, res.data)
@@ -212,7 +206,7 @@ const handleDelete = async (id) => {
       type: 'warning'
     })
     // 调用后端删除接口，传递id参数
-    await deleteNoticeApi.delete(id)
+    await noticeApi.delete(id)
     ElMessage.success('删除成功')
     getNoticeList() // 重新获取列表
   } catch (err) {
@@ -239,11 +233,11 @@ const handleSave = async () => {
     if (noticeForm.id) {
       // 编辑：补充id字段
       submitData.id = noticeForm.id
-      await editNoticeApi.edit(submitData)
+      await noticeApi.edit(submitData)
       ElMessage.success('编辑成功')
     } else {
       // 新增
-      await addNoticeApi.add(submitData)
+      await noticeApi.add(submitData)
       ElMessage.success('新增成功')
     }
     isEdit.value = false

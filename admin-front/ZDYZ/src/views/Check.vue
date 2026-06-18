@@ -76,7 +76,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getCheckListApi, checkBookingApi } from '@/api/check'
+import { checkApi } from '@/api/check'
+import { exportData } from '@/utils/export'
 
 // 搜索表单
 const searchForm = reactive({
@@ -102,7 +103,7 @@ const getCheckList = async () => {
       page: page.value,
       limit: limit.value
     }
-    const res = await getCheckListApi.getList(params)
+    const res = await checkApi.list(params)
     checkList.value = res.data.records
     total.value = res.data.total
   } catch (err) {
@@ -141,31 +142,7 @@ const handleCurrentChange = (val) => {
 
 // 导出
 const handleExport = async () => {
-  try {
-    ElMessage.info('正在下载，请稍候...')
-    // 导出所有，不需要传分页参数
-    const res = await checkBookingApi.exportData()
-    // 下载 blob
-    const url = window.URL.createObjectURL(new Blob([res.data]))
-    const link = document.createElement('a')
-    link.href = url
-    // 尝试获取文件名
-    const disposition = res.headers['content-disposition']
-    let fileName = '预约记录.xlsx'
-    if (disposition) {
-      const match = disposition.match(/filename=(.+)/)
-      if (match && match[1]) {
-        fileName = decodeURIComponent(match[1])
-      }
-    }
-    link.setAttribute('download', fileName)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  } catch (e) {
-    console.error(e)
-    ElMessage.error('导出失败')
-  }
+  await exportData('/admin/join/export', '预约记录')
 }
 
 // 辅助函数：解析JSON
@@ -198,7 +175,7 @@ const getStatusType = (row) => {
 // 核销操作
 const handleCheck = async (id) => {
   try {
-    await checkBookingApi.check(id)
+    await checkApi.check(id)
     ElMessage.success('核销成功')
     getCheckList()
   } catch (err) {

@@ -116,7 +116,7 @@ import {
   StarFilled, Search, Bell, Files, Plus, ArrowDown 
 } from '@element-plus/icons-vue'
 // 导入 venue API 获取场馆信息
-import { getAllVenueApi } from '@/api/venue'
+import { venueApi } from '@/api/venue'
 // 新增：导入个人信息接口
 import { profileApi } from '@/api/profile'
 // 新增：导入4个固定头像（需放在 assets/avatars 目录下，可替换为实际图片路径）
@@ -157,7 +157,7 @@ const formatTime = () => {
 // 获取场馆名称
 const getMuseumInfo = async () => {
   try {
-    const res = await getAllVenueApi.getAll()
+    const res = await venueApi.all()
     if (res.data && res.data.length > 0) {
       // 默认取第一个场馆作为当前展示
       museumName.value = res.data[0].museumTitle
@@ -184,7 +184,7 @@ const handleLogout = () => {
 const changeAvatar = async (avatar) => {
   try {
     // 调用后端接口保存头像
-    await profileApi.updateAvatar({ avatarUrl: avatar })
+    await profileApi.avatar({ avatarUrl: avatar })
     currentAvatar.value = avatar
     // 同步到本地存储
     localStorage.setItem('userAvatar', avatar)
@@ -212,7 +212,7 @@ const handleIntroBlur = async () => {
 // 保存用户名/简介到后端
 const saveUserInfoToServer = async () => {
   try {
-    await profileApi.updateProfile({
+    await profileApi.update({
       userName: userName.value,
       userIntro: userIntro.value
     })
@@ -253,7 +253,7 @@ const adjustIntroInputHeight = () => {
 // 初始化个人信息（从后端获取）
 const initAdminProfile = async () => {
   try {
-    const res = await profileApi.getProfile()
+    const res = await profileApi.get()
     if (res.data) {
       // 赋值后端返回的个人信息
       userName.value = res.data.userName

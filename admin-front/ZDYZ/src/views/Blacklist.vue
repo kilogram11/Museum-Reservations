@@ -121,11 +121,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {
-  getBlacklistApi,
-  cancelBlackApi,
-  addBlackApi
-} from '@/api/blacklist'
+import { blacklistApi } from '@/api/blacklist'
+import { exportData } from '@/utils/export'
 
 // 搜索表单：拆分为姓名、身份证号、手机号独立字段
 const searchForm = reactive({
@@ -197,7 +194,7 @@ const getBlacklist = async () => {
       limit: pageSize.value,
       status: 0 // 明确查询黑名单用户
     }
-    const res = await getBlacklistApi.list(params)
+    const res = await blacklistApi.list(params)
     blacklist.value = res.data.records
     total.value = res.data.total
   } catch (err) {
@@ -223,7 +220,7 @@ const searchNormalUsers = async () => {
   }
   try {
     manualLoading.value = true
-    const res = await getBlacklistApi.list({
+    const res = await blacklistApi.list({
        keyword: manualKeyword.value,
        page: 1,
        limit: 20, // 只展示前20条匹配结果
@@ -255,28 +252,7 @@ const handleSearch = () => {
 
 // 导出黑名单
 const handleExport = async () => {
-  try {
-    ElMessage.info('正在下载，请稍候...')
-    const res = await getBlacklistApi.exportData()
-    const url = window.URL.createObjectURL(new Blob([res.data]))
-    const link = document.createElement('a')
-    link.href = url
-    let fileName = '黑名单记录.xlsx'
-    const disposition = res.headers['content-disposition']
-    if (disposition) {
-      const match = disposition.match(/filename=(.+)/)
-      if (match && match[1]) {
-        fileName = decodeURIComponent(match[1])
-      }
-    }
-    link.setAttribute('download', fileName)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  } catch (e) {
-    console.error(e)
-    ElMessage.error('导出失败')
-  }
+  await exportData('/admin/blacklist/export', '黑名单记录')
 }
 
 // 重置搜索：清空所有独立搜索字段
@@ -305,7 +281,7 @@ const handleCancelBlack = async (row) => {
       type: 'warning'
     })
     // 必须传递 identityId (业务ID) 而非身份证号
-    await cancelBlackApi.remove({ identityId: row.identityId })
+    await blacklistApi.remove({ identityId: row.identityId })
     
     const index = blacklist.value.findIndex(item => item.identityId === row.identityId)
     if (index > -1) {
@@ -334,7 +310,7 @@ const handleConfirmBlack = async () => {
   try {
     await blackRef.value.validate()
     const endTime = Date.now() + 30 * 86400000
-    await addBlackApi.add({
+    await blacklistApi.add({
       identityId: blackForm.idCard, // 传递的是 identityId
       reason: blackForm.reason,
       endTime: endTime

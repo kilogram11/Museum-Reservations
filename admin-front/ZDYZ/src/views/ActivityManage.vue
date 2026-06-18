@@ -280,14 +280,7 @@ import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { Plus } from '@element-plus/icons-vue'
-import { 
-  getActivityListApi, 
-  addActivityApi, 
-  editActivityApi, 
-  deleteActivityApi,
-  getActivityDetailApi,
-  changeActivityStatusApi // 新增：导入状态修改接口
-} from '@/api/activity'
+import { activityApi } from '@/api/activity'
 import { uploadImageApi } from '@/api/common' // 导入通用上传API
 
 // 基础变量
@@ -385,7 +378,7 @@ const getDuration = (row) => {
 const getActivityList = async () => {
   loading.value = true
   try {
-    const res = await getActivityListApi.getList({
+    const res = await activityApi.list({
       keyword: searchKeyword.value, // 传入搜索关键词
       page: page.value,
       limit: limit.value
@@ -419,8 +412,7 @@ const handleCurrentChange = (val) => {
 // 行点击处理
 const handleRowClick = async (row) => {
   try {
-    // 修复：接口方法名错误（get 而非 getDetail）
-    const res = await getActivityDetailApi.get(row.id)
+    const res = await activityApi.detail(row.id)
     if (res.code === 200) {
       const detail = res.data
       const obj = parseObj(detail.activityObj)
@@ -467,7 +459,7 @@ const handleChangeStatus = async (row) => {
       }
     )
 
-    const res = await changeActivityStatusApi.change({
+    const res = await activityApi.status({
       id: row.id,
       status: newStatus
     })
@@ -620,8 +612,7 @@ const showPreview = async () => {
   if (activityForm.id) {
     // 已有活动，调用详情接口
     try {
-      // 修复：接口方法名错误
-      const res = await getActivityDetailApi.get(activityForm.id)
+      const res = await activityApi.detail(activityForm.id)
       if (res.code === 200) {
         const detail = res.data
         // 修正：需解析 activityObj 获取 content
@@ -708,10 +699,10 @@ const handleSubmit = async (status) => {
     if (activityForm.id) {
       // 编辑
       reqData.id = activityForm.id
-      res = await editActivityApi.edit(reqData)
+      res = await activityApi.edit(reqData)
     } else {
       // 新增
-      res = await addActivityApi.add(reqData)
+      res = await activityApi.add(reqData)
     }
 
     if (res.code === 200) {
@@ -740,7 +731,7 @@ const handleDelete = async (id) => {
       }
     )
 
-    const res = await deleteActivityApi.delete(id)
+    const res = await activityApi.delete(id)
     if (res.code === 200) {
       ElMessage.success('删除成功')
       getActivityList()
