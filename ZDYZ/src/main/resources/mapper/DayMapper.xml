@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.DayMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Day">
+        <id column="_id" property="id" />
+        <result column="DAY_ID" property="dayId" />
+        <result column="DAY" property="day" />
+        <result column="MUSEUM_ID" property="museumId" />
+        <result column="ACTIVITY_ID" property="activityId" />
+        <result column="STATUS" property="status" />
+        <result column="DAY_LIMIT_CNT" property="dayLimitCnt" />
+        <result column="ADD_TIME" property="addTime" />
+        <result column="EDIT_TIME" property="editTime" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+    <!-- 手写的 CRUD 语句 -->
+    <insert id="insert" parameterType="com.museum.entity.Day">
+        INSERT INTO day (
+            _id, DAY_ID, DAY, MUSEUM_ID, ACTIVITY_ID, STATUS, DAY_LIMIT_CNT, ADD_TIME, EDIT_TIME, _pid
+        ) VALUES (
+            #{id}, #{dayId}, #{day}, #{museumId}, #{activityId}, #{status}, #{dayLimitCnt}, #{addTime}, #{editTime}, #{pid}
+        )
+    </insert>
+    <select id="selectById" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM day WHERE _id = #{id}
+    </select>
+    <update id="updateById" parameterType="com.museum.entity.Day">
+        UPDATE day SET
+            DAY_ID = #{dayId},
+            DAY = #{day},
+            MUSEUM_ID = #{museumId},
+            ACTIVITY_ID = #{activityId},
+            STATUS = #{status},
+            DAY_LIMIT_CNT = #{dayLimitCnt},
+            ADD_TIME = #{addTime},
+            EDIT_TIME = #{editTime},
+            _pid = #{pid}
+        WHERE _id = #{id}
+    </update>
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM day WHERE _id = #{id}
+    </delete>
+
+    <!-- Existing custom query -->
+    <select id="selectByMuseumAndDate" resultMap="BaseResultMap" parameterType="map">
+        SELECT * FROM day WHERE MUSEUM_ID = #{museumId} AND DAY = #{date} LIMIT 1
+    </select>
+</mapper>

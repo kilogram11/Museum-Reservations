@@ -1,0 +1,24 @@
+<view class="container">
+  <scroll-view class="chat-list" scroll-y scroll-into-view="{{toView}}" scroll-with-animation>
+    <block wx:for="{{messages}}" wx:key="index">
+      <view class="message-item {{item.type === 'user' ? 'user-message' : 'bot-message'}}" id="msg-{{index}}">
+        <image class="avatar" src="{{item.type === 'user' ? '/images/icons/usercenter.png' : '/images/icons/customer-service.svg'}}"></image>
+        <view class="content">
+          <text>{{item.content}}</text>
+        </view>
+      </view>
+    </block>
+    <!-- Loading indicator -->
+    <view wx:if="{{loading}}" class="message-item bot-message">
+       <image class="avatar" src="/images/icons/customer-service.svg"></image>
+       <view class="content">
+         <text>...</text>
+       </view>
+    </view>
+  </scroll-view>
+
+  <view class="input-area">
+    <input class="input-box" value="{{inputValue}}" bindinput="onInput" placeholder="请输入您的问题..." confirm-type="send" bindconfirm="sendMessage" />
+    <button class="send-btn" bindtap="sendMessage" disabled="{{loading || !inputValue}}">发送</button>
+  </view>
+</view>

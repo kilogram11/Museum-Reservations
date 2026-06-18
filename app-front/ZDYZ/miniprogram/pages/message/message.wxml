@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="msg-list">
+    <block wx:if="{{msgList.length > 0}}">
+      <view class="msg-card {{item.type === 1 ? 'booking-theme' : 'activity-theme'}}" 
+            wx:for="{{msgList}}" 
+            wx:key="id"
+            bindtap="goToDetail"
+            data-item="{{item}}">
+        <!-- 装饰条 -->
+        <view class="left-bar"></view>
+        
+        <view class="card-content">
+            <view class="card-header">
+                <text class="title">{{item.title}}</text>
+                <view class="status-tag {{item.isRead === 1 ? 'tag-read' : 'tag-unread'}}">
+                    {{item.isRead === 1 ? '已读' : '未读'}}
+                </view>
+            </view>
+            
+            <view class="msg-body">
+                <text>{{item.content}}</text>
+            </view>
+
+            <view class="card-footer">
+                <text class="time">{{item.createTime}}</text>
+            </view>
+        </view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="empty-tip">暂无消息</view>
+    </block>
+  </view>
+</view>

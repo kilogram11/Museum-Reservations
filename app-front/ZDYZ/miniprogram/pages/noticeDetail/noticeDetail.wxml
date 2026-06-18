@@ -1,0 +1,25 @@
+<view class="container">
+  
+  <view class="header">
+    <view class="title">{{detail.title}}</view>
+    <view class="meta">
+      <text>{{detail.author}}</text>
+      <text class="divider">·</text>
+      <text>{{detail.date}}</text>
+      <text class="divider">·</text>
+      <text>{{detail.category}}</text>
+    </view>
+  </view>
+
+  <view class="line"></view>
+
+  <view class="content">
+    <text class="detail-text" user-select="{{true}}" decode="{{true}}">{{detail.content}}</text>
+  </view>
+
+  <view class="footer">
+    <view class="footer-org">{{detail.author}}</view>
+    <view class="footer-date">{{detail.date}}</view>
+  </view>
+
+</view>

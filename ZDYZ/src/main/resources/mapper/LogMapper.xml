@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.LogMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Log">
+        <id column="_id" property="id" />
+        <result column="LOG_ID" property="logId" />
+        <result column="LOG_CONTENT" property="logContent" />
+        <result column="LOG_TYPE" property="logType" />
+        <result column="LOG_ADMIN_ID" property="logAdminId" />
+        <result column="LOG_ADMIN_NAME" property="logAdminName" />
+        <result column="LOG_ADD_TIME" property="logAddTime" />
+        <result column="LOG_EDIT_TIME" property="logEditTime" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+    <!-- Insert -->
+    <insert id="insert" parameterType="com.museum.entity.Log">
+        INSERT INTO log (
+            _id, LOG_ID, LOG_CONTENT, LOG_TYPE, LOG_ADMIN_ID, LOG_ADMIN_NAME,
+            LOG_ADD_TIME, LOG_EDIT_TIME, _pid
+        ) VALUES (
+            #{id}, #{logId}, #{logContent}, #{logType}, #{logAdminId}, #{logAdminName},
+            #{logAddTime}, #{logEditTime}, #{pid}
+        )
+    </insert>
+
+    <!-- Select by ID -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM log WHERE _id = #{id}
+    </select>
+
+    <!-- Update by ID -->
+    <update id="updateById" parameterType="com.museum.entity.Log">
+        UPDATE log SET
+            LOG_ID = #{logId},
+            LOG_CONTENT = #{logContent},
+            LOG_TYPE = #{logType},
+            LOG_ADMIN_ID = #{logAdminId},
+            LOG_ADMIN_NAME = #{logAdminName},
+            LOG_ADD_TIME = #{logAddTime},
+            LOG_EDIT_TIME = #{logEditTime},
+            _pid = #{pid}
+        WHERE _id = #{id}
+    </update>
+
+    <!-- Delete by ID -->
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM log WHERE _id = #{id}
+    </delete>
+</mapper>

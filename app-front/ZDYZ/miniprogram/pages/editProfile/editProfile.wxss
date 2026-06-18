@@ -1,0 +1,131 @@
+page {
+  background-color: #f9f5ec;
+}
+.container {
+  padding: 30rpx;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(139, 69, 19, 0.05);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  color: #6b5a3e;
+}
+
+/* 头像网格布局 */
+.avatar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+
+.avatar-item {
+  position: relative;
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+  border: 4rpx solid #e0d6c6;
+  padding: 4rpx;
+  transition: all 0.2s;
+}
+
+/* 选中状态：深红边框 */
+.avatar-item.active {
+  border-color: #8b0000;
+  background: #fdf5e6;
+  transform: scale(1.05);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #f8f8f8;
+}
+
+.check-badge {
+  position: absolute;
+  top: -6rpx;
+  right: -6rpx;
+  background: #8b0000;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 输入框样式 */
+.input-label {
+  font-size: 28rpx;
+  color: #8b4513;
+  margin-bottom: 16rpx;
+}
+
+.input-box {
+  background: #fcf9f2;
+  height: 100rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+  border: 2rpx solid #e0d6c6;
+}
+
+.icon-user {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 20rpx;
+  opacity: 0.6;
+}
+
+.name-input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #6b5a3e;
+}
+
+/* 保存按钮 */
+.btn-save {
+  margin-top: 60rpx;
+  background: #8b0000;
+  color: #fff;
+  height: 100rpx;
+  line-height: 100rpx;
+  border-radius: 50rpx;
+  font-weight: bold;
+  font-size: 32rpx;
+  box-shadow: 0 10rpx 20rpx rgba(139, 0, 0, 0.2);
+}
+.btn-save:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+/* 预览卡片 */
+.preview-card .info-row {
+  display: flex;
+  font-size: 28rpx;
+  padding: 16rpx 0;
+  border-bottom: 2rpx dashed #eee;
+}
+.preview-card .info-row:last-child {
+  border-bottom: none;
+}
+.info-label {
+  color: #999;
+  width: 160rpx;
+}
+.info-value {
+  color: #333;
+  flex: 1;
+}

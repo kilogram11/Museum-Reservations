@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/login/login",
+    "pages/index/index",
+    "pages/map/map",
+    "pages/profile/profile",
+    "pages/reserve/reserve",
+    "pages/activity/activity",
+    "pages/notice/notice",
+    "pages/orderRecord/orderRecord",
+    "pages/visitorRegistration/visitorRegistration",
+    "pages/editProfile/editProfile",
+    "pages/identify/identify",
+    "pages/noticeReservation/noticeReservation",
+    "pages/activityDetail/activityDetail",
+    "pages/noticeDetail/noticeDetail",
+    "pages/aiChat/aiChat",
+    "pages/message/message",
+    "pages/messageDetail/messageDetail",
+    "pages/relic3d/relic3d",
+    "pages/privacy/privacy",
+    "pages/faq/faq"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#8B0000",
+    "navigationBarTitleText": "博物馆预约系统",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "/images/home-active.png",
+        "selectedIconPath": "/images/home.png"
+      },
+      {
+        "pagePath": "pages/identify/identify",
+        "text": "文物识别",
+        "iconPath": "/images/scan_v4.png",
+        "selectedIconPath": "/images/scan_active_v4.png"
+      },
+      {
+        "pagePath": "pages/message/message",
+        "text": "消息",
+        "iconPath": "/images/home-active.png",
+        "selectedIconPath": "/images/home.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "/images/mine-active.png",
+        "selectedIconPath": "/images/mine.png"
+      }
+    ],
+    "backgroundColor": "#f5f0e8",
+    "color": "#8B4513",
+    "selectedColor": "#8B0000"
+  },
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.TimeMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Time">
+        <id column="_id" property="id" />
+        <result column="TIME_ID" property="timeId" />
+        <result column="DAY_ID" property="dayId" />
+        <result column="MUSEUM_ID" property="museumId" />
+        <result column="ACTIVITY_ID" property="activityId" />
+        <result column="TIME_START" property="timeStart" />
+        <result column="TIME_END" property="timeEnd" />
+        <result column="TIME_MARK" property="timeMark" />
+        <result column="LIMIT_CNT" property="limitCnt" />
+        <result column="SUCC_CNT" property="succCnt" />
+        <result column="STATUS" property="status" />
+        <result column="IS_LIMIT" property="isLimit" />
+        <result column="ADD_TIME" property="addTime" />
+        <result column="EDIT_TIME" property="editTime" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+
+    
+    <insert id="insert" parameterType="com.museum.entity.Time">
+        INSERT INTO time (
+            _id, TIME_ID, DAY_ID, MUSEUM_ID, ACTIVITY_ID, TIME_START, TIME_END,
+            TIME_MARK, LIMIT_CNT, SUCC_CNT, STATUS, IS_LIMIT, ADD_TIME, EDIT_TIME, _pid
+        ) VALUES (
+            #{id}, #{timeId}, #{dayId}, #{museumId}, #{activityId}, #{timeStart}, #{timeEnd},
+            #{timeMark}, #{limitCnt}, #{succCnt}, #{status}, #{isLimit}, #{addTime}, #{editTime}, #{pid}
+        )
+    </insert>
+    <select id="selectById" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM time WHERE _id = #{id}
+    </select>
+    <update id="updateById" parameterType="com.museum.entity.Time">
+        UPDATE time SET
+            TIME_ID = #{timeId},
+            DAY_ID = #{dayId},
+            MUSEUM_ID = #{museumId},
+            ACTIVITY_ID = #{activityId},
+            TIME_START = #{timeStart},
+            TIME_END = #{timeEnd},
+            TIME_MARK = #{timeMark},
+            LIMIT_CNT = #{limitCnt},
+            SUCC_CNT = #{succCnt},
+            STATUS = #{status},
+            IS_LIMIT = #{isLimit},
+            ADD_TIME = #{addTime},
+            EDIT_TIME = #{editTime},
+            _pid = #{pid}
+        WHERE _id = #{id}
+    </update>
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM time WHERE _id = #{id}
+    </delete>
+   
+</mapper>

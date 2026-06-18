@@ -1,0 +1,397 @@
+package com.museum.service.impl;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.museum.common.constant.AdminBusinessConstant;
+import com.museum.common.constant.BookingConstant;
+import com.museum.common.dto.MuseumAddDTO;
+import com.museum.common.exception.BusinessException;
+import com.museum.entity.Day;
+import com.museum.entity.Museum;
+import com.museum.entity.Time;
+import com.museum.mapper.DayMapper;
+import com.museum.mapper.MuseumMapper;
+import com.museum.mapper.TimeMapper;
+import com.museum.service.MuseumService;
+import com.museum.service.ScheduleService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class MuseumServiceImpl extends ServiceImpl<MuseumMapper, Museum> implements MuseumService {
+
+    @Autowired
+    private MuseumMapper museumMapper;
+
+    @Autowired
+    private DayMapper dayMapper;
+
+    @Autowired
+    private TimeMapper timeMapper;
+
+    @Autowired
+    private ScheduleService scheduleService;
+
+    @Override
+    public Page<Museum> dataList(String keyword, Integer page, Integer limit) {
+        Page<Museum> pageParam = new Page<>(page, limit);
+        QueryWrapper<Museum> wrapper = new QueryWrapper<>();
+        if (StrUtil.isNotBlank(keyword)) {
+            wrapper.like("MUSEUM_TITLE", keyword);
+        }
+        wrapper.orderByDesc("MUSEUM_ADD_TIME");
+        return museumMapper.selectPage(pageParam, wrapper);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addMuseum(MuseumAddDTO dto) {
+        validateAddMuseum(dto);
+        long now = System.currentTimeMillis();
+        String museumId = AdminBusinessConstant.MUSEUM_ID_PREFIX + IdUtil.fastSimpleUUID();
+        Integer status = dto.getMuseumStatus() != null ? dto.getMuseumStatus() : 0;
+
+        if (status == 1) {
+            disableOtherActiveMuseums(null);
+        }
+
+        Museum museum = buildMuseumEntity(dto, museumId, now, status);
+        log.info("鍗冲皢鎻掑叆鏁版嵁搴撶殑 Museum 瀵硅薄: {}", JSONUtil.toJsonStr(museum));
+
+        museumMapper.insert(museum);
+        log.info("鍒涘缓鍦洪鎴愬姛: {}, 鐘舵€? {}", museumId, status);
+
+        initScheduleIfEnabled(museumId, status, dto.getStartDate(), dto.getEndDate(), dto.getTimes());
+    }
+
+    private void validateAddMuseum(MuseumAddDTO dto) {
+        if (StrUtil.isBlank(dto.getMuseumTitle()))
+            throw new BusinessException(500, "场馆名称不能为空");
+        if (StrUtil.isBlank(dto.getStartDate()) || StrUtil.isBlank(dto.getEndDate())) {
+            throw new BusinessException(500, "排期日期范围不能为空");
+        }
+        if (CollUtil.isEmpty(dto.getTimes())) {
+            throw new BusinessException(500, "请至少配置一个时间段");
+        }
+        validateDateRange(dto.getStartDate(), dto.getEndDate());
+    }
+
+    private void validateDateRange(String startDate, String endDate) {
+        Date start = DateUtil.parse(startDate);
+        Date end = DateUtil.parse(endDate);
+        if (start.after(end)) {
+            throw new BusinessException(500, "开始日期不能晚于结束日期");
+        }
+    }
+
+    private Museum buildMuseumEntity(MuseumAddDTO dto, String museumId, long now, Integer status) {
+        Museum museum = new Museum();
+        museum.setId(IdUtil.fastSimpleUUID());
+        museum.setMuseumId(museumId);
+        museum.setMuseumTitle(dto.getMuseumTitle());
+        museum.setAdminId(dto.getAdminId());
+        museum.setMuseumMaxJoinCnt(dto.getMuseumMaxJoinCnt());
+        museum.setMuseumBookSet(dto.getMuseumBookSet());
+        museum.setLatitude(dto.getLatitude());
+        museum.setLongitude(dto.getLongitude());
+        log.info("前端传入地址: {}", dto.getAddress());
+        museum.setAddress(dto.getMuseumAddress());
+        log.info("设置到 Museum 对象的地址: {}", museum.getAddress());
+        museum.setMuseumStatus(status);
+        museum.setMuseumAddTime(now);
+        museum.setMuseumEditTime(now);
+        museum.setPid(BookingConstant.DEFAULT_PID);
+        museum.setMuseumObj(JSONUtil.toJsonStr(buildMuseumExtraInfo(dto)));
+        museum.setMuseumPic(buildMuseumPic(dto));
+        return museum;
+    }
+
+    private Map<String, Object> buildMuseumExtraInfo(MuseumAddDTO dto) {
+        Map<String, Object> museumExtraInfo = new HashMap<>();
+        museumExtraInfo.put("desc", dto.getMuseumDesc());
+        museumExtraInfo.put("cover", dto.getMuseumCover());
+        museumExtraInfo.put("content", dto.getMuseumContent());
+        museumExtraInfo.put("address", dto.getMuseumAddress());
+        museumExtraInfo.put("phone", dto.getMuseumPhone());
+        museumExtraInfo.put("traffic", dto.getMuseumTraffic());
+        museumExtraInfo.put("startDate", dto.getStartDate());
+        museumExtraInfo.put("endDate", dto.getEndDate());
+        museumExtraInfo.put("times", dto.getTimes());
+        return museumExtraInfo;
+    }
+
+    private String buildMuseumPic(MuseumAddDTO dto) {
+        if (CollUtil.isNotEmpty(dto.getMuseumImgs())) {
+            return JSONUtil.toJsonStr(dto.getMuseumImgs());
+        }
+        if (StrUtil.isNotBlank(dto.getMuseumCover())) {
+            return JSONUtil.toJsonStr(CollUtil.newArrayList(dto.getMuseumCover()));
+        }
+        return BookingConstant.EMPTY_JSON_ARRAY;
+    }
+
+    private Map<String, Object> buildMuseumExtraInfo(com.museum.common.dto.MuseumEditDTO dto) {
+        Map<String, Object> museumExtraInfo = new HashMap<>();
+        museumExtraInfo.put("desc", dto.getMuseumDesc());
+        museumExtraInfo.put("cover", dto.getMuseumCover());
+        museumExtraInfo.put("content", dto.getMuseumContent());
+        museumExtraInfo.put("address", dto.getMuseumAddress());
+        museumExtraInfo.put("phone", dto.getMuseumPhone());
+        museumExtraInfo.put("traffic", dto.getMuseumTraffic());
+        museumExtraInfo.put("startDate", dto.getStartDate());
+        museumExtraInfo.put("endDate", dto.getEndDate());
+        museumExtraInfo.put("times", dto.getTimes());
+        return museumExtraInfo;
+    }
+
+    private String buildMuseumPic(com.museum.common.dto.MuseumEditDTO dto) {
+        if (CollUtil.isNotEmpty(dto.getMuseumImgs())) {
+            return JSONUtil.toJsonStr(dto.getMuseumImgs());
+        }
+        if (StrUtil.isNotBlank(dto.getMuseumCover())) {
+            return JSONUtil.toJsonStr(CollUtil.newArrayList(dto.getMuseumCover()));
+        }
+        return BookingConstant.EMPTY_JSON_ARRAY;
+    }
+
+    private void initScheduleIfEnabled(String museumId, Integer status, String startDate,
+                                       String endDate, List<MuseumAddDTO.TimeTemplate> times) {
+        if (status == 1) {
+            scheduleService.initMuseumSchedule(museumId, startDate, endDate, times);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void editMuseum(com.museum.common.dto.MuseumEditDTO dto) {
+        Museum museum = loadMuseumForEdit(dto.getId());
+        JSONObject oldObj = JSONUtil.parseObj(museum.getMuseumObj());
+        boolean scheduleChanged = isMuseumScheduleChanged(dto, oldObj);
+
+        updateMuseumBasicFields(museum, dto);
+        applyMuseumStatusChange(museum, dto);
+        rebuildMuseumScheduleIfNeeded(museum, dto, oldObj, scheduleChanged);
+        syncMuseumScheduleStatusIfNeeded(museum, dto, scheduleChanged);
+        updateMuseumExtraFields(museum, dto);
+
+        museumMapper.updateById(museum);
+        log.info("编辑场馆: {}", museum.getMuseumId());
+    }
+
+    private Museum loadMuseumForEdit(String id) {
+        if (StrUtil.isBlank(id))
+            throw new BusinessException(500, "ID不能为空");
+
+        Museum museum = museumMapper.selectById(id);
+        if (museum == null)
+            throw new BusinessException(500, "场馆不存在");
+        return museum;
+    }
+
+    private void updateMuseumBasicFields(Museum museum, com.museum.common.dto.MuseumEditDTO dto) {
+        museum.setMuseumTitle(dto.getMuseumTitle());
+        museum.setMuseumMaxJoinCnt(dto.getMuseumMaxJoinCnt());
+        museum.setMuseumBookSet(dto.getMuseumBookSet());
+        museum.setLatitude(dto.getLatitude());
+        museum.setLongitude(dto.getLongitude());
+        museum.setAddress(dto.getMuseumAddress());
+    }
+
+    private void applyMuseumStatusChange(Museum museum, com.museum.common.dto.MuseumEditDTO dto) {
+        if (dto.getMuseumStatus() == null) {
+            return;
+        }
+        if (dto.getMuseumStatus() == 1) {
+            disableOtherActiveMuseums(museum.getMuseumId());
+        }
+        museum.setMuseumStatus(dto.getMuseumStatus());
+    }
+
+    private boolean isMuseumScheduleChanged(com.museum.common.dto.MuseumEditDTO dto, JSONObject oldObj) {
+        if (StrUtil.isNotBlank(dto.getStartDate()) && !dto.getStartDate().equals(oldObj.getStr("startDate"))) {
+            return true;
+        }
+        if (StrUtil.isNotBlank(dto.getEndDate()) && !dto.getEndDate().equals(oldObj.getStr("endDate"))) {
+            return true;
+        }
+        if (CollUtil.isNotEmpty(dto.getTimes())) {
+            String newTimesJson = JSONUtil.toJsonStr(dto.getTimes());
+            String oldTimesJson = JSONUtil.toJsonStr(oldObj.getBeanList("times", MuseumAddDTO.TimeTemplate.class));
+            return !newTimesJson.equals(oldTimesJson);
+        }
+        return false;
+    }
+
+    private void rebuildMuseumScheduleIfNeeded(Museum museum, com.museum.common.dto.MuseumEditDTO dto,
+                                               JSONObject oldObj, boolean scheduleChanged) {
+        if (!scheduleChanged) {
+            return;
+        }
+        log.info("检测到排期变更，正在重置排期数据... MuseumId={}", museum.getMuseumId());
+        dayMapper.delete(new QueryWrapper<Day>().eq("MUSEUM_ID", museum.getMuseumId()));
+        timeMapper.delete(new QueryWrapper<Time>().eq("MUSEUM_ID", museum.getMuseumId()));
+
+        Integer effectiveStatus = dto.getMuseumStatus() != null ? dto.getMuseumStatus() : museum.getMuseumStatus();
+        if (effectiveStatus == 1) {
+            String start = StrUtil.isNotBlank(dto.getStartDate()) ? dto.getStartDate() : oldObj.getStr("startDate");
+            String end = StrUtil.isNotBlank(dto.getEndDate()) ? dto.getEndDate() : oldObj.getStr("endDate");
+            List<MuseumAddDTO.TimeTemplate> times = CollUtil.isNotEmpty(dto.getTimes()) ? dto.getTimes()
+                    : oldObj.getBeanList("times", MuseumAddDTO.TimeTemplate.class);
+            scheduleService.initMuseumSchedule(museum.getMuseumId(), start, end, times);
+        }
+    }
+
+    private void syncMuseumScheduleStatusIfNeeded(Museum museum, com.museum.common.dto.MuseumEditDTO dto,
+                                                 boolean scheduleChanged) {
+        if (scheduleChanged || dto.getMuseumStatus() == null) {
+            return;
+        }
+        scheduleService.updateMuseumScheduleStatus(museum.getMuseumId(), dto.getMuseumStatus() == 1 ? 1 : 0);
+    }
+
+    private void updateMuseumExtraFields(Museum museum, com.museum.common.dto.MuseumEditDTO dto) {
+        museum.setMuseumEditTime(System.currentTimeMillis());
+        museum.setMuseumObj(JSONUtil.toJsonStr(buildMuseumExtraInfo(dto)));
+        museum.setMuseumPic(buildMuseumPic(dto));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delMuseum(String id) {
+        Museum museum = museumMapper.selectById(id);
+        if (museum == null)
+            return;
+
+        QueryWrapper<Day> dayWrapper = new QueryWrapper<>();
+        dayWrapper.eq("MUSEUM_ID", museum.getMuseumId());
+        dayMapper.delete(dayWrapper);
+
+        QueryWrapper<Time> timeWrapper = new QueryWrapper<>();
+        timeWrapper.eq("MUSEUM_ID", museum.getMuseumId());
+        timeMapper.delete(timeWrapper);
+
+        museumMapper.deleteById(id);
+        log.info("删除场馆及排期: {}", museum.getMuseumId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void status(String id, Integer status) {
+        // 尝试按 ID 查询
+        Museum museum = museumMapper.selectById(id);
+        // 如果按 ID 查不到，尝试按 MUSEUM_ID (业务ID) 查询
+        if (museum == null) {
+            QueryWrapper<Museum> wrapper = new QueryWrapper<>();
+            wrapper.eq("MUSEUM_ID", id);
+            museum = museumMapper.selectOne(wrapper);
+        }
+
+        if (museum == null) {
+            log.warn("修改状态失败: 未找到场馆 ID={}", id);
+            return;
+        }
+
+        // 1. 更新场馆状态
+        // --- 逻辑增强: 如果要启用，先禁用其他所有场馆 ---
+        if (status == 1) {
+            disableOtherActiveMuseums(museum.getMuseumId());
+        }
+        // ---------------------------------------------
+
+        museum.setMuseumStatus(status);
+        museum.setMuseumEditTime(System.currentTimeMillis());
+        museumMapper.updateById(museum);
+
+        // 2. 状态级联逻辑
+        if (status == 1) {
+            // 启用逻辑：检查是否有排期，无则生成，有则启用
+            long count = dayMapper.selectCount(new QueryWrapper<Day>().eq("MUSEUM_ID", museum.getMuseumId()));
+            if (count == 0) {
+                // 读取存储的排期配置
+                if (StrUtil.isNotBlank(museum.getMuseumObj())) {
+                    JSONObject obj = JSONUtil.parseObj(museum.getMuseumObj());
+                    String start = obj.getStr("startDate");
+                    String end = obj.getStr("endDate");
+                    List<MuseumAddDTO.TimeTemplate> times = obj.getBeanList("times", MuseumAddDTO.TimeTemplate.class);
+
+                    if (StrUtil.isAllNotBlank(start, end) && CollUtil.isNotEmpty(times)) {
+                        scheduleService.initMuseumSchedule(museum.getMuseumId(), start, end, times);
+                    } else {
+                        log.warn("场馆启用失败: 缺少排期配置数据, ID: {}", id);
+                    }
+                }
+            } else {
+                // 已有排期，全部启用 (逻辑恢复)
+                scheduleService.updateMuseumScheduleStatus(museum.getMuseumId(), 1);
+            }
+        } else {
+            // 禁用逻辑：全部禁用 (逻辑删除)
+            scheduleService.updateMuseumScheduleStatus(museum.getMuseumId(), 0);
+        }
+    }
+
+    /**
+     * 禁用其他已启用的场馆 (互斥逻辑)
+     * 
+     * @param excludeMuseumId 当前需要排除的场馆ID (即正在启用的那个), 新增时传 null
+     */
+    private void disableOtherActiveMuseums(String excludeMuseumId) {
+        QueryWrapper<Museum> wrapper = new QueryWrapper<>();
+        wrapper.eq("MUSEUM_STATUS", 1);
+        if (StrUtil.isNotBlank(excludeMuseumId)) {
+            wrapper.ne("MUSEUM_ID", excludeMuseumId);
+        }
+        List<Museum> activeList = museumMapper.selectList(wrapper);
+
+        for (Museum m : activeList) {
+            // 1. 修改主表状态
+            m.setMuseumStatus(0);
+            m.setMuseumEditTime(System.currentTimeMillis());
+            museumMapper.updateById(m);
+
+            // 2. 联动禁用排期
+            scheduleService.updateMuseumScheduleStatus(m.getMuseumId(), 0);
+
+            log.info("互斥策略执行: 自动禁用场馆 {}", m.getMuseumId());
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllList() {
+        QueryWrapper<Museum> wrapper = new QueryWrapper<>();
+        wrapper.eq("MUSEUM_STATUS", 1);
+        wrapper.select("MUSEUM_ID", "MUSEUM_TITLE");
+        List<Museum> list = museumMapper.selectList(wrapper);
+        return list.stream().map(m -> {
+            Map<String, Object> optionItem = new HashMap<>();
+            optionItem.put("id", m.getMuseumId());
+            optionItem.put("title", m.getMuseumTitle());
+            return optionItem;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Museum> appList(Integer page, Integer limit) {
+        Page<Museum> pageParam = new Page<>(page, limit);
+        QueryWrapper<Museum> wrapper = new QueryWrapper<>();
+        wrapper.eq("MUSEUM_STATUS", 1);
+        wrapper.orderByAsc("MUSEUM_ADD_TIME");
+        return museumMapper.selectPage(pageParam, wrapper);
+    }
+}

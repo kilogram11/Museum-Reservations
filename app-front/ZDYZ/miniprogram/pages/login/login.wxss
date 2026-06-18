@@ -1,0 +1,54 @@
+.login-container {
+  padding: 50rpx 30rpx;
+  background-color: #f5f0e8;
+  min-height: 100vh;
+}
+.title-area {
+  text-align: center;
+  margin-bottom: 80rpx;
+  display: block;
+}
+.sub-title {
+  font-size: 28rpx;
+  color: #8B4513;
+  margin-top: 10rpx;
+  display: block;
+}
+
+.input-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid #8B4513;
+  padding: 20rpx 0;
+  margin-bottom: 30rpx;
+}
+.input-icon {
+  margin-right: 20rpx;
+}
+.input-placeholder {
+  color: #8B4513;
+}
+/* 发送验证码按钮基础样式 */
+.send-code-btn {
+  font-size: 28rpx;
+  color: #8B0000;
+  padding: 0 10rpx;
+  background: transparent;
+  border: none;
+}
+/* 倒计时中按钮禁用样式（变灰+不可点击） */
+.send-code-disabled {
+  color: #999; /* 文字变灰 */
+  pointer-events: none; /* 禁止点击 */
+}
+.btn-red {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  background-color: #8B0000;
+  color: #fff;
+  border-radius: 10rpx;
+  text-align: center;
+  font-size: 32rpx;
+  margin-top: 50rpx;
+}

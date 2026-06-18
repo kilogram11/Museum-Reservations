@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.museum.mapper.MuseumMapper">
+    <!-- ResultMap -->
+    <resultMap id="BaseResultMap" type="com.museum.entity.Museum">
+        <id column="_id" property="id" />
+        <result column="MUSEUM_ID" property="museumId" />
+        <result column="MUSEUM_TITLE" property="museumTitle" />
+        <result column="ADMIN_ID" property="adminId" />
+        <result column="MUSEUM_OBJ" property="museumObj" />
+        <result column="MUSEUM_PIC" property="museumPic" />
+        <result column="MUSEUM_MAX_JOIN_CNT" property="museumMaxJoinCnt" />
+        <result column="MUSEUM_BOOK_SET" property="museumBookSet" />
+        <result column="MUSEUM_STATUS" property="museumStatus" />
+        <result column="MUSEUM_ADD_TIME" property="museumAddTime" />
+        <result column="MUSEUM_EDIT_TIME" property="museumEditTime" />
+        <result column="_pid" property="pid" />
+    </resultMap>
+
+
+    <!-- Insert -->
+    <insert id="insert" parameterType="com.museum.entity.Museum">
+        INSERT INTO museum (
+        _id,
+        MUSEUM_ID,
+        MUSEUM_TITLE,
+        ADMIN_ID,
+        MUSEUM_OBJ,
+        MUSEUM_PIC,
+        MUSEUM_MAX_JOIN_CNT,
+        MUSEUM_BOOK_SET,
+        MUSEUM_STATUS,
+        MUSEUM_ADD_TIME,
+        MUSEUM_EDIT_TIME,
+        _pid,
+        LATITUDE,
+        LONGITUDE,
+        ADDRESS
+        ) VALUES (
+        #{id},
+        #{museumId},
+        #{museumTitle},
+        #{adminId},
+        #{museumObj},
+        #{museumPic},
+        #{museumMaxJoinCnt},
+        #{museumBookSet},
+        #{museumStatus},
+        #{museumAddTime},
+        #{museumEditTime},
+        #{pid},
+        #{latitude},
+        #{longitude},
+        #{address}
+        )
+    </insert>
+
+
+    <!-- Select by ID -->
+    <select id="selectById" resultMap="BaseResultMap" parameterType="String">
+        SELECT * FROM museum WHERE _id = #{id}
+    </select>
+
+    <!-- Update by ID -->
+    <update id="updateById" parameterType="com.museum.entity.Museum">
+        UPDATE museum SET
+            MUSEUM_ID = #{museumId},
+            MUSEUM_TITLE = #{museumTitle},
+            ADMIN_ID = #{adminId},
+            MUSEUM_OBJ = #{museumObj},
+            MUSEUM_PIC = #{museumPic},
+            MUSEUM_MAX_JOIN_CNT = #{museumMaxJoinCnt},
+            MUSEUM_BOOK_SET = #{museumBookSet},
+            MUSEUM_STATUS = #{museumStatus},
+            MUSEUM_ADD_TIME = #{museumAddTime},
+            MUSEUM_EDIT_TIME = #{museumEditTime},
+            _pid = #{pid},
+            LATITUDE = #{latitude},
+            LONGITUDE = #{longitude},
+            ADDRESS = #{address}
+        WHERE _id = #{id}
+    </update>
+
+    <!-- Delete by ID -->
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM museum WHERE _id = #{id}
+    </delete>
+</mapper>

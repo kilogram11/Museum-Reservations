@@ -1,0 +1,117 @@
+/* 全局背景设为淡雅的米色，配合首页风格 */
+page {
+  background-color: #f2e4e1; /* 宣纸米白，极具质感 */
+  background-image: radial-gradient(#b6b2a8 1.5rpx, transparent 0); /* 极细微的纹理 */
+  background-size: 40rpx 40rpx;
+}
+
+/* 轮播图样式 */
+.swiper-container {
+  width: 100%;
+  height: 420rpx;
+  position: relative;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 轮播图标题遮罩 */
+.swiper-title-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 30rpx 20rpx;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+  display: flex;
+  flex-direction: column;
+}
+
+.swiper-title {
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+  letter-spacing: 2rpx;
+}
+
+.swiper-sub {
+  color: #ddd;
+  font-size: 24rpx;
+}
+
+/* 列表区域 */
+.list-section {
+  padding: 30rpx;
+}
+
+.section-header {
+  margin-bottom: 30rpx;
+  border-left: 8rpx solid #8B0000; /* 故宫红 */
+  padding-left: 20rpx;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 卡片样式 */
+.activity-card {
+  background-color: #b7ab94;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.05);
+}
+
+.card-img {
+  width: 100%;
+  height: 320rpx; /* 大图模式 */
+}
+
+.card-content {
+  padding: 24rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fdfdfd; /* 对应图中的深蓝色标题 */
+  margin-bottom: 16rpx;
+}
+
+.card-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+  color: #5c4f4f;
+  font-size: 26rpx;
+}
+
+.icon {
+  margin-right: 10rpx;
+  font-size: 24rpx;
+}
+
+/* 小图列表 (如需) */
+.card-thumbnails {
+  display: flex;
+  margin-top: 20rpx;
+}
+
+.thumb-img {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+  margin-right: 10rpx;
+  background-color: #eee;
+}
