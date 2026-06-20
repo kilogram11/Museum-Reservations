@@ -1,0 +1,32 @@
+{
+  "name": "museum-app-front-test",
+  "version": "1.0.0",
+  "description": "博物馆预约系统微信小程序前端 - 测试模块",
+  "private": true,
+  "scripts": {
+    "test": "jest --config jest.config.js",
+    "test:coverage": "jest --config jest.config.js --coverage",
+    "test:verbose": "jest --config jest.config.js --verbose"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "babel-jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterSetup": ["./__tests__/setup.js"],
+    "moduleNameMapper": {
+      "^../../api/(.*)$": "<rootDir>/api/$1",
+      "^../../utils/(.*)$": "<rootDir>/utils/$1"
+    },
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ]
+  }
+}
