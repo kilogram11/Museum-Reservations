@@ -1,5 +1,6 @@
 package com.museum.controller.app;
 
+import com.museum.annotation.RequireLogin;
 import com.museum.common.dto.BookingSubmitDTO;
 import com.museum.common.result.Result;
 import com.museum.service.JoinService;
@@ -31,6 +32,7 @@ public class AppBookingController extends BaseAppController {
         return Result.success("获取成功", times);
     }
 
+    @RequireLogin
     @PostMapping("/submit")
     public Result submit(@RequestBody BookingSubmitDTO dto) {
         String userId = getUserId();

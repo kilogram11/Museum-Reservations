@@ -11,6 +11,8 @@ import com.museum.mapper.NewsMapper;
 import com.museum.service.NoticeService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 公告业务实现类
  */
@@ -73,6 +75,14 @@ public class NoticeServiceImpl extends ServiceImpl<NewsMapper, News> implements 
         wrapper.eq(News::getNewsStatus, 1);
         wrapper.orderByDesc(News::getNewsAddTime);
         return this.page(p, wrapper);
+    }
+
+    @Override
+    public List<News> listVisibleForRag() {
+        LambdaQueryWrapper<News> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(News::getNewsStatus, 1);
+        wrapper.orderByDesc(News::getNewsAddTime);
+        return this.list(wrapper);
     }
 
     @Override

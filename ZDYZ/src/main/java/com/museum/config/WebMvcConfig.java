@@ -1,30 +1,46 @@
 package com.museum.config;
 
+import com.museum.security.AdminAuthInterceptor;
+import com.museum.security.AppAuthInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-//# Web MVC配置
-//# - 跨域配置（CORS）
-//# - 静态资源映射
-//# - 拦截器注册（后面会用）
+/**
+ * Web MVC 配置：静态资源、CORS、JWT 拦截器注册。
+ */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    private final AppAuthInterceptor appAuthInterceptor;
+    private final AdminAuthInterceptor adminAuthInterceptor;
+
+    public WebMvcConfig(AppAuthInterceptor appAuthInterceptor, AdminAuthInterceptor adminAuthInterceptor) {
+        this.appAuthInterceptor = appAuthInterceptor;
+        this.adminAuthInterceptor = adminAuthInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(appAuthInterceptor)
+                .addPathPatterns("/app/**", "/ai/**");
+
+        registry.addInterceptor(adminAuthInterceptor)
+                .addPathPatterns("/admin/**", "/stats/**", "/message/**")
+                .excludePathPatterns("/admin/auth/login", "/admin/auth/register");
+    }
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 映射本地文件目录
-        // file:files/ 表示项目根目录下的 files 文件夹
         String projectPath = System.getProperty("user.dir");
         String filesPath = projectPath + java.io.File.separator + "files" + java.io.File.separator;
 
-        // 使用 toUri() 自动处理斜杠和特殊字符（如中文路径）
         String pathPattern = java.nio.file.Paths.get(filesPath).toUri().toString();
 
         registry.addResourceHandler("/files/**")
                 .addResourceLocations(pathPattern);
 
-        // 确保 static 目录下的静态资源（如 model_viewer.html, models/*.glb）能被访问
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
     }

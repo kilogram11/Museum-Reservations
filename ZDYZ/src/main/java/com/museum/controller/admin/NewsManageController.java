@@ -1,6 +1,7 @@
 package com.museum.controller.admin;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.dto.NewsAddDTO;
 import com.museum.common.result.Result;
 import com.museum.entity.News;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@RequireLogin
 @Slf4j
 @RestController
 @RequestMapping("/admin/news")

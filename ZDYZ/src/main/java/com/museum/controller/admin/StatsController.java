@@ -1,5 +1,6 @@
 package com.museum.controller.admin;
 
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  * 统计数据控制器
  */
+@RequireLogin
 @RestController
 @RequestMapping("/stats")
 public class StatsController {

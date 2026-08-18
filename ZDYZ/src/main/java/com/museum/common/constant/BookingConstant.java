@@ -33,6 +33,15 @@ public final class BookingConstant {
 
     public static final String CHECKIN_LOCK_KEY_PREFIX = "lock:checkin:";
 
+    /** Redis 时段剩余名额：booking:stock:{timeMark} */
+    public static final String STOCK_KEY_PREFIX = "booking:stock:";
+
+    /** Redis 一证一约：booking:booked:{day}:{identityId} */
+    public static final String BOOKED_KEY_PREFIX = "booking:booked:";
+
+    /** booked key 在参观日结束后额外保留的秒数（2 小时） */
+    public static final long BOOKED_TTL_BUFFER_SECONDS = 2 * 60 * 60L;
+
     public static final String DEFAULT_USER_NAME_PREFIX = "用户";
 
     public static final int MOBILE_SUFFIX_LENGTH = 4;
@@ -40,4 +49,12 @@ public final class BookingConstant {
     public static final String JOIN_ID_PREFIX = "join_";
 
     public static final String EMPTY_JSON_ARRAY = "[]";
+
+    public static String stockKey(String timeMark) {
+        return STOCK_KEY_PREFIX + timeMark;
+    }
+
+    public static String bookedKey(String day, String identityId) {
+        return BOOKED_KEY_PREFIX + day + ":" + identityId;
+    }
 }

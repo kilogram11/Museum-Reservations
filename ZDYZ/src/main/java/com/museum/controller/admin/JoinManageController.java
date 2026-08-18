@@ -1,6 +1,7 @@
 package com.museum.controller.admin;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.common.utils.PageParamUtil;
 import com.museum.entity.Join;
@@ -21,6 +22,7 @@ import java.util.Map;
 /**
  * 预约核销管理 Controller
  */
+@RequireLogin
 @Slf4j
 @RestController
 @RequestMapping("/admin/join")

@@ -1,6 +1,7 @@
 package com.museum.controller.admin;
 
 import cn.hutool.core.util.StrUtil;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.dto.AdminLoginDTO;
 import com.museum.common.result.Result;
 import com.museum.entity.Admin;
@@ -48,6 +49,7 @@ public class AdminLoginController {
     /**
      * 获取管理员信息
      */
+    @RequireLogin
     @GetMapping("/info")
     public Result info() {
         Admin admin = adminService.getAdminInfo();
@@ -57,6 +59,7 @@ public class AdminLoginController {
     /**
      * 退出登录
      */
+    @RequireLogin
     @PostMapping("/logout")
     public Result logout() {
         adminService.logout();
@@ -67,6 +70,7 @@ public class AdminLoginController {
     /**
      * 1. 获取个人信息（前端弹窗初始化时调用）
      */
+    @RequireLogin
     @GetMapping("/profile")
     public Result getAdminProfile() {
         // 直接通过 service 获取当前登录人的 profile
@@ -87,6 +91,7 @@ public class AdminLoginController {
     /**
      * 2. 更新用户名和简介（前端编辑后调用）
      */
+    @RequireLogin
     @PostMapping("/profile/update")
     public Result updateAdminProfile(@RequestBody Map<String, String> requestParams) {
         Admin currentAdmin = adminService.getAdminInfo();
@@ -104,6 +109,7 @@ public class AdminLoginController {
     /**
      * 3. 更新头像（前端切换头像后调用）
      */
+    @RequireLogin
     @PostMapping("/profile/update-avatar")
     public Result updateAdminAvatar(@RequestBody Map<String, String> requestParams) {
         Admin currentAdmin = adminService.getAdminInfo();

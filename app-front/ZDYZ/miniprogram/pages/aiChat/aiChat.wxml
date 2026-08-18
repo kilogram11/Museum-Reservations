@@ -1,24 +1,162 @@
-<view class="container">
+<view class="page">
+  <view class="hero-card">
+    <view class="hero-title">博物馆 AI 助手</view>
+    <view class="hero-subtitle">可查余票、看预约、取消预约，也能回答参观须知与公告问题。</view>
+    <view class="prompt-chips">
+      <view
+        class="chip"
+        wx:for="{{examplePrompts}}"
+        wx:key="*this"
+        wx:for-item="prompt"
+        bindtap="onExampleTap"
+        data-value="{{prompt}}"
+      >
+        {{prompt}}
+      </view>
+    </view>
+    <view class="login-hint" wx:if="{{!isLoggedIn}}">
+      <text>当前未登录，可先查询公开信息；涉及预约写操作时需要先登录。</text>
+      <text class="login-link" bindtap="goLogin">去登录</text>
+    </view>
+  </view>
+
   <scroll-view class="chat-list" scroll-y scroll-into-view="{{toView}}" scroll-with-animation>
-    <block wx:for="{{messages}}" wx:key="index">
-      <view class="message-item {{item.type === 'user' ? 'user-message' : 'bot-message'}}" id="msg-{{index}}">
-        <image class="avatar" src="{{item.type === 'user' ? '/images/icons/usercenter.png' : '/images/icons/customer-service.svg'}}"></image>
-        <view class="content">
-          <text>{{item.content}}</text>
+    <block wx:for="{{messages}}" wx:key="id" wx:for-item="message">
+      <view class="message-row {{message.role === 'user' ? 'user-row' : 'assistant-row'}}" id="{{message.id}}">
+        <image
+          class="avatar"
+          src="{{message.role === 'user' ? '/images/icons/usercenter.png' : '/images/icons/customer-service.svg'}}"
+        />
+        <view class="message-main">
+          <view class="bubble {{message.role === 'user' ? 'user-bubble' : 'assistant-bubble'}}">
+            <text class="message-text">{{message.text}}</text>
+          </view>
+
+          <view class="state-banner state-{{message.meta.state}}" wx:if="{{message.meta.state}}">
+            <text>{{message.meta.stateText}}</text>
+            <text class="state-action" wx:if="{{message.meta.showLoginAction}}" bindtap="goLogin">去登录</text>
+            <text class="state-action" wx:if="{{message.meta.retryable}}" bindtap="retryLastMessage">重试</text>
+          </view>
+
+          <view class="block-list" wx:if="{{message.blocks && message.blocks.length}}">
+            <block wx:for="{{message.blocks}}" wx:key="blockId" wx:for-item="block">
+              <view class="info-card slots-card" wx:if="{{block.type === 'time_slots'}}">
+                <view class="card-title">{{block.title || '时段余票'}}</view>
+                <view class="empty-text" wx:if="{{!block.items.length}}">当前没有可展示的时段信息。</view>
+                <block wx:for="{{block.items}}" wx:key="timeMark" wx:for-item="slot">
+                  <view class="slot-item">
+                    <view class="slot-main">
+                      <text class="slot-period">{{slot.periodLabel}}</text>
+                      <text class="slot-time">{{slot.startTime}} - {{slot.endTime}}</text>
+                    </view>
+                    <view class="slot-side">
+                      <text class="slot-remain">余票 {{slot.remainLabel}}</text>
+                      <text class="slot-status {{slot.statusClass}}">{{slot.statusLabel}}</text>
+                    </view>
+                  </view>
+                </block>
+              </view>
+
+              <view class="info-card records-card" wx:elif="{{block.type === 'booking_records'}}">
+                <view class="card-title">{{block.title || '预约记录'}}</view>
+                <view class="empty-text" wx:if="{{!block.items.length}}">当前没有预约记录。</view>
+                <block wx:for="{{block.items}}" wx:key="joinId" wx:for-item="record">
+                  <view class="record-item">
+                    <view class="record-header">
+                      <text class="record-day">{{record.day}}</text>
+                      <text class="record-status">{{record.statusLabel}}</text>
+                    </view>
+                    <view class="record-line">{{record.startTime}} - {{record.endTime}} · {{record.visitorName}}</view>
+                    <view class="record-line">预约号：{{record.joinId}}</view>
+                    <view class="record-line" wx:if="{{record.checkinLabel}}">状态：{{record.checkinLabel}}</view>
+                  </view>
+                </block>
+              </view>
+
+              <view class="info-card source-card" wx:elif="{{block.type === 'rules_source'}}">
+                <view
+                  class="source-header"
+                  bindtap="toggleBlock"
+                  data-message-id="{{message.id}}"
+                  data-block-id="{{block.blockId}}"
+                >
+                  <view>
+                    <view class="card-title">{{block.title || '参考来源'}}</view>
+                    <view class="source-tag">来源：{{block.sourceLabel}}</view>
+                  </view>
+                  <text class="expand-text">{{block.expanded ? '收起' : '展开'}}</text>
+                </view>
+                <view wx:if="{{block.expanded}}">
+                  <block wx:for="{{block.items}}" wx:key="sourceId" wx:for-item="sourceItem">
+                    <view class="source-text">{{sourceItem.text}}</view>
+                  </block>
+                </view>
+              </view>
+
+              <view class="info-card tips-card" wx:elif="{{block.type === 'tips'}}">
+                <view class="card-title">{{block.title || '提示'}}</view>
+                <block wx:for="{{block.items}}" wx:key="text" wx:for-item="tip">
+                  <view class="tip-line">{{tip.text}}</view>
+                </block>
+              </view>
+
+              <view class="info-card generic-card" wx:else>
+                <view class="card-title">{{block.title || '助手结果'}}</view>
+                <block wx:for="{{block.items}}" wx:key="index" wx:for-item="generic">
+                  <view class="tip-line">{{generic.text || generic}}</view>
+                </block>
+              </view>
+            </block>
+          </view>
+
+          <view class="suggestion-row" wx:if="{{message.suggestions && message.suggestions.length}}">
+            <view
+              class="suggestion-chip"
+              wx:for="{{message.suggestions}}"
+              wx:key="*this"
+              wx:for-item="suggestion"
+              bindtap="onSuggestionTap"
+              data-value="{{suggestion}}"
+            >
+              {{suggestion}}
+            </view>
+          </view>
         </view>
       </view>
     </block>
-    <!-- Loading indicator -->
-    <view wx:if="{{loading}}" class="message-item bot-message">
-       <image class="avatar" src="/images/icons/customer-service.svg"></image>
-       <view class="content">
-         <text>...</text>
-       </view>
+
+    <view wx:if="{{loading}}" class="message-row assistant-row">
+      <image class="avatar" src="/images/icons/customer-service.svg" />
+      <view class="message-main">
+        <view class="bubble assistant-bubble">
+          <text class="message-text">正在整理答案...</text>
+        </view>
+      </view>
     </view>
   </scroll-view>
 
+  <view class="quick-action-bar">
+    <view
+      class="quick-action"
+      wx:for="{{quickActions}}"
+      wx:key="label"
+      wx:for-item="action"
+      bindtap="goQuickAction"
+      data-url="{{action.url}}"
+    >
+      {{action.label}}
+    </view>
+  </view>
+
   <view class="input-area">
-    <input class="input-box" value="{{inputValue}}" bindinput="onInput" placeholder="请输入您的问题..." confirm-type="send" bindconfirm="sendMessage" />
+    <input
+      class="input-box"
+      value="{{inputValue}}"
+      bindinput="onInput"
+      placeholder="输入你的问题，例如：后天下午有票吗"
+      confirm-type="send"
+      bindconfirm="sendMessage"
+    />
     <button class="send-btn" bindtap="sendMessage" disabled="{{loading || !inputValue}}">发送</button>
   </view>
 </view>

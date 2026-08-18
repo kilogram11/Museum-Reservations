@@ -45,6 +45,12 @@ AccessKey.csv
 # Local runtime upload/generated files
 ZDYZ/files/
 
+# JMeter local tokens / results
+docs/jmeter/users.csv
+docs/jmeter/users-duplicate.csv
+docs/jmeter/results-*.jtl
+docs/jmeter/jmeter-*.log
+
 # Office temporary files
 ~$*
 

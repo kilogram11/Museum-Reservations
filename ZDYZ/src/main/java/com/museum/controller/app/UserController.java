@@ -1,5 +1,6 @@
 package com.museum.controller.app;
 
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.entity.User;
 import com.museum.service.UserService;
@@ -29,12 +30,14 @@ public class UserController {
         return Result.success("登录成功", data);
     }
 
+    @RequireLogin
     @GetMapping("/info")
     public Result info() {
         User user = userService.getUserInfo();
         return Result.success("获取成功", user);
     }
 
+    @RequireLogin
     @PostMapping("/update")
     public Result update(@RequestBody User user) {
         userService.updateUserInfo(user);

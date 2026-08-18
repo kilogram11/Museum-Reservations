@@ -22,6 +22,13 @@ public interface TimeMapper extends BaseMapper<Time> {
     Time selectByTimeMark(@Param("timeMark") String timeMark);
 
     /**
+     * 原子增减 SUCC_CNT，禁止用 updateById 整行回写库存字段
+     */
+    int incrSuccCnt(@Param("timeMark") String timeMark,
+                     @Param("delta") int delta,
+                     @Param("editTime") long editTime);
+
+    /**
      * 重写 updateById 以去除 @Param("et")，兼容手写 XML
      */
     int updateById(Time entity);

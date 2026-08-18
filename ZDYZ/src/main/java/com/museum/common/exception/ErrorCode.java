@@ -22,6 +22,7 @@ public enum ErrorCode {
     IDENTITY_NOT_FOUND(2001, "游客信息不存在"),
     IDENTITY_BLACKLISTED(2002, "游客在黑名单中，无法预约"),
     IDENTITY_DUPLICATE_BOOKING(2003, "今日已预约，请勿重复提交"),
+    IDENTITY_DUPLICATE_IN_REQUEST(2004, "同一请求中不能重复选择同一游客"),
 
     BOOKING_SLOT_INVALID(3001, "时段无效或未开放"),
     BOOKING_SLOT_FULL(3002, "该时段余量不足"),
@@ -34,6 +35,7 @@ public enum ErrorCode {
     BOOKING_EXPIRED(3009, "该记录已失效/爽约，无法核销"),
     BOOKING_LOCK_FAILED(3010, "预约人数较多，请稍后刷新重试"),
     BOOKING_SCHEDULE_ERROR(3011, "排期日期数据异常"),
+    BOOKING_STOCK_REDIS_ERROR(3012, "库存服务暂不可用，请稍后重试"),
 
     CHECKIN_BUSY(4001, "正在核销中，请勿重复扫描"),
 

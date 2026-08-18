@@ -10,16 +10,41 @@ spring:
     # URL 包含：协议 + IP端口 + 数据库名 + 时区/编码设置
     url: jdbc:mysql://localhost:3306/museum_book?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password:
+    password: 123456
 
-  # 2. Redis 配置 (我们选择了 Redis 依赖，必须配置，否则启动报错)
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
-#      password: # 如果没设密码就留空
+  # 2. Redis 配置（预约锁依赖真实 Redis，无 Redis 时启动或运行会明确失败）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
 
-# 3. MyBatis-Plus 配置 (让程序知道去哪里找你的 SQL)
+  # 3. Spring AI OpenAI-compatible → DeepSeek
+  # 本项目演示：直接在下方 api-key 填写 DeepSeek Key（字符串，不要用 ${}），不使用环境变量。
+  # 注意：真实 Key 勿提交到 Git。
+  ai:
+    model:
+      chat: openai
+    openai:
+      api-key: "sk-0c2ad925d9014b68aff2162e2e60758d"
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-v4-flash
+
+# 5. 轻量 RAG（馆规/公告）；Embedding 为本地哈希，不依赖 DeepSeek embeddings
+museum:
+  ai:
+    rag:
+      enabled: true
+      top-k: 4
+      min-score: 0.12
+      rebuild-on-startup: true
+      sources:
+        news-enabled: true
+        static-rules-enabled: true
+
+# 4. MyBatis-Plus 配置 (让程序知道去哪里找你的 SQL)
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 在控制台打印打印 SQL 语句

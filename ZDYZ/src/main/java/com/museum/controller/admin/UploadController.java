@@ -2,6 +2,7 @@ package com.museum.controller.admin;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import java.util.Map;
 /**
  * 文件上传控制器
  */
+@RequireLogin
 @Slf4j
 @RestController
 @RequestMapping("/admin/upload")

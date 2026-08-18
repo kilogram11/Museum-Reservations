@@ -1,6 +1,7 @@
 package com.museum.controller.app;
 
 import cn.hutool.core.util.StrUtil;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.entity.Join;
 import com.museum.service.JoinService;
@@ -13,6 +14,7 @@ import java.util.Map;
 /**
  * App 预约记录控制器
  */
+@RequireLogin
 @RestController
 @RequestMapping("/app/record")
 public class AppRecordController extends BaseAppController {

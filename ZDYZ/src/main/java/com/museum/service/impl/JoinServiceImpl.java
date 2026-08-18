@@ -26,9 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements JoinService {
 
     private static final Logger logger = LoggerFactory.getLogger(JoinServiceImpl.class);
-    private static final ConcurrentHashMap<String, Object> LOCAL_LOCKS = new ConcurrentHashMap<>();
 
     @Autowired
     private DayMapper dayMapper;
@@ -56,6 +55,8 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private BookingStockService bookingStockService;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     // ==================== 查询：可预约日期 ====================
 
@@ -130,13 +131,27 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
     private List<Map<String, Object>> buildTimeResultList(List<Time> times) {
         List<Map<String, Object>> result = new ArrayList<>();
         for (Time time : times) {
+            int total = time.getLimitCnt() == null ? 0 : time.getLimitCnt();
+            int usedDb = time.getSuccCnt() == null ? 0 : time.getSuccCnt();
+            int dbRemain = Math.max(0, total - usedDb);
+
+            Integer redisRemain = bookingStockService.getRedisRemain(time.getTimeMark());
+            if (redisRemain == null) {
+                bookingStockService.warmUpIfAbsent(time.getTimeMark(), dbRemain);
+                redisRemain = bookingStockService.getRedisRemain(time.getTimeMark());
+                if (redisRemain == null) {
+                    redisRemain = dbRemain;
+                }
+            }
+
+            int surplus = Math.max(0, redisRemain);
             Map<String, Object> map = new HashMap<>();
             map.put("timeMark", time.getTimeMark());
             map.put("startTime", time.getTimeStart());
             map.put("endTime", time.getTimeEnd());
-            map.put("total", time.getLimitCnt());
-            map.put("used", time.getSuccCnt());
-            map.put("surplus", Math.max(0, time.getLimitCnt() - time.getSuccCnt()));
+            map.put("total", total);
+            map.put("used", Math.max(0, total - surplus));
+            map.put("surplus", surplus);
             result.add(map);
         }
         return result;
@@ -145,10 +160,30 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
     // ==================== 核心：提交预约 ====================
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void submitBooking(String userId, String timeMark, List<String> identityIds) {
         validateBookingRequest(identityIds);
-        acquireLockAndBook(userId, timeMark, identityIds);
+        rejectDuplicateIdentityIdsInRequest(identityIds);
+
+        Time time = validateTimeSlot(timeMark);
+        Day day = validateDaySchedule(time);
+        String meetDay = day.getDay();
+
+        List<Join> joinsToSave = buildJoinRecords(userId, timeMark, identityIds, meetDay);
+
+        int remain = Math.max(0, time.getLimitCnt() - time.getSuccCnt());
+        bookingStockService.warmUpIfAbsent(timeMark, remain);
+        long bookedTtlSeconds = calcBookedTtlSeconds(meetDay);
+        bookingStockService.tryReserve(timeMark, meetDay, identityIds, bookedTtlSeconds);
+
+        try {
+            transactionTemplate.executeWithoutResult(status -> {
+                saveBookingRecords(joinsToSave, time, meetDay, userId);
+                bookingStockService.incrMysqlSuccCnt(timeMark, identityIds.size());
+            });
+        } catch (RuntimeException e) {
+            bookingStockService.compensate(timeMark, meetDay, identityIds);
+            throw e;
+        }
     }
 
     private void validateBookingRequest(List<String> identityIds) {
@@ -160,68 +195,20 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         }
     }
 
-    private void acquireLockAndBook(String userId, String timeMark, List<String> identityIds) {
-        String lockKey = BookingConstant.LOCK_KEY_PREFIX + timeMark;
-        boolean locked = false;
-        long startTime = System.currentTimeMillis();
-
-        try {
-            locked = waitForLock(lockKey, startTime);
-            doSubmitBooking(userId, timeMark, identityIds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new BusinessException(ErrorCode.INTERNAL_ERROR.getCode(), "预约中断");
-        } finally {
-            releaseLock(lockKey, locked);
-        }
-    }
-
-    private boolean waitForLock(String lockKey, long startTime) throws InterruptedException {
-        while (true) {
-            try {
-                Boolean success = stringRedisTemplate.opsForValue()
-                        .setIfAbsent(lockKey, "1", BookingConstant.REDIS_LOCK_TTL_SECONDS, TimeUnit.SECONDS);
-                if (Boolean.TRUE.equals(success)) {
-                    return true;
-                }
-            } catch (Exception e) {
-                logger.warn("Redis 连接失败，正在使用 JVM 本地锁降级运行... 错误: {}", e.getMessage());
-                if (LOCAL_LOCKS.putIfAbsent(lockKey, new Object()) == null) {
-                    return true;
-                }
+    private void rejectDuplicateIdentityIdsInRequest(List<String> identityIds) {
+        Set<String> seen = new HashSet<>();
+        for (String identityId : identityIds) {
+            if (!seen.add(identityId)) {
+                throw new BusinessException(ErrorCode.IDENTITY_DUPLICATE_IN_REQUEST);
             }
-
-            if (System.currentTimeMillis() - startTime > BookingConstant.LOCK_TIMEOUT_MS) {
-                throw new BusinessException(ErrorCode.BOOKING_LOCK_FAILED);
-            }
-            Thread.sleep(BookingConstant.LOCK_RETRY_SLEEP_MS);
         }
     }
 
-    private void releaseLock(String lockKey, boolean locked) {
-        if (!locked) {
-            return;
-        }
-        try {
-            stringRedisTemplate.delete(lockKey);
-        } catch (Exception e) {
-            LOCAL_LOCKS.remove(lockKey);
-        }
-    }
-
-    private void doSubmitBooking(String userId, String timeMark, List<String> identityIds) {
-        BookingContext bookingContext = loadAndValidateBookingContext(timeMark, identityIds.size());
-        List<Join> joinsToSave = buildJoinRecords(userId, timeMark, identityIds, bookingContext.getMeetDay());
-
-        persistBookingAndSendMessages(joinsToSave, bookingContext, userId);
-        bookingStockService.deduct(bookingContext.getTime(), identityIds.size());
-    }
-
-    private BookingContext loadAndValidateBookingContext(String timeMark, int visitorCount) {
-        Time time = validateTimeSlot(timeMark);
-        Day day = validateDaySchedule(time);
-        bookingStockService.checkSufficient(time, visitorCount);
-        return new BookingContext(time, day.getDay());
+    private long calcBookedTtlSeconds(String meetDay) {
+        Date endOfDay = DateUtil.endOfDay(DateUtil.parseDate(meetDay));
+        long seconds = (endOfDay.getTime() - System.currentTimeMillis()) / 1000
+                + BookingConstant.BOOKED_TTL_BUFFER_SECONDS;
+        return Math.max(BookingConstant.BOOKED_TTL_BUFFER_SECONDS, seconds);
     }
 
     private List<Join> buildJoinRecords(String userId, String timeMark,
@@ -235,11 +222,6 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
             joinsToSave.add(buildJoinRecord(userId, identity, timeMark, meetDay, now));
         }
         return joinsToSave;
-    }
-
-    private void persistBookingAndSendMessages(List<Join> joinsToSave,
-                                                BookingContext bookingContext, String userId) {
-        saveBookingRecords(joinsToSave, bookingContext.getTime(), bookingContext.getMeetDay(), userId);
     }
 
     private Time validateTimeSlot(String timeMark) {
@@ -434,17 +416,23 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
     // ==================== 取消预约 ====================
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void cancelBooking(String userId, String joinId) {
         Join join = findBookingOwnedByUser(userId, joinId);
         validateCancellable(join);
 
-        join.setJoinStatus(JoinStatus.CANCELLED.getCode());
-        join.setJoinEditTime(System.currentTimeMillis());
-        joinMapper.updateById(join);
+        String timeMark = join.getTimeMark();
+        String meetDay = join.getJoinMeetDay();
+        String identityId = join.getIdentityId();
 
-        sendCancelMessage(userId, join);
-        bookingStockService.rollback(join.getTimeMark());
+        transactionTemplate.executeWithoutResult(status -> {
+            join.setJoinStatus(JoinStatus.CANCELLED.getCode());
+            join.setJoinEditTime(System.currentTimeMillis());
+            joinMapper.updateById(join);
+            bookingStockService.incrMysqlSuccCnt(timeMark, -1);
+            sendCancelMessage(userId, join);
+        });
+
+        bookingStockService.compensate(timeMark, meetDay, Collections.singletonList(identityId));
     }
 
     private Join findBookingOwnedByUser(String userId, String joinId) {
@@ -504,8 +492,8 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
                     .setIfAbsent(lockKey, "1", BookingConstant.CHECKIN_LOCK_TTL_SECONDS, TimeUnit.SECONDS);
             return Boolean.TRUE.equals(success);
         } catch (Exception e) {
-            logger.warn("核销时 Redis 不可用，使用 JVM 锁降级");
-            return LOCAL_LOCKS.putIfAbsent(lockKey, new Object()) == null;
+            logger.error("核销时 Redis 不可用: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.INTERNAL_ERROR.getCode(), "Redis 不可用，无法完成核销");
         }
     }
 
@@ -513,7 +501,7 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
         try {
             stringRedisTemplate.delete(lockKey);
         } catch (Exception e) {
-            LOCAL_LOCKS.remove(lockKey);
+            logger.error("释放核销锁失败, lockKey={}: {}", lockKey, e.getMessage());
         }
     }
 
@@ -603,23 +591,5 @@ public class JoinServiceImpl extends ServiceImpl<JoinMapper, Join> implements Jo
             return form.getStr("name", "游客");
         }
         return "游客";
-    }
-
-    private static class BookingContext {
-        private final Time time;
-        private final String meetDay;
-
-        private BookingContext(Time time, String meetDay) {
-            this.time = time;
-            this.meetDay = meetDay;
-        }
-
-        private Time getTime() {
-            return time;
-        }
-
-        private String getMeetDay() {
-            return meetDay;
-        }
     }
 }

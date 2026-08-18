@@ -2,6 +2,7 @@ package com.museum.controller.admin;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.dto.MuseumAddDTO;
 import com.museum.common.result.Result;
 import com.museum.common.utils.PageParamUtil;
@@ -16,6 +17,7 @@ import java.util.Map;
 /**
  * 场馆管理控制器
  */
+@RequireLogin
 @Slf4j
 @RestController
 @RequestMapping("/admin/museum")

@@ -1,6 +1,7 @@
 package com.museum.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.entity.MessageTemplate;
 import com.museum.service.MessageTemplateService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 消息模版管理 (管理端)
  */
+@RequireLogin
 @RestController
 @RequestMapping("/admin/message/template")
 public class AdminMessageController {

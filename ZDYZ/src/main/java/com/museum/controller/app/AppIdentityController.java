@@ -1,5 +1,6 @@
 package com.museum.controller.app;
 
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.entity.Identity;
 import com.museum.service.IdentityService;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * App端常用游客管理
  */
+@RequireLogin
 @RestController
 @RequestMapping("/app/identity")
 public class AppIdentityController extends BaseAppController {

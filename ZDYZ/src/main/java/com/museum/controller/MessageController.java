@@ -1,6 +1,7 @@
 package com.museum.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.museum.annotation.RequireLogin;
 import com.museum.common.result.Result;
 import com.museum.entity.Message;
 import com.museum.service.MessageService;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * 消息中心 (小程序端)
  */
+@RequireLogin
 @RestController
 @RequestMapping("/message")
 public class MessageController {

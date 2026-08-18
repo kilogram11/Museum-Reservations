@@ -52,6 +52,13 @@
             _pid = #{pid}
         WHERE _id = #{id}
     </update>
+    <update id="incrSuccCnt">
+        UPDATE time
+        SET SUCC_CNT = SUCC_CNT + #{delta},
+            EDIT_TIME = #{editTime}
+        WHERE TIME_MARK = #{timeMark}
+          AND SUCC_CNT + #{delta} &gt;= 0
+    </update>
     <delete id="deleteById" parameterType="String">
         DELETE FROM time WHERE _id = #{id}
     </delete>
