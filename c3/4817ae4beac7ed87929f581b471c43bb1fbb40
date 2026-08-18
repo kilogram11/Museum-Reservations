@@ -1,0 +1,400 @@
+ZDYZ/src/main/java/com/museum/ai/dto/CancelBookingData.java
+  s_ca88252b1e5c7c::t_e7a08d0c743b07 1-13
+ZDYZ/src/main/java/com/museum/ai/dto/QueryTimesRequest.java
+  s_ca88252b1e5c7c::t_f2a2aa94cba3df 1-13
+ZDYZ/src/main/java/com/museum/ai/dto/BookingStatus.java
+  s_ca88252b1e5c7c::t_4422f9fa5f764b 1-6
+docs/sql/README.md
+  s_ca88252b1e5c7c::t_a0b2c2fd348e0d 1-26
+docs/jmeter/README.md
+  s_ca88252b1e5c7c::t_96fa84828f37f7 1-56
+docs/ai-agent-test-case.md
+  s_f8d762a0cfe970::t_3b5002957a8167 1-19,22-66,68-79,81-83,85-93,96-105,107-115,118-125,127,129-134,136,138,140-146,148,150-151,162,165-170
+  s_f8d762a0cfe970::t_3cc1d9ab8878f3 20-21,67,80,84,94-95,106,116-117,126,128,135,137,139,147,149,152-161,163-164
+docs/sql/museum_book_seed_base.sql
+  s_ca88252b1e5c7c::t_5f066179067c99 1-52
+ZDYZ/src/main/java/com/museum/controller/AdminMessageController.java
+  s_1063def04fa266::t_f2f792c7fb49d1 4,14
+ZDYZ/src/main/java/com/museum/service/impl/NoticeServiceImpl.java
+  s_f8d762a0cfe970::t_ab52bf3b38b1c5 14-15
+  s_f8d762a0cfe970::t_615682380e032a 81
+  s_f8d762a0cfe970::t_a525ea9849f826 82-87
+ZDYZ/src/main/java/com/museum/service/impl/JoinServiceImpl.java
+  s_1063def04fa266::t_350f3ce6466cb0 134-147,152-154,165-178,180-186,198-202,207-211
+  s_1063def04fa266::t_b12a387e7aee5a 29
+  s_1063def04fa266::t_77fa24a38eeb40 59
+  s_1063def04fa266::t_ec43cb2ef6617d 423-425,428-435
+  s_1063def04fa266::t_2a72da16997713 427
+  s_1063def04fa266::t_0ec52941307ebf 58
+  s_1063def04fa266::t_6c125a1b439235 495-496,504
+  s_1063def04fa266::t_dda7ec83fd3dac 179
+ZDYZ/src/main/java/com/museum/controller/AiChatController.java
+  s_e43eb713364818::t_89b68b1d84fad7 3,18,20
+ZDYZ/src/main/java/com/museum/ai/support/AiChatBlockCollector.java
+  s_e43eb713364818::t_d124e04eb15b45 1-90
+app-front/ZDYZ/miniprogram/pages/aiChat/aiChat.js
+  s_e43eb713364818::t_a8efc1d2ae9764 1-29,32,35-66,76-81,83-100,102-113,116-137,141-166,169,173-409,411-414,416
+ZDYZ/src/main/java/com/museum/common/constant/BookingConstant.java
+  s_1063def04fa266::t_c673aea1d319bf 36-44,52-59
+docs/jmeter/assert_loadtest.py
+  s_ca88252b1e5c7c::t_6d4d2ca9c937d4 1-88
+ZDYZ/pom.xml
+  s_96fd53d2cf3b60::t_64032a2b5e14c7 9,24,27-37
+  s_96fd53d2cf3b60::t_74405525727276 153,155,158
+  s_96fd53d2cf3b60::t_6a2e255d549ae8 154,156-157
+ZDYZ/src/main/java/com/museum/ai/rag/model/ChatIntent.java
+  s_f8d762a0cfe970::t_3b70cc9299b5a3 1-10
+ZDYZ/src/main/java/com/museum/ai/config/AiChatClientConfig.java
+  s_96fd53d2cf3b60::t_d23320aeee9bb2 1-4,14-15,20-23,25-29,32-33,78-80
+  s_f8d762a0cfe970::t_b2b4720a6f6044 6-13,18-19,24,30-31,34-53,60-77
+  s_96fd53d2cf3b60::t_b60b3cd2a91a3c 16-17,54-59
+  s_96fd53d2cf3b60::t_64feb85b29b2b5 5
+ZDYZ/src/main/java/com/museum/controller/admin/UploadController.java
+  s_1063def04fa266::t_2b4c64ceb0c5fa 22
+  s_1063def04fa266::t_483c487cf189a2 5
+ZDYZ/src/main/java/com/museum/security/AppAuthInterceptor.java
+  s_96fd53d2cf3b60::t_d20ec7b01b3578 4,19-21,39-40,48,50-63,66-71,75-80,82,84
+  s_1063def04fa266::t_4ed6ec9337f85d 3,5-8,11-13,16-17,23,26-35,37-38,41-47,49,64-65,72,81,83,85-96
+ZDYZ/src/test/java/com/museum/ai/AiChatBlockCollectorTest.java
+  s_e43eb713364818::t_46a332dec3723f 1-47
+ZDYZ/src/main/resources/rag/visit-rules.md
+  s_f8d762a0cfe970::t_1d34a2716bc541 1-79
+docs/jmeter/mobiles.csv
+  s_ca88252b1e5c7c::t_1d9f1c8ead85f2 1-81
+ZDYZ/src/main/java/com/museum/controller/admin/AdminLoginController.java
+  s_1063def04fa266::t_b990a78bc1f68f 4
+  s_1063def04fa266::t_901d98785f444d 112
+  s_1063def04fa266::t_c1490360bf97d8 94
+  s_1063def04fa266::t_2b279d58d3056d 52,62,73
+context.md
+  s_ca88252b1e5c7c::t_d78e7c4a24fbcb 21,25
+  s_48dceb0ef91d94::t_229d2e708d65e1 34-42,44-45,50,52,54
+  s_96fd53d2cf3b60::t_704d6612eb5934 43,46,48
+  s_96fd53d2cf3b60::t_b07cce8b91f26a 47
+  s_ca88252b1e5c7c::t_84eed0d82f4330 49
+  s_ca88252b1e5c7c::t_c8eb2355400dba 13-14
+  s_1063def04fa266::t_57dd4da2a1d75a 1-12,16-20,22,24,26-33
+  s_96fd53d2cf3b60::t_3b325b56968dd7 15
+  s_ca88252b1e5c7c::t_6acbff52242f55 51,53,55
+  s_96fd53d2cf3b60::t_77ec80e3efb242 23
+ZDYZ/src/main/java/com/museum/service/BookingStockService.java
+  s_1063def04fa266::t_9f2bdbfda5aaa0 3,5-7,10-13,15-33
+ZDYZ/src/main/java/com/museum/ai/dto/SlotAvailStatus.java
+  s_ca88252b1e5c7c::t_601f31e8f2d1eb 1-6
+ZDYZ/src/main/java/com/museum/controller/admin/NewsManageController.java
+  s_1063def04fa266::t_15a24919f04d6f 13
+  s_1063def04fa266::t_0c0ebf3c103950 4
+ZDYZ/src/main/java/com/museum/ai/context/UserContext.java
+  s_ca88252b1e5c7c::t_b026d35d1df162 1-25
+ZDYZ/src/main/java/com/museum/ai/dto/SubmitBookingRequest.java
+  s_ca88252b1e5c7c::t_a1bd41d7822bee 1-16
+ZDYZ/src/main/java/com/museum/controller/app/AppIdentityController.java
+  s_1063def04fa266::t_f30f5de8cfd883 3,16
+docs/jmeter/loadtest-meta.properties
+  s_ca88252b1e5c7c::t_1d9f1c8ead85f2 1-5
+docs/jmeter/prepare_tokens.py
+  s_ca88252b1e5c7c::t_1a6ac8d0445dd2 1-53
+ZDYZ/src/main/java/com/museum/service/NoticeService.java
+  s_f8d762a0cfe970::t_89c690b9fb5155 40,42-43,45-46
+  s_f8d762a0cfe970::t_ff4cc0701ac4dd 7-8,48
+ZDYZ/src/test/java/com/museum/security/AppAuthInterceptorTest.java
+  s_1063def04fa266::t_e40d3948691707 1-3,5-8,10-25,27-38,40-41,47-62,66-69,72-73,75,93-106,108-122,124-139,153-157,159-163,165-167
+  s_96fd53d2cf3b60::t_79370af9c2ccfe 4,9,26,39,42-46,63-65,70-71,74,76-92,107,123,140-152,158,164
+ZDYZ/src/main/java/com/museum/controller/app/UserController.java
+  s_1063def04fa266::t_4dd89ea3571ae8 3,33,40
+ZDYZ/src/main/java/com/museum/ai/dto/ListRecordsData.java
+  s_ca88252b1e5c7c::t_65d41bd860ee93 1-15
+ZDYZ/src/main/java/com/museum/config/WebMvcConfig.java
+  s_1063def04fa266::t_ee900d846a3cf8 3-4,6,10-12,16-26,28-33
+  s_96fd53d2cf3b60::t_2370d74dfa0197 27
+docs/jmeter/booking-oversell.jmx
+  s_ca88252b1e5c7c::t_0defb067103aba 1-161
+ZDYZ/src/main/java/com/museum/controller/app/AppRecordController.java
+  s_1063def04fa266::t_d63a5f46df0883 4,17
+docs/sql/generate_loadtest_seed.py
+  s_ca88252b1e5c7c::t_bdde0e850665fd 1-146
+docs/ai-rag-design.md
+  s_f8d762a0cfe970::t_4f9667e8e9f770 1-64
+ZDYZ/src/main/java/com/museum/security/AdminAuthInterceptor.java
+  s_1063def04fa266::t_ed3f7ff74d2cef 3-7,10-12,15-16,18,20,23-32,34-58,61-79
+ZDYZ/src/main/java/com/museum/ai/rag/support/IntentRouter.java
+  s_f8d762a0cfe970::t_285d79c5e72094 15-16
+  s_f8d762a0cfe970::t_9675ff278b60e0 1-13,17-50
+  s_f8d762a0cfe970::t_12bd7c13acab87 14
+OPTIMIZATION_PLAN.md
+  s_96fd53d2cf3b60::t_90a1a6fec39edf 43
+  s_1063def04fa266::t_22886b1cafbf68 79-84
+  s_ca88252b1e5c7c::t_53cbfa2bd8560c 138,148
+  s_ca88252b1e5c7c::t_23483aa385ab56 68,70
+  s_96fd53d2cf3b60::t_7469d85f8b8605 175,179,182
+  s_1063def04fa266::t_7bb0d5f3704609 57-62,64-67,69,71
+  s_96fd53d2cf3b60::t_8fd97e9050617d 361,368
+  s_96fd53d2cf3b60::t_a2871dd5c8fa8e 163
+  s_f8d762a0cfe970::t_fa7ac911b29d8d 912
+  s_f8d762a0cfe970::t_bb257644b170aa 363,374
+  s_96fd53d2cf3b60::t_074ee2563d3c97 367
+  s_96fd53d2cf3b60::t_d31b6d9eaa868c 154
+  s_e43eb713364818::t_7d3de77c55ac66 384-508,510-597
+  s_96fd53d2cf3b60::t_128d926eb6e60e 923
+  s_1063def04fa266::t_ecbab96829edec 6
+  s_f8d762a0cfe970::t_71e8652fcf1cf2 911
+  s_e43eb713364818::t_fabc77618c3dde 5,913
+  s_48dceb0ef91d94::t_229d2e708d65e1 152-153,155-162,164-174,176-178,180,183-360,362,364-366
+  s_f8d762a0cfe970::t_fabba58ba9c6aa 598-599
+  s_ca88252b1e5c7c::t_7629c4dc7d86fe 909-910
+  s_1063def04fa266::t_5f93d7b279b5d7 136-137,139-147,149
+  s_77ab779de5bc8f::t_7db78602aa5f2f 1-4,7-42,44-56,72-78,85-135,150-151,375-383,600-601,899-908,914-922,924-938
+  s_96fd53d2cf3b60::t_b26454a11fa9dd 369-373
+  s_e43eb713364818::t_45c257fd006dc4 509
+  s_96fd53d2cf3b60::t_9527695dec85b0 63
+  s_7d2adb1486bd9c::t_2b7ceb0784bbdf 890-898
+  s_e43eb713364818::t_c3848a23d30adf 602-603,622-889
+  s_7d2adb1486bd9c::t_cd1d7a8b2af6b7 604-621
+ZDYZ/src/test/java/com/museum/security/AdminAuthInterceptorTest.java
+  s_1063def04fa266::t_ac71a05f046ad7 1-73
+docs/sql/museum_book_schema.sql
+  s_ca88252b1e5c7c::t_9486223ebb8047 1-229
+ZDYZ/src/main/java/com/museum/ai/dto/DaySlot.java
+  s_ca88252b1e5c7c::t_e7729bdd8f564d 1-14
+ZDYZ/src/main/java/com/museum/ai/rag/model/RagChunk.java
+  s_f8d762a0cfe970::t_ee73be9170f44f 1-14
+ZDYZ/src/main/java/com/museum/ai/dto/SubmitBookingData.java
+  s_ca88252b1e5c7c::t_377d8aeea9124f 1-18
+ZDYZ/src/main/java/com/museum/ai/rag/config/RagAutoConfiguration.java
+  s_f8d762a0cfe970::t_ed978507912d34 1-24
+ZDYZ/src/test/java/com/museum/ai/BookingToolConverterTest.java
+  s_ca88252b1e5c7c::t_f9ea234fe65d85 1-84,86-180
+ZDYZ/src/main/java/com/museum/ai/dto/ToolError.java
+  s_ca88252b1e5c7c::t_db51fba524b2d9 1-23
+ZDYZ/src/main/resources/mapper/TimeMapper.xml
+  s_1063def04fa266::t_00d1c1bae62959 55-61
+README.md
+  s_ca88252b1e5c7c::t_6c11bb1f6d326d 92-95
+  s_f8d762a0cfe970::t_0ba6c1d18e8464 75-76,78-80,84-86,97
+  s_48dceb0ef91d94::t_229d2e708d65e1 73-74,77
+  s_1063def04fa266::t_acab291f13988e 90
+  s_1063def04fa266::t_90eb4d68e4017e 41-42
+  s_96fd53d2cf3b60::t_d828af07f62a6a 48-49
+  s_e43eb713364818::t_fabc77618c3dde 72,81-83,96
+  s_77ab779de5bc8f::t_5d1cffd773e603 5-6
+  s_96fd53d2cf3b60::t_42702592751307 43-47,50-58
+  s_1063def04fa266::t_584683cd7038ab 91
+ZDYZ/src/main/java/com/museum/ai/rag/support/LocalHashingEmbeddingModel.java
+  s_f8d762a0cfe970::t_0a2e1de4439055 1-45
+docs/ai-miniapp-page.md
+  s_e43eb713364818::t_fabc77618c3dde 1-105,108-115
+  s_7d2adb1486bd9c::t_fc137195b12ce7 106-107
+ZDYZ/src/main/java/com/museum/config/TransactionConfig.java
+  s_1063def04fa266::t_41bfde19f161b6 1-15
+docs/sql/maven-settings-local.xml
+  s_ca88252b1e5c7c::t_2573dc2994899e 1-9
+ZDYZ/src/main/java/com/museum/controller/MessageController.java
+  s_1063def04fa266::t_3febf44b099f45 4,17
+docs/jmeter/reset_loadtest.py
+  s_ca88252b1e5c7c::t_8fb56be82338a5 1-61
+ZDYZ/src/main/java/com/museum/controller/admin/BlacklistController.java
+  s_1063def04fa266::t_f7d535a0b080ca 26
+  s_1063def04fa266::t_ccf1e85674f2a4 5
+ZDYZ/src/test/java/com/museum/ai/config/AiChatClientConfigTest.java
+  s_f8d762a0cfe970::t_2f3917b31cf965 24,35-36,48
+  s_e43eb713364818::t_92bd3c32f103b1 1-23,25-34,37-47,49-53
+ZDYZ/src/main/java/com/museum/ai/rag/model/RagDocument.java
+  s_f8d762a0cfe970::t_dd03cd7fe91bf2 1-14
+ZDYZ/src/main/java/com/museum/ai/rag/support/HtmlTextCleaner.java
+  s_f8d762a0cfe970::t_e89b93cc240ceb 1-24
+ZDYZ/src/main/java/com/museum/ai/rag/config/RagProperties.java
+  s_f8d762a0cfe970::t_c36d49e9f9ff6d 1-74
+ZDYZ/src/main/java/com/museum/ai/dto/ListRecordsRequest.java
+  s_ca88252b1e5c7c::t_156050dc132e37 1-15
+docs/ai-rag-test-case.md
+  s_f8d762a0cfe970::t_0d290374f9b981 1-72
+ZDYZ/src/main/java/com/museum/controller/admin/JoinManageController.java
+  s_1063def04fa266::t_5a666fe815bb24 25
+  s_1063def04fa266::t_15b8716960d61d 4
+ZDYZ/src/test/java/com/museum/booking/BookingStockServiceImplTest.java
+  s_1063def04fa266::t_059db918594592 1-65,67-78,80-91,93-108,110-115,118-126,128-130,133,138
+  s_1063def04fa266::t_589796c01c0d65 66,79,92,116-117,127,139
+  s_1063def04fa266::t_ca7d7ca9464287 109
+  s_1063def04fa266::t_89a5d6f4024cab 131-132,134-137
+docs/ai-agent-design.md
+  s_96fd53d2cf3b60::t_c8f9c8168f3db0 538
+  s_f8d762a0cfe970::t_7aa030aae010c6 548,550-552
+  s_96fd53d2cf3b60::t_c26116e2f63286 527-531,536-537
+  s_96fd53d2cf3b60::t_89b71238ef3caa 63
+  s_ca88252b1e5c7c::t_9178bca5a7eb5b 523,533
+  s_96fd53d2cf3b60::t_6b768132127f2d 534-535
+  s_f8d762a0cfe970::t_49bc7637d3ab73 60,62,65
+  s_f8d762a0cfe970::t_afee2803f3060d 6
+  s_ca88252b1e5c7c::t_03de552e6ae173 1-5,7-59,61,64,66-522,524-526,532,539-547,549,553-569
+docs/jmeter/generate_jmx.py
+  s_ca88252b1e5c7c::t_1f1ab048571a67 1-231
+ZDYZ/src/main/java/com/museum/ai/dto/BookingRecord.java
+  s_ca88252b1e5c7c::t_fc6ca199400dc4 1-23
+ZDYZ/src/main/java/com/museum/ai/rag/model/RagHit.java
+  s_f8d762a0cfe970::t_4c718ea5e14374 1-10
+ZDYZ/src/main/resources/lua/booking_reserve.lua
+  s_1063def04fa266::t_7e6a6b3c1472a5 1-39
+ZDYZ/src/main/java/com/museum/ai/tool/BookingTools.java
+  s_e43eb713364818::t_fde688b3cfd6b4 1-144
+docs/api-contract.md
+  s_ca88252b1e5c7c::t_e530e16d4b0382 649
+  s_f8d762a0cfe970::t_16f77f00bce719 60
+  s_7d2adb1486bd9c::t_93fced494dd0ac 553-554,562-575,578-596
+  s_ca88252b1e5c7c::t_53076c35eb8931 1-59,61-546,548-551,555-561,576-577,597-642,646-648,650
+  s_96fd53d2cf3b60::t_567f826461b724 547,552
+  s_7d2adb1486bd9c::t_729ae3f706990e 643-645,651
+ZDYZ/src/main/java/com/museum/controller/app/AppBookingController.java
+  s_1063def04fa266::t_15086a9fc38b69 3,35
+.gitignore
+  s_ca88252b1e5c7c::t_f1e8b019bb6f64 48-53
+ZDYZ/src/main/java/com/museum/ai/dto/Period.java
+  s_ca88252b1e5c7c::t_9d8ff1ccefdc84 1-6
+ZDYZ/src/main/java/com/museum/ai/rag/support/Chunker.java
+  s_f8d762a0cfe970::t_098f90d360924b 1-56
+ZDYZ/src/main/resources/lua/booking_compensate.lua
+  s_1063def04fa266::t_30ab599b0bd989 1-12
+ZDYZ/src/main/java/com/museum/ai/dto/CancelBookingRequest.java
+  s_ca88252b1e5c7c::t_0963351cb92a2e 1-12
+docs/scripts/sync-visit-rules.md
+  s_f8d762a0cfe970::t_342bde0af09abb 1-18
+ZDYZ/src/main/java/com/museum/common/exception/ErrorCode.java
+  s_1063def04fa266::t_fb1e6d06b0827b 25,38
+ZDYZ/src/main/java/com/museum/ai/dto/CheckinStatusAi.java
+  s_ca88252b1e5c7c::t_3afaa9dac136a8 1-10
+app-front/ZDYZ/miniprogram/api/ai.js
+  s_e43eb713364818::t_a8efc1d2ae9764 1-5
+ZDYZ/src/main/java/com/museum/service/impl/BookingStockServiceImpl.java
+  s_1063def04fa266::t_501d1980db4533 15,38-39,43-45,47-51,53
+  s_1063def04fa266::t_d68c5b877302b2 3,8-10,12-14,16,19-22,26-34,40-42,46,52,54-55,57-91,94-119,123-133,137-148,150
+ZDYZ/src/main/java/com/museum/ai/dto/ToolResult.java
+  s_ca88252b1e5c7c::t_98c92c838bf952 1-31
+ZDYZ/src/test/java/com/museum/ai/rag/RagUnitTest.java
+  s_f8d762a0cfe970::t_fe3b8be6ec7271 76
+  s_f8d762a0cfe970::t_6a2732ee266037 37-39
+  s_f8d762a0cfe970::t_59f1925814b259 9-12
+  s_f8d762a0cfe970::t_8fa0cd06a783af 1-8,13-36,40-75,77-112
+ZDYZ/src/main/java/com/museum/ai/dto/ChatBlock.java
+  s_e43eb713364818::t_d124e04eb15b45 1-18
+ZDYZ/src/main/java/com/museum/ai/rag/store/InMemoryRagStore.java
+  s_f8d762a0cfe970::t_1f35a70ab364f1 1-74
+app-front/ZDYZ/miniprogram/pages/aiChat/aiChat.wxml
+  s_e43eb713364818::t_a8efc1d2ae9764 1-22,24-123,127-134,138-150,152-159
+ZDYZ/src/test/java/com/museum/ai/BookingToolsTest.java
+  s_96fd53d2cf3b60::t_203358cf041074 1-237
+ZDYZ/src/test/java/com/museum/service/AiChatServiceTest.java
+  s_e43eb713364818::t_46a332dec3723f 1-97
+ZDYZ/src/main/java/com/museum/controller/admin/StatsController.java
+  s_1063def04fa266::t_2831de6ba27af2 3
+  s_1063def04fa266::t_11f34f86b9d532 17
+ZDYZ/src/main/java/com/museum/ai/rag/loader/NewsRagLoader.java
+  s_f8d762a0cfe970::t_1b5207ec10d8cf 1-51
+ZDYZ/src/main/java/com/museum/ai/dto/DayOpenStatus.java
+  s_ca88252b1e5c7c::t_782cbf274b1c10 1-6
+ZDYZ/src/main/java/com/museum/ai/rag/loader/StaticRulesLoader.java
+  s_f8d762a0cfe970::t_5b8f379bc01337 1-65
+ZDYZ/src/main/java/com/museum/ai/dto/AiChatResponse.java
+  s_e43eb713364818::t_d124e04eb15b45 1-19
+ZDYZ/src/main/java/com/museum/controller/admin/ActivityManageController.java
+  s_1063def04fa266::t_34ed46a406fa75 19
+  s_1063def04fa266::t_000daf1d38510a 5
+ZDYZ/src/main/java/com/museum/service/AiChatService.java
+  s_e43eb713364818::t_d90751321112f3 3-13,16-23,27-44,46-50,52-64,66-73,75-90,92-106,108-116,118-127,129-164,166-174
+ZDYZ/src/main/java/com/museum/ai/converter/BookingToolConverter.java
+  s_ca88252b1e5c7c::t_7e477323ae05a4 1-256
+ZDYZ/src/main/java/com/museum/ai/dto/QueryDaysData.java
+  s_ca88252b1e5c7c::t_093de5abf25d0e 1-15
+ZDYZ/src/main/resources/application.yml
+  s_f8d762a0cfe970::t_3be5796459655d 35-46
+  s_96fd53d2cf3b60::t_429f5a95b6359d 22-24
+  s_1063def04fa266::t_948e390c406ddd 15-20
+  s_96fd53d2cf3b60::t_55b12fabdfdb2b 25,31-32,34,47
+  s_96fd53d2cf3b60::t_87c335369c6c29 26-27
+  s_96fd53d2cf3b60::t_bf4a2caeaa2194 28,30,33
+ZDYZ/src/main/java/com/museum/ai/dto/TimeSlot.java
+  s_ca88252b1e5c7c::t_ff694232cad46c 1-19
+ZDYZ/src/main/java/com/museum/controller/admin/MuseumManageController.java
+  s_1063def04fa266::t_389864d7c43748 20
+  s_1063def04fa266::t_ea9bda80a60134 5
+ZDYZ/src/main/java/com/museum/mapper/TimeMapper.java
+  s_1063def04fa266::t_52c565e4161f42 25-30
+ZDYZ/src/test/java/com/museum/booking/JoinServiceImplTest.java
+  s_1063def04fa266::t_50af248ec85282 5,12-13,15-16,19-20,22-25,33,61,64,73-75,80,84-86,91-92,96,103,105,113,117,124,126,129,138,141,144-145,151,158-160,163,165-167,169,173-178,182-186,188-197,199-203,206-241
+app-front/ZDYZ/miniprogram/pages/aiChat/aiChat.wxss
+  s_e43eb713364818::t_a8efc1d2ae9764 2-3,6-37,39-78,82-83,85,88,91,94,98,103-135,137-146,150-177,180-300,306-307,310-313,319-323,329-334,337,341-342
+docs/jmeter/booking-duplicate.jmx
+  s_ca88252b1e5c7c::t_0defb067103aba 1-161
+docs/sql/museum_book_seed_loadtest.sql
+  s_ca88252b1e5c7c::t_1d9f1c8ead85f2 1-544
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.40-trip",
+  "base_commit_sha": "c34817ae4beac7ed87929f581b471c43bb1fbb40",
+  "prompts": {},
+  "sessions": {
+    "s_1063def04fa266": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1faf2320-8ca4-442e-9e5f-ed6e3c1f3576",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_48dceb0ef91d94": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ffe47-912d-7b11-baae-cf6def2d8f71",
+        "model": "gpt-5.4"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_77ab779de5bc8f": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0b62da26-a404-455b-93b6-180183dd642c",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_7d2adb1486bd9c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9d2c6856-d300-4179-9f7e-3ccc0cef608d",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_96fd53d2cf3b60": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5d8a5c22-e1bb-4be1-b8bd-5158414c01ab",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_ca88252b1e5c7c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7e62a94c-43bf-4d77-9d45-ac67492142c0",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_e43eb713364818": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00e4e-be46-74e1-a3bc-e17d2e89a9cd",
+        "model": "gpt-5.4"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    },
+    "s_f8d762a0cfe970": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "936485fb-fedb-44ae-872b-ac4c9062f474",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    }
+  }
+}
