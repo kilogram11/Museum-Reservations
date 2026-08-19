@@ -1,0 +1,55 @@
+ZDYZ/src/test/java/com/museum/ai/trace/AiDebugTraceContextTest.java
+  s_7d2adb1486bd9c::t_8a1e9b1c89cf43 1-96
+ZDYZ/src/test/java/com/museum/ai/BookingToolsTest.java
+  s_7d2adb1486bd9c::t_0f365ec259e559 6,8-10
+  s_7d2adb1486bd9c::t_2b0fca4a9c740f 48
+  s_7d2adb1486bd9c::t_14f3d41cfeff6d 242-283
+ZDYZ/src/main/java/com/museum/ai/dto/AiChatResponse.java
+  s_7d2adb1486bd9c::t_6379cfeeb2fcad 3,5,21-26
+ZDYZ/src/main/java/com/museum/ai/trace/AiDebugTrace.java
+  s_7d2adb1486bd9c::t_01dd2707b2a964 1-36
+docs/ai-tool-trace-plan.md
+  s_7d2adb1486bd9c::t_c9d450827126be 3-5
+  s_7d2adb1486bd9c::t_f35212abc31f30 109,112,114
+docs/ai-agent-test-case.md
+  s_7d2adb1486bd9c::t_951dfe97af8df5 172-197
+  s_7d2adb1486bd9c::t_eb59a3fe219eac 10,12-14,17-18
+ZDYZ/src/main/java/com/museum/service/AiChatService.java
+  s_7d2adb1486bd9c::t_71a64135df28b9 11,48-51,55,57,67,70,75,87,91,107-111,118,127,160,164-168
+  s_7d2adb1486bd9c::t_c2594b39df6091 60-62,74,78,81-82,85,88,93,97,101,104,112,134
+  s_7d2adb1486bd9c::t_4f80437854b996 148,151,154,157
+ZDYZ/src/main/java/com/museum/ai/trace/ToolTraceEntry.java
+  s_7d2adb1486bd9c::t_c3142290971684 1-21
+ZDYZ/src/main/java/com/museum/controller/AiChatController.java
+  s_7d2adb1486bd9c::t_93ab6329b21313 18-20,22-30
+ZDYZ/src/main/java/com/museum/ai/trace/RagTraceEntry.java
+  s_7d2adb1486bd9c::t_6099524c88b7b5 1-18
+ZDYZ/src/main/java/com/museum/ai/tool/BookingTools.java
+  s_7d2adb1486bd9c::t_de537c4f0eedc7 8,16,19,38-47,53-71,78-97,104-122,128-154
+docs/api-contract.md
+  s_7d2adb1486bd9c::t_05a44df0e3c0ac 680
+  s_7d2adb1486bd9c::t_051147b0c9dd90 598-632
+ZDYZ/src/main/java/com/museum/ai/trace/AiDebugTraceContext.java
+  s_7d2adb1486bd9c::t_eb96d205525d71 50
+  s_7d2adb1486bd9c::t_3b469a75ba5d01 111,113,115,117,120,122
+  s_7d2adb1486bd9c::t_eb6849975f7ded 3-7
+  s_7d2adb1486bd9c::t_45c6cf9368d814 1-2,8-49,51-110,112,114,116,118-119,121,123-137
+ZDYZ/src/test/java/com/museum/service/AiChatServiceTest.java
+  s_7d2adb1486bd9c::t_8ff1d6082b38ea 97-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.40-trip",
+  "base_commit_sha": "e1a8bb8fe8e41533d6e35578b478d1ffccbd7ac6",
+  "prompts": {},
+  "sessions": {
+    "s_7d2adb1486bd9c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9d2c6856-d300-4179-9f7e-3ccc0cef608d",
+        "model": "default"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    }
+  }
+}
