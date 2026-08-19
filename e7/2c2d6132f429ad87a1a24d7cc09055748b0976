@@ -1,0 +1,21 @@
+context.md
+  s_717a0d59b7450b::t_c25d02cdff0135 15-17,23,48,51-74,80-85
+docs/ai-tool-trace-plan.md
+  s_717a0d59b7450b::t_c25d02cdff0135 1-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.40-trip",
+  "base_commit_sha": "e72c2d6132f429ad87a1a24d7cc09055748b0976",
+  "prompts": {},
+  "sessions": {
+    "s_717a0d59b7450b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a014b1-163f-7450-ac2f-4da9a2180c3c",
+        "model": "gpt-5.4"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    }
+  }
+}
