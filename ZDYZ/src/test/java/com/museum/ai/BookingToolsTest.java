@@ -3,7 +3,11 @@ package com.museum.ai;
 import com.museum.ai.context.UserContext;
 import com.museum.ai.converter.BookingToolConverter;
 import com.museum.ai.dto.*;
+import com.museum.ai.rag.model.ChatIntent;
 import com.museum.ai.tool.BookingTools;
+import com.museum.ai.trace.AiDebugTrace;
+import com.museum.ai.trace.AiDebugTraceContext;
+import com.museum.ai.trace.ToolTraceEntry;
 import com.museum.common.exception.BusinessException;
 import com.museum.common.exception.ErrorCode;
 import com.museum.entity.Join;
@@ -41,6 +45,7 @@ class BookingToolsTest {
     @AfterEach
     void tearDown() {
         UserContext.clear();
+        AiDebugTraceContext.clear();
     }
 
     @Test
@@ -233,5 +238,47 @@ class BookingToolsTest {
         assertFalse(result.isOk());
         assertEquals(ToolError.INTERNAL_ERROR, result.getError());
         assertEquals("boom", result.getMessage());
+    }
+
+    @Test
+    @DisplayName("debug 开启时 queryTimes 记 OK toolTrace")
+    void queryTimes_whenDebugEnabled_recordsOkTrace() {
+        AiDebugTraceContext.begin(true);
+        Map<String, Object> morning = new HashMap<>();
+        morning.put("timeMark", "m_2026-08-16_09:00");
+        morning.put("startTime", "09:00");
+        morning.put("endTime", "11:00");
+        morning.put("total", 50);
+        morning.put("surplus", 12);
+        morning.put("used", 38);
+        when(joinService.getBookingTimes("2026-08-16")).thenReturn(List.of(morning));
+
+        bookingTools.queryTimes("2026-08-16");
+
+        AiDebugTrace debug = AiDebugTraceContext.snapshot(ChatIntent.BOOKING, System.currentTimeMillis());
+        assertEquals(1, debug.getToolTrace().size());
+        ToolTraceEntry entry = debug.getToolTrace().get(0);
+        assertEquals("queryTimes", entry.getName());
+        assertEquals("OK", entry.getStatus());
+        assertEquals("2026-08-16", entry.getInputSummary().get("day"));
+        assertEquals(1, entry.getOutputSummary().get("slotCount"));
+        assertNull(entry.getError());
+    }
+
+    @Test
+    @DisplayName("debug 开启且未登录时 submitBooking 记 UNAUTHORIZED")
+    void submitBooking_whenDebugEnabledAndAnonymous_recordsUnauthorized() {
+        AiDebugTraceContext.begin(true);
+
+        bookingTools.submitBooking("tm_1", List.of("id_1", "id_2"));
+
+        ToolTraceEntry entry = AiDebugTraceContext.snapshot(ChatIntent.BOOKING, System.currentTimeMillis())
+                .getToolTrace().get(0);
+        assertEquals("submitBooking", entry.getName());
+        assertEquals("FAIL", entry.getStatus());
+        assertEquals("UNAUTHORIZED", entry.getError());
+        assertEquals(2, entry.getInputSummary().get("identityCount"));
+        assertFalse(entry.getInputSummary().containsKey("identityIds"));
+        assertTrue(entry.getOutputSummary().isEmpty());
     }
 }

@@ -15,8 +15,18 @@ public class AiChatController {
     private AiChatService aiChatService;
 
     @PostMapping("/chat")
-    public AiChatResponse chat(@RequestBody Map<String, String> request) {
+    public AiChatResponse chat(
+            @RequestBody Map<String, String> request,
+            @RequestHeader(value = "X-AI-Debug", required = false) String debugHeader) {
         String message = request.get("message");
-        return aiChatService.chat(message);
+        return aiChatService.chat(message, isDebugEnabled(debugHeader));
+    }
+
+    static boolean isDebugEnabled(String debugHeader) {
+        if (debugHeader == null) {
+            return false;
+        }
+        String value = debugHeader.trim();
+        return "1".equals(value) || "true".equalsIgnoreCase(value);
     }
 }

@@ -7,13 +7,15 @@
 
 ## 0. 验收强度（定稿）
 
-`/ai/chat` 只返回 `{ "reply": "..." }`，**无法从响应严格证明 Tool 调用序列**。
+`/ai/chat` 业务字段仍是 `reply + intent + blocks + suggestions`。行为级验收看「行为判据」与「副作用观测」。
 
-| 项 | 本阶段 |
+带请求头 `X-AI-Debug: 1` 时，响应可额外返回 `debug`（`route` / `ragTrace` / `toolTrace` / `timing`），用于解释本轮 Tool / RAG。`debug` **不是**正式业务字段，小程序不依赖。
+
+| 项 | 状态 |
 | --- | --- |
 | 行为级验收（reply + HTTP 对照 / 副作用快照） | **必须** |
-| 参考 Tool 意图 | 仅排障提示，**不作为 Pass/Fail** |
-| 给 `/ai/chat` 增加 tool trace | **不做**（另开任务） |
+| 参考 Tool 意图 | 仅排障提示；带 `X-AI-Debug` 时可对照 `toolTrace` |
+| `/ai/chat` tool trace | **已交付**（可选 `debug`，见下文 §5） |
 
 每条用例的 Pass/Fail 只看「行为判据」与「副作用观测」。
 
@@ -167,4 +169,29 @@ TC-06: reply 余票 50 与 HTTP surplus 一致
 
 ## 4. 与设计文档的关系
 
-[ai-agent-design.md](./ai-agent-design.md) §8 话术表仍有效，但其中「期望 Tool 序列」在 2.6 仅作参考；正式 Pass/Fail 以本文「行为判据 + 副作用观测」为准。
+[ai-agent-design.md](./ai-agent-design.md) §8 话术表仍有效，但其中「期望 Tool 序列」在 2.6 仅作参考；正式 Pass/Fail 以本文「行为判据 + 副作用观测」为准。带 `X-AI-Debug: 1` 时可用 `debug.toolTrace` 辅助排障（见 §5）。
+
+---
+
+## 5. Debug / Tool Trace 验收
+
+开关：`X-AI-Debug: 1`（或 `true`）。不带头时 JSON **不得**出现 `debug`。契约：[api-contract.md](./api-contract.md) §9.3。
+
+```bash
+curl -s -X POST http://127.0.0.1:8081/ai/chat \
+  -H "Content-Type: application/json" \
+  -H "X-AI-Debug: 1" \
+  -H "Token: <JWT>" \
+  -d "{\"message\":\"后天下午有票吗\"}"
+```
+
+| 场景 | 话术 | 期望 debug |
+| --- | --- | --- |
+| 预约问句 | 后天下午有票吗 | `toolTrace` 含 `queryTimes`（`status=OK`） |
+| 连续事务 | 后天下午有票就帮我订 | 含 `queryTimes`、`submitBooking`（写操作需登录 + 游客） |
+| 规则问句 | 可以带背包吗 | `ragTrace.hitCount > 0`，`toolTrace=[]` |
+| 混合问句 | 明天下午有票吗，另外可以带水吗 | 同时有 `ragTrace` 与 `toolTrace` |
+| 未登录写操作 | 帮我订明天上午（不带 Token） | `submitBooking` 的 `error=UNAUTHORIZED` |
+| RAG 未命中 | 馆规允许饲养企鹅吗 | `ragTrace.queried=true` 且 `hitCount=0` |
+
+摘要不得含 `identityIds`、完整证件号、Token、Prompt 原文。`debug` 不作为 2.6 行为级 Pass/Fail 的替代。

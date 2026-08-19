@@ -8,6 +8,7 @@ import com.museum.ai.rag.model.RagHit;
 import com.museum.ai.rag.service.RagService;
 import com.museum.ai.rag.support.IntentRouter;
 import com.museum.ai.support.AiChatBlockCollector;
+import com.museum.ai.trace.AiDebugTraceContext;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,60 +45,77 @@ public class AiChatService {
     }
 
     public AiChatResponse chat(String userMessage) {
+        return chat(userMessage, false);
+    }
+
+    public AiChatResponse chat(String userMessage, boolean debugEnabled) {
         String message = userMessage == null ? "" : userMessage;
         ChatIntent intent = intentRouter.route(message);
         RagService rag = ragServiceProvider.getIfAvailable();
+        long startedAt = System.currentTimeMillis();
         AiChatBlockCollector.begin();
+        AiDebugTraceContext.begin(debugEnabled);
         try {
             return switch (intent) {
-                case RULES -> chatRules(message, rag);
-                case MIXED -> chatMixed(message, rag);
-                case BOOKING -> chatBooking(message);
+                case RULES -> chatRules(message, rag, startedAt);
+                case MIXED -> chatMixed(message, rag, startedAt);
+                case BOOKING -> chatBooking(message, startedAt);
             };
         } catch (Exception e) {
             return response("发生错误: " + e.getMessage(), intent,
                     List.of(AiChatBlockCollector.tipBlock("异常提示", "发生错误: " + e.getMessage(), "error")),
-                    suggestionsFor(intent));
+                    suggestionsFor(intent), startedAt);
         } finally {
             AiChatBlockCollector.clear();
+            AiDebugTraceContext.clear();
         }
     }
 
-    private AiChatResponse chatBooking(String message) {
+    private AiChatResponse chatBooking(String message, long startedAt) {
+        AiDebugTraceContext.recordRagDisabled();
         ChatClient client = bookingChatClientProvider.getIfAvailable();
         if (client == null) {
-            return configResponse(ChatIntent.BOOKING);
+            return configResponse(ChatIntent.BOOKING, startedAt);
         }
         String reply = call(client, message);
-        return response(reply, ChatIntent.BOOKING, AiChatBlockCollector.snapshot(), suggestionsFor(ChatIntent.BOOKING));
+        return response(reply, ChatIntent.BOOKING, AiChatBlockCollector.snapshot(),
+                suggestionsFor(ChatIntent.BOOKING), startedAt);
     }
 
-    private AiChatResponse chatRules(String message, RagService rag) {
+    private AiChatResponse chatRules(String message, RagService rag, long startedAt) {
         if (rag == null) {
-            return ragMissResponse(ChatIntent.RULES);
+            AiDebugTraceContext.recordRagDisabled();
+            return ragMissResponse(ChatIntent.RULES, startedAt);
         }
         List<RagHit> hits = rag.retrieve(message);
+        AiDebugTraceContext.recordRagHits(hits);
         if (hits.isEmpty()) {
-            return ragMissResponse(ChatIntent.RULES);
+            return ragMissResponse(ChatIntent.RULES, startedAt);
         }
         ChatClient client = rulesChatClientProvider.getIfAvailable();
         if (client == null) {
-            return configResponse(ChatIntent.RULES);
+            return configResponse(ChatIntent.RULES, startedAt);
         }
         String prompt = rag.formatContext(hits) + "\n\n用户问题：" + message;
         String reply = call(client, prompt);
-        return response(reply, ChatIntent.RULES, toRulesBlocks(hits), suggestionsFor(ChatIntent.RULES));
+        return response(reply, ChatIntent.RULES, toRulesBlocks(hits), suggestionsFor(ChatIntent.RULES), startedAt);
     }
 
-    private AiChatResponse chatMixed(String message, RagService rag) {
+    private AiChatResponse chatMixed(String message, RagService rag, long startedAt) {
         ChatClient client = bookingChatClientProvider.getIfAvailable();
         if (client == null) {
-            return configResponse(ChatIntent.MIXED);
+            if (rag == null) {
+                AiDebugTraceContext.recordRagDisabled();
+            } else {
+                AiDebugTraceContext.recordRagHits(rag.retrieve(message));
+            }
+            return configResponse(ChatIntent.MIXED, startedAt);
         }
         List<ChatBlock> blocks = new ArrayList<>();
         StringBuilder user = new StringBuilder();
         if (rag != null) {
             List<RagHit> hits = rag.retrieve(message);
+            AiDebugTraceContext.recordRagHits(hits);
             if (!hits.isEmpty()) {
                 blocks.addAll(toRulesBlocks(hits));
                 user.append(rag.formatContext(hits)).append("\n\n");
@@ -106,13 +124,14 @@ public class AiChatService {
                 user.append("（馆规检索未命中：馆规部分请明确说未查到相关规定。）\n\n");
             }
         } else {
+            AiDebugTraceContext.recordRagDisabled();
             blocks.add(AiChatBlockCollector.tipBlock("馆规检索", RagService.MISS_REPLY, "rag_disabled"));
         }
         user.append("用户问题：").append(message)
                 .append("\n请分段回答：预约事务只信 Tool；馆规只信上方检索片段。");
         String reply = call(client, user.toString());
         blocks.addAll(AiChatBlockCollector.snapshot());
-        return response(reply, ChatIntent.MIXED, blocks, suggestionsFor(ChatIntent.MIXED));
+        return response(reply, ChatIntent.MIXED, blocks, suggestionsFor(ChatIntent.MIXED), startedAt);
     }
 
     private static String call(ChatClient client, String userMessage) {
@@ -126,24 +145,27 @@ public class AiChatService {
         return content;
     }
 
-    private static AiChatResponse configResponse(ChatIntent intent) {
+    private AiChatResponse configResponse(ChatIntent intent, long startedAt) {
         return response(CONFIG_HINT, intent,
                 List.of(AiChatBlockCollector.tipBlock("配置提示", CONFIG_HINT, "config")),
-                suggestionsFor(intent));
+                suggestionsFor(intent), startedAt);
     }
 
-    private static AiChatResponse ragMissResponse(ChatIntent intent) {
+    private AiChatResponse ragMissResponse(ChatIntent intent, long startedAt) {
         return response(RagService.MISS_REPLY, intent,
                 List.of(AiChatBlockCollector.tipBlock("馆规检索", RagService.MISS_REPLY, "rag_miss")),
-                suggestionsFor(intent));
+                suggestionsFor(intent), startedAt);
     }
 
-    private static AiChatResponse response(
+    private AiChatResponse response(
             String reply,
             ChatIntent intent,
             List<ChatBlock> blocks,
-            List<String> suggestions) {
-        return new AiChatResponse(reply, intent, new ArrayList<>(blocks), new ArrayList<>(suggestions));
+            List<String> suggestions,
+            long startedAt) {
+        AiChatResponse body = new AiChatResponse(reply, intent, new ArrayList<>(blocks), new ArrayList<>(suggestions));
+        body.setDebug(AiDebugTraceContext.snapshot(intent, startedAt));
+        return body;
     }
 
     private static List<ChatBlock> toRulesBlocks(List<RagHit> hits) {

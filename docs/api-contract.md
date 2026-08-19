@@ -595,6 +595,41 @@ data[] Identity
 
 小程序消费约定见 [ai-miniapp-page.md](./ai-miniapp-page.md)。
 
+**可选 `debug`（联调辅助，不是正式业务字段）**
+
+| 项 | 值 |
+| --- | --- |
+| 开关 | 请求头 `X-AI-Debug: 1`（或 `true`） |
+| 默认 | 不带头时响应**不含** `debug` |
+| 小程序 | 不依赖此字段 |
+
+```json
+{
+  "reply": "...",
+  "intent": "BOOKING",
+  "blocks": [],
+  "suggestions": [],
+  "debug": {
+    "route": { "intent": "BOOKING", "routerVersion": "v1" },
+    "ragTrace": { "enabled": false, "queried": false, "hitCount": 0, "sources": [] },
+    "toolTrace": [
+      {
+        "name": "queryTimes",
+        "status": "OK",
+        "startedAt": 1723970000000,
+        "durationMs": 42,
+        "inputSummary": { "day": "2026-08-20" },
+        "outputSummary": { "slotCount": 2 },
+        "error": null
+      }
+    ],
+    "timing": { "totalMs": 1086 }
+  }
+}
+```
+
+脱敏约束：`debug` 只给摘要。禁止返回完整身份证、`identityIds`、JWT/`userId`、完整 Prompt、异常堆栈。写操作摘要用 `identityCount` / `hasJoinId` / `hasTimeMark`。规划见 [ai-tool-trace-plan.md](./ai-tool-trace-plan.md)。
+
 ---
 
 ## 10. Service 层契约（Tool 应直接调用）
@@ -642,6 +677,7 @@ HTTP 契约是「业务真相」；AI Contract 是其上的语义投影，不要
 | 统一结果 | `ZDYZ/.../common/result/Result.java` |
 | AI 聊天 | `ZDYZ/.../controller/AiChatController.java` → `AiChatResponse` |
 | AI 块收集 | `ZDYZ/.../ai/support/AiChatBlockCollector.java` |
+| AI debug trace | `ZDYZ/.../ai/trace/AiDebugTraceContext.java`；请求头 `X-AI-Debug` |
 | 小程序 AI 页 | `app-front/ZDYZ/miniprogram/pages/aiChat`；约定见 [ai-miniapp-page.md](./ai-miniapp-page.md) |
 
 ---
