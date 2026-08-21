@@ -1,0 +1,27 @@
+project-docs/FLOWS.md
+  s_641f687e5b6766::t_b27dba0ae848dd 1-203,205-327,329-334
+project-docs/README.md
+  s_641f687e5b6766::t_5f544d241dca4d 1-120
+project-docs/ARCHITECTURE.md
+  s_641f687e5b6766::t_0c9bec5bbcd19b 1-235
+project-docs/DATABASE.md
+  s_641f687e5b6766::t_a6f19ad5ea18cd 1-321
+project-docs/API.md
+  s_641f687e5b6766::t_d56e464af2374b 1-260
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.40-trip",
+  "base_commit_sha": "6806ae353d380a38f04ddf9e519dcebfa8901673",
+  "prompts": {},
+  "sessions": {
+    "s_641f687e5b6766": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72d0f5d6-e125-4e62-8f9c-054b887bf32b",
+        "model": "glm-5.2"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    }
+  }
+}
