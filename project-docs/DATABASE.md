@@ -1,321 +1,434 @@
-# 数据库设计 · DATABASE
+# Database (Redis) Design
 
-> 库名 `museum_book`，MySQL 8.0。所有表（除 `sys_message*`）使用**双主键策略**：`_id`（VARCHAR 64 UUID，MyBatis-Plus 主键）+ 业务 ID（如 `USER_ID`）。
-> 初始化脚本见 `docs/sql/`：`museum_book_schema.sql`（DDL）、`museum_book_seed_base.sql`（种子）、`museum_book_seed_loadtest.sql`（压测）。
+## Overview
 
-## 1. ER 概览
+The scheduler uses **Redis only** for persistence — no relational database. All state is stored in a CRedis cluster (`HTL_STRATEGY_HUB`) using 3 keys:
 
-```mermaid
-erDiagram
-    admin ||--o{ museum : "ADMIN_ID 创建"
-    admin ||--o{ activity : "ADMIN_ID 创建"
-    admin ||--o{ log : "LOG_ADMIN_ID 操作"
-    museum ||--o{ day : "MUSEUM_ID"
-    museum ||--o{ time : "MUSEUM_ID"
-    activity ||--o{ day : "ACTIVITY_ID"
-    activity ||--o{ time : "ACTIVITY_ID"
-    day ||--o{ time : "DAY_ID"
-    time ||--o{ join : "TIME_MARK"
-    user ||--o{ identity : "USER_ID(JSON数组)"
-    user ||--o{ join : "USER_ID 提交"
-    identity ||--o{ join : "IDENTITY_ID 到访"
-    head }o--|| user : "USER_PIC 头像"
-    user ||--o{ sys_message : "user_id 收件"
-    relic }o..o{ app_relic_identify : "_id=类别ID"
+| Key | Redis Type | Purpose |
+|-----|-----------|---------|
+| `timeline` | ZSET | Scheduled tasks waiting for trigger time |
+| `executeline` | ZSET | Tasks ready for execution (priority queue) |
+| `typeconfig` | HASH | Per-action configuration |
 
-    join {
-        VARCHAR JOIN_ID "业务预约ID"
-        VARCHAR IDENTITY_ID "FK→identity"
-        VARCHAR USER_ID "FK→user"
-        VARCHAR TIME_MARK "FK→time"
-        VARCHAR JOIN_MEET_DAY "参观日"
-        TINYINT  JOIN_STATUS "1成功 2取消"
-        TINYINT  JOIN_IS_CHECKIN "0未核销 1已核销 3爽约"
-        TEXT     JOIN_QR "二维码Base64"
-        TEXT     JOIN_FORMS "表单快照JSON"
-    }
-    time {
-        VARCHAR TIME_MARK "唯一键"
-        INT LIMIT_CNT "容量上限"
-        INT SUCC_CNT "已成功数"
-        TINYINT IS_LIMIT "1限购 0允许超卖"
-    }
-    identity {
-        VARCHAR IDENTITY_CARD "唯一,去重+拉黑"
-        TINYINT IDENTITY_STATUS "1正常 0拉黑"
-        INT USER_BAN_NUM "爽约次数"
-    }
+---
+
+## Key Prefix
+
+All keys support an optional prefix via `scheduler.redis.key-prefix`:
+
+| Environment | Prefix | Effective Keys |
+|-------------|--------|---------------|
+| Production (default) | _(empty)_ | `timeline`, `executeline`, `typeconfig` |
+| Local dev | `scheduler-local:alice:` | `scheduler-local:alice:timeline`, etc. |
+| Integration test | `scheduler-it:` | `scheduler-it:timeline`, etc. |
+
+Applied at startup by `RedisKeyPrefixConfiguration.applyPrefix()`.
+
+---
+
+## Data Model
+
+### timeline (ZSET)
+
+Tasks waiting for their trigger time.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **member** | `string` | Task identifier: `{value1};{value2};...;{action_id}` |
+| **score** | `long` | Next trigger timestamp (epoch millis) |
+
+**Score semantics by schedule type:**
+
+| schedule_type | Score Meaning |
+|--------------|---------------|
+| `once` | First (and only) trigger time; ZREM on advance |
+| `interval` | `now + intervalMs` (written at advance) |
+| `cron` | Next cron occurrence (written at advance) |
+| `fixed_delay` | **Backup** `now + timeoutMs` (overwritten by callback on success) |
+
+---
+
+### executeline (ZSET)
+
+Tasks ready for execution, ordered by priority.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **member** | `string` | Same member string as timeline |
+| **score** | `long` | Priority score (smaller = higher priority) |
+
+**Score calculation:**
+- If `policy_handler` configured: external Policy service returns score
+- Otherwise: built-in defaults (once=1000, interval=2000, cron=3000, fixed_delay=4000)
+
+---
+
+### typeconfig (HASH)
+
+Per-action configuration stored as JSON.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **field** | `string` | `action_id` (e.g., `main`, `refreshPrice`) |
+| **value** | `JSON` | Full configuration object |
+
+**JSON Structure:**
+
+```json
+{
+  "scheduleType": "interval",
+  "intervalMs": 60000,
+  "timeoutMs": null,
+  "cronExpr": null,
+  "handler": {
+    "kind": "http",
+    "baseUrl": "https://business.example.com",
+    "path": "/actions/main/execute"
+  },
+  "policyHandler": {
+    "kind": "grpc",
+    "target": "127.0.0.1:50051",
+    "service": "policy.v1.PolicyService",
+    "method": "Score",
+    "deadlineMs": 3000
+  }
+}
 ```
 
-## 2. 表清单
+**Field validation by scheduleType:**
 
-| # | 表名 | 实体类 | 角色 |
-|---|------|--------|------|
-| 1 | `admin` | Admin | 管理员 |
-| 2 | `museum` | Museum | 场馆 |
-| 3 | `activity` | Activity | 活动 |
-| 4 | `user` | User | 小程序账号用户 |
-| 5 | `identity` | Identity | 访客身份（按身份证去重） |
-| 6 | `day` | Day | 每日排期 |
-| 7 | `time` | Time | 时段（库存单元） |
-| 8 | `join` | Join | ★ 预约记录核心表 |
-| 9 | `news` | News | 公告/推文 |
-| 10 | `log` | Log | 操作日志 |
-| 11 | `head` | Head | 头像 |
-| 12 | `relic` | Relic | 文物（ONNX 类别对应） |
-| 13 | `sys_message` | Message | 用户系统消息 |
-| 14 | `sys_message_template` | MessageTemplate | 消息模板 |
+| scheduleType | Required Fields |
+|-------------|----------------|
+| `once` | `handler` |
+| `interval` | `handler`, `intervalMs` (> 0) |
+| `cron` | `handler`, `cronExpr` (valid Spring CronExpression) |
+| `fixed_delay` | `handler`, `intervalMs` (> 0), `timeoutMs` (> 0) |
 
-## 3. 表结构详解
+**Handler kinds:**
 
-### 3.1 admin · 管理员
+| kind | Required Fields |
+|------|----------------|
+| `http` | `baseUrl`, `path` |
+| `grpc` | `target`, `service`, `method`; `deadlineMs` optional (> 0) |
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `ADMIN_ID` | VARCHAR(64) | 业务 ID |
-| `ADMIN_NAME` | VARCHAR(50) | 登录名 |
-| `ADMIN_PASSWORD` | VARCHAR(255) | 加密密码 |
-| `ADMIN_TOKEN` | VARCHAR(255) | JWT |
-| `ADMIN_TOKEN_TIME` | BIGINT | Token 时间 |
-| `ADMIN_ADD_TIME` | BIGINT | 创建时间 |
-| `ADMIN_NICKNAME` | VARCHAR(50) | 昵称 |
-| `ADMIN_INTRO` | TEXT | 简介 |
-| `ADMIN_AVATAR` | VARCHAR(255) | 头像 URL |
-| `ADMIN_INFO_UPDATE_TIME` | BIGINT | 资料更新时间 |
-| `_pid` | VARCHAR(64) | 多租户标识 |
+---
 
-### 3.2 museum · 场馆
+## Member Encoding
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `MUSEUM_ID` | VARCHAR(64) | 业务 ID，索引 `idx_museum_id` |
-| `MUSEUM_TITLE` | VARCHAR(255) | 名称 |
-| `ADMIN_ID` | VARCHAR(64) | FK→admin |
-| `MUSEUM_OBJ` | LONGTEXT | 详情 JSON |
-| `MUSEUM_PIC` | LONGTEXT | 封面图 JSON 数组 |
-| `MUSEUM_MAX_JOIN_CNT` | INT | 最大预约数 |
-| `MUSEUM_BOOK_SET` | INT | 提前可预约天数 |
-| `MUSEUM_STATUS` | TINYINT | 1启用 0停用 |
-| `MUSEUM_ADD_TIME` / `MUSEUM_EDIT_TIME` | BIGINT | 时间戳 |
-| `LATITUDE` / `LONGITUDE` | DOUBLE | 地图坐标 |
-| `ADDRESS` | VARCHAR(550) | 地址 |
-| `_pid` | VARCHAR(64) | 多租户 |
+Tasks are encoded as semicolon-delimited strings:
 
-### 3.3 activity · 活动
+```
+member = "{value1};{value2};...;{valueN};{action_id}"
+```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `ACTIVITY_ID` | VARCHAR(64) | 业务 ID |
-| `ACTIVITY_TITLE` | VARCHAR(255) | 标题 |
-| `ADMIN_ID` | VARCHAR(64) | FK→admin |
-| `ACTIVITY_OBJ` | LONGTEXT | 详情 JSON |
-| `ACTIVITY_PIC` | LONGTEXT | 封面图 JSON |
-| `ACTIVITY_STATUS` | TINYINT | 1发布 0下架 |
-| `ACTIVITY_ADD_TIME` / `ACTIVITY_EDIT_TIME` | BIGINT | 时间戳 |
-| `_pid` | VARCHAR(64) | 多租户 |
+**Rules:**
+- Segments separated by `;`
+- Last segment is always `action_id`
+- Preceding segments are opaque business values (scheduler doesn't parse)
+- No segment may contain the delimiter `;`
 
-### 3.4 user · 小程序账号
+**Example:**
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `USER_ID` | VARCHAR(64) | 业务 ID，索引 `idx_user_id` |
-| `USER_MINI_OPENID` | VARCHAR(128) | 微信 OpenID |
-| `USER_NAME` | VARCHAR(100) | 昵称 |
-| `USER_MOBILE` | VARCHAR(20) | 手机号，索引 `idx_user_mobile` |
-| `USER_PIC` | INT | 头像 ID（FK→head） |
-| `USER_ADD_TIME` / `USER_EDIT_TIME` | BIGINT | 时间戳 |
-| `_pid` | VARCHAR(64) | 多租户 |
-| `userPicUrl` | 非持久 | 计算字段：头像 URL |
+```
+member = "hotel_example;48;22;main"
+         ↓             ↓  ↓  ↓
+       value[0]     [1] [2] action_id
+```
 
-### 3.5 identity · 访客身份
+**Parsing:**
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `IDENTITY_ID` | VARCHAR(64) | 业务 ID，索引 `idx_identity_id` |
-| `USER_ID` | TEXT | 拥有者用户 ID 的 JSON 数组（N:N） |
-| `IDENTITY_NAME` | VARCHAR(50) | 真实姓名 |
-| `IDENTITY_CARD` | VARCHAR(30) | 身份证，**唯一索引** `uk_identity_card` |
-| `IDENTITY_MOBILE` | VARCHAR(20) | 手机号 |
-| `IDENTITY_OBJ` | TEXT | 扩展信息 JSON |
-| `IDENTITY_STATUS` | TINYINT | 1正常 0拉黑 |
-| `BLACK_START_TIME` / `BLACK_END_TIME` | BIGINT | 拉黑起止 |
-| `USER_BAN_NUM` | INT | 爽约累计次数 |
-| `USER_CHECK_TYPE` | TINYINT | 1自动拉黑 0人工拉黑 |
-| `_pid` | VARCHAR(64) | 多租户 |
+```java
+ParsedMember parsed = MemberParser.parse(member);
+// parsed.values() = ["hotel_example", "48", "22"]
+// parsed.actionId() = "main"
+```
 
-### 3.6 day · 每日排期
+**Building:**
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `DAY_ID` | VARCHAR(64) | 业务 ID |
-| `DAY` | VARCHAR(20) | 日期 `yyyy-MM-dd` |
-| `MUSEUM_ID` | VARCHAR(64) | FK→museum |
-| `ACTIVITY_ID` | VARCHAR(64) | FK→activity |
-| `STATUS` | TINYINT | 1开放 0闭馆 |
-| `DAY_LIMIT_CNT` | INT | 当日总限额 |
-| `ADD_TIME` / `EDIT_TIME` | BIGINT | 时间戳 |
-| `_pid` | VARCHAR(64) | 多租户 |
+```java
+String member = MemberParser.build(
+    List.of("hotel_example", "48", "22"),
+    "main"
+);
+// member = "hotel_example;48;22;main"
+```
 
-> 复合索引 `idx_day_museum_date`（`MUSEUM_ID, DAY`），支撑日期可用性查询。
+---
 
-### 3.7 time · 时段（库存单元）
+## Domain Objects
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `TIME_ID` | VARCHAR(64) | 业务 ID |
-| `DAY_ID` | VARCHAR(64) | FK→day |
-| `MUSEUM_ID` / `ACTIVITY_ID` | VARCHAR(64) | FK |
-| `TIME_START` / `TIME_END` | VARCHAR(10) | `HH:mm` |
-| `TIME_MARK` | VARCHAR(64) | 唯一键 `uk_time_mark`（场馆+日期+时段） |
-| `LIMIT_CNT` | INT | 容量上限 |
-| `SUCC_CNT` | INT | 已成功预约数（原子自增） |
-| `STATUS` | TINYINT | 1启用 0停用 |
-| `IS_LIMIT` | TINYINT | 1限购 0允许超卖 |
-| `ADD_TIME` / `EDIT_TIME` | BIGINT | 时间戳 |
-| `_pid` | VARCHAR(64) | 多租户 |
+### TypeConfigDomain
 
-> 配额校验：`SUCC_CNT < LIMIT_CNT` 或 `IS_LIMIT=0`，O(1) 查询无需 JOIN。
+Immutable configuration object:
 
-### 3.8 join · 预约记录（核心）
+```java
+record TypeConfigDomain(
+    String scheduleType,      // once | interval | cron | fixed_delay
+    Long intervalMs,          // nullable
+    Long timeoutMs,           // nullable
+    String cronExpr,          // nullable
+    HandlerConfigDomain handler,        // required
+    HandlerConfigDomain policyHandler   // nullable
+)
+```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `JOIN_ID` | VARCHAR(64) | 业务 ID |
-| `IDENTITY_ID` | VARCHAR(64) | FK→identity，索引 `idx_join_identity` |
-| `USER_ID` | VARCHAR(64) | FK→user，索引 `idx_join_user` |
-| `JOIN_MEET_DAY` | VARCHAR(20) | 参观日 |
-| `TIME_MARK` | VARCHAR(64) | FK→time，索引 `idx_join_time_mark` |
-| `JOIN_START_TIME` | BIGINT | 预约开始时间戳 |
-| `JOIN_COMPLETE_END_TIME` | VARCHAR(50) | 结束时间字符串 |
-| `JOIN_STATUS` | TINYINT | 1成功 2取消（不删除） |
-| `JOIN_FORMS` | TEXT | 表单快照 JSON（不可变） |
-| `JOIN_IS_CHECKIN` | TINYINT | 0未核销 1已核销 3爽约 |
-| `JOIN_QR` | TEXT | 核销二维码 Base64 |
-| `JOIN_ADD_TIME` / `JOIN_EDIT_TIME` | BIGINT | 时间戳 |
-| `_pid` | VARCHAR(64) | 多租户 |
-| `joinMeetTimeStart/End`, `museumTitle`, `museumAddress`, `latitude`, `longitude` | 非持久 | Mapper LEFT JOIN 填充 |
+### HandlerConfigDomain
 
-### 3.9 news · 公告
+Immutable handler configuration:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `NEWS_ID` | VARCHAR(64) | 业务 ID |
-| `NEWS_TITLE` | VARCHAR(255) | 标题 |
-| `NEWS_DESC` | TEXT | 内容 |
-| `NEWS_STATUS` | TINYINT | 1发布 0下线 |
-| `NEWS_VIEW_CNT` | INT | 浏览量 |
-| `NEWS_ADD_TIME` / `NEWS_EDIT_TIME` | BIGINT | 时间戳 |
-| `NEWS_ADD_IP` / `NEWS_EDIT_IP` | VARCHAR(64) | IP |
-| `_pid` | VARCHAR(64) | 多租户 |
+```java
+record HandlerConfigDomain(
+    String kind,        // http | grpc
+    String baseUrl,     // HTTP only
+    String path,        // HTTP only
+    String target,      // gRPC only
+    String service,     // gRPC only
+    String method,      // gRPC only
+    Integer deadlineMs  // gRPC only, nullable
+)
+```
 
-### 3.10 log · 日志
+### ParsedMember
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `_id` | VARCHAR(64) | PK |
-| `LOG_ID` | VARCHAR(64) | 业务 ID |
-| `LOG_CONTENT` | TEXT | 内容 |
-| `LOG_TYPE` | INT | 0登录 99操作 |
-| `LOG_ADMIN_ID` | VARCHAR(64) | FK→admin |
-| `LOG_ADMIN_NAME` | VARCHAR(50) | 操作人名（反范式） |
-| `LOG_ADD_TIME` / `LOG_EDIT_TIME` | BIGINT | 时间戳 |
-| `_pid` | VARCHAR(64) | 多租户 |
+Parsed member string:
 
-### 3.11 head · 头像
-| `_id` PK | `HEAD_PIC_ID` 业务 ID | `HEAD_PIC_URL` 完整 URL | `_pid` |
+```java
+record ParsedMember(
+    List<String> values,  // opaque business values
+    String actionId       // trailing segment
+)
+```
 
-### 3.12 relic · 文物
-| `_id` PK（= ONNX 模型类别 ID 0-4） | `RELIC_NAME` | `RELIC_DESC` LONGTEXT | `RELIC_IMAGE` |
+### ScoredMember
 
-### 3.13 sys_message · 用户消息
+ZSET member with score:
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT AUTO | PK |
-| `user_id` | VARCHAR(64) | FK→user，索引 `idx_user_id` |
-| `title` | VARCHAR(100) | 标题 |
-| `content` | TEXT | 内容 |
-| `type` | TINYINT | 0系统 1预约 2活动 |
-| `is_read` | TINYINT | 0未读 1已读 |
-| `create_time` | DATETIME | 默认 `CURRENT_TIMESTAMP` |
+```java
+record ScoredMember(
+    String member,   // full member string
+    long scoreMs     // score in epoch millis
+)
+```
 
-### 3.14 sys_message_template · 消息模板
+---
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | BIGINT AUTO | PK |
-| `code` | VARCHAR(50) | 模板编码，唯一 `uk_code` |
-| `title_template` | VARCHAR(100) | 标题模板 |
-| `content_template` | TEXT | 内容模板 |
-| `update_time` | DATETIME | 更新时间 |
+## Repository Operations
 
-## 4. 索引策略
+### TimelineRepository
 
-| 表 | 索引 | 列 | 用途 |
-|----|------|----|------|
-| museum | idx_museum_id | MUSEUM_ID | 业务键查询 |
-| user | idx_user_id | USER_ID | 用户资料 |
-| user | idx_user_mobile | USER_MOBILE | 手机号登录 |
-| identity | uk_identity_card | IDENTITY_CARD | 去重 + 拉黑（唯一） |
-| identity | idx_identity_id | IDENTITY_ID | 访客资料 |
-| day | idx_day_museum_date | (MUSEUM_ID, DAY) | 日期可用性 |
-| time | uk_time_mark | TIME_MARK | 时段唯一（唯一） |
-| join | idx_join_identity | IDENTITY_ID | 访客历史 |
-| join | idx_join_user | USER_ID | 用户历史 |
-| join | idx_join_time_mark | TIME_MARK | 时段占用 |
-| sys_message | idx_user_id | user_id | 收件箱 |
-| sys_message_template | uk_code | code | 模板编码（唯一） |
+| Method | Redis Command | Description |
+|--------|--------------|-------------|
+| `add(member, scoreMs)` | `ZADD timeline scoreMs member` | Insert/update task |
+| `remove(member)` | `ZREM timeline member` | Delete task |
+| `getScore(member)` | `ZSCORE timeline member` | Get scheduled time |
+| `count()` | `ZCARD timeline` | Total task count |
+| `rangeWithScores(start, stop)` | `ZRANGE timeline start stop WITHSCORES` | Rank-bounded query |
+| `rangeByScoreWithScores(min, max, offset, count)` | `ZRANGEBYSCORE timeline min max WITHSCORES LIMIT offset count` | Score-bounded query |
+| `rangeNearestWithScores(limit)` | `ZRANGEBYSCORE timeline -inf +inf WITHSCORES LIMIT 0 limit` | Nearest due tasks |
+| `getNearest()` | `ZRANGE timeline 0 0 WITHSCORES` | Single nearest task |
+| `advanceRemove(member, execScore)` | `MULTI: ZREM timeline, ZADD executeline / EXEC` | Atomic once advance |
+| `advanceUpdate(member, tlScore, execScore)` | `MULTI: ZADD timeline, ZADD executeline / EXEC` | Atomic recurring advance |
+| `batchAdvance(advances)` | Pipeline of ZADD/ZREM | Batch advance (non-atomic per member) |
 
-## 5. 关键关系
+### ExecutelineRepository
 
-| 关系 | 从→到 | 类型 | 说明 |
-|------|------|----|------|
-| 创建者 | admin→museum/activity/log | 1:N | 管理员创建并操作 |
-| 场馆排期 | museum→day | 1:N | 场馆有每日排期 |
-| 排期时段 | day→time | 1:N | 一天多时段 |
-| 活动映射 | activity→day/time | 1:N | 活动挂载到具体日期/时段 |
-| 访客归属 | user↔identity | N:N | `identity.USER_ID` 为 JSON 数组，一用户可多访客 |
-| 预约核心 | identity/user/time→join | 1:N | 三方关联到预约记录 |
-| 头像引用 | head→user.USER_PIC | 1:1 | 头像链接 |
-| 消息收件 | user→sys_message | 1:N | 用户收消息 |
+| Method | Redis Command | Description |
+|--------|--------------|-------------|
+| `add(member, score)` | `ZADD executeline score member` | Queue for execution |
+| `remove(member)` | `ZREM executeline member` | Complete execution |
+| `popMin()` | WATCH + ZRANGE[0,0] + MULTI/ZREM/EXEC | Atomically pop highest-priority task |
+| `getScore(member)` | `ZSCORE executeline member` | Get priority score |
+| `count()` | `ZCARD executeline` | Total count |
+| `rangeWithScores(start, stop)` | `ZRANGE executeline start stop WITHSCORES` | Rank-bounded query |
 
-## 6. 设计取舍
+**popMin algorithm (no ZPOPMIN API):**
+1. WATCH executeline
+2. ZRANGE [0,0] WITHSCORES to peek minimum
+3. MULTI → ZREM candidate → EXEC
+4. Retry up to 16 times on conflict (EXEC returns null)
 
-### 6.1 库存模型：`time` 表 + Redis 双层
-- `time.LIMIT_CNT` / `SUCC_CNT` 同列存放，配额校验 O(1)
-- 高并发下由 Redis Lua 原子预扣，MySQL `SUCC_CNT` 仅作持久化记账（`SUCC_CNT = SUCC_CNT + delta`）
-- 详见 [FLOWS.md §1](./FLOWS.md)
+### TypeConfigRepository
 
-### 6.2 身份证去重与黑名单
-- `IDENTITY_CARD` 唯一索引：同一身份证全局只一条 `identity`
-- `IDENTITY_STATUS` 软删除（0 拉黑），不物理删除
-- `BLACK_*_TIME` 支持时段拉黑，到期 `autoUnban()` 自动解禁
-- `USER_BAN_NUM` 超阈值（>5）自动 `doBan()`，`USER_CHECK_TYPE` 区分自动/人工
+| Method | Redis Command | Description |
+|--------|--------------|-------------|
+| `put(actionId, config)` | `HSET typeconfig actionId JSON` | Serialize and store |
+| `get(actionId)` | `HGET typeconfig actionId` | Retrieve and deserialize |
+| `getByActionIds(actionIds)` | Multiple `HGET` | Batch fetch |
+| `count()` | `HLEN typeconfig` | Total count |
+| `getAll()` | `HGETALL typeconfig` | Full dump |
 
-### 6.3 预约状态生命周期
-- `JOIN_STATUS`：1 成功 / 2 取消，永不删除（审计完整）
-- `JOIN_IS_CHECKIN`：0 待核销 / 1 已核销 / 3 爽约
-- 状态 3 由 `BookingScheduler` 定时任务赋值（过 `JOIN_COMPLETE_END_TIME` 未核销）
-- 状态 3 驱动 `USER_BAN_NUM` 累加与拉黑升级
+**Error handling:**
+- Serialization failure → `IllegalStateException`
+- Deserialization failure → log warning, skip entry (fail-open)
 
-### 6.4 表单快照不可变
-`JOIN_FORMS` 落单时快照，后续即使访客资料变更也不影响历史预约记录，支撑合规与争议追溯。
+---
 
-### 6.5 反范式
-- `log.LOG_ADMIN_NAME` 反范式存名，查日志不 JOIN（且管理员可能被删）
-- `join` 计算字段由 Mapper LEFT JOIN 填充，减少 N+1
+## Atomicity Strategies
 
-### 6.6 时间统一 BIGINT
-所有业务时间用 BIGINT 毫秒，跨表比较与排序一致；`sys_message*` 例外用 DATETIME（MySQL 原生函数友好）。
+### 1. Single-Key Atomicity
 
-### 6.7 多租户预留
-`_pid` 字段全表覆盖，当前未启用分库但保留软多租户过滤能力。
+Most operations (add, remove, getScore) rely on Redis single-command atomicity.
+
+### 2. MULTI/EXEC (Advance)
+
+联合写入 timeline + executeline:
+
+```redis
+MULTI
+  ZREM timeline member          # or ZADD timeline nextScore member
+  ZADD executeline execScore member
+EXEC
+```
+
+- WATCH detects conflicts
+- Retry on EXEC null (conflict)
+- Used by `advanceRemove`, `advanceUpdate`
+
+### 3. Pipeline Batch (High Throughput)
+
+`batchAdvance` pipelines all commands:
+
+```redis
+# Pipeline (no MULTI)
+ZREM timeline member1
+ZADD executeline score1 member1
+ZADD timeline nextScore2 member2
+ZADD executeline score2 member2
+...
+```
+
+- Reduces RTT from O(n) to O(1)
+- Per-member non-atomic (commands interleaved by Redis)
+- Acceptable under single-leader design (only TimeLineTrigger writes)
+- Failed members retry next cycle
+
+### 4. popMin (Optimistic Locking)
+
+Simulates ZPOPMIN using WATCH + optimistic locking:
+
+```redis
+WATCH executeline
+ZRANGE executeline 0 0 WITHSCORES    # peek minimum
+MULTI
+  ZREM executeline candidate
+EXEC
+# If EXEC returns null → conflict → retry
+```
+
+---
+
+## Score Conversion
+
+Redis ZSET scores are `double`, but scheduler uses `long` (epoch millis):
+
+```java
+// Write
+double redisScore = (double) scoreMs;
+
+// Read
+long scoreMs = Math.round(redisScore);
+```
+
+No transformation — direct cast with rounding on read.
+
+---
+
+## Data Flow Examples
+
+### Task Registration
+
+```
+1. Validate request
+2. HGET typeconfig {actionId} → fail if missing
+3. Build member = values.join(";") + ";" + actionId
+4. ZSCORE timeline member → fail if exists (duplicate)
+5. ZADD timeline firstTriggerAtMs member
+6. Publish TaskRegistered event
+```
+
+### Task Cancellation
+
+```
+1. ZREM timeline member
+2. ZREM executeline member (idempotent)
+3. Publish TaskCanceled event with alreadyCanceled flag
+```
+
+### Timeline Advance (once)
+
+```
+1. ZRANGE timeline 0 0 WITHSCORES → check if due
+2. HGET typeconfig {actionId}
+3. SchedulingPolicy.calcScore → executeline_score
+4. MULTI
+     ZREM timeline member
+     ZADD executeline execScore member
+   EXEC
+5. Publish TimelineAdvanced, ExecutelineEnqueued events
+```
+
+### Timeline Advance (interval)
+
+```
+1-3. Same as once
+4. nextTimelineScore = now + intervalMs
+   MULTI
+     ZADD timeline nextTimelineScore member
+     ZADD executeline execScore member
+   EXEC
+5. Publish events
+```
+
+### Task Execution (fixed_delay success)
+
+```
+1. ZPOPMIN executeline → member
+2. HGET typeconfig {actionId}
+3. Invoke action (HTTP/gRPC) → success
+4. nextScore = finishAtMs + intervalMs
+5. ZADD timeline nextScore member
+6. Publish ExecutionSucceeded, TimelineCallbackWritten events
+```
+
+---
+
+## Monitoring Queries
+
+### Dashboard Counts
+
+```redis
+ZCARD timeline          # timelineCount
+ZCARD executeline       # executeLineCount
+HLEN typeconfig         # typeConfigCount
+```
+
+### Near-Due Tasks
+
+```redis
+ZRANGEBYSCORE timeline -inf (now+60s WITHSCORES LIMIT 0 10
+```
+
+### Timeline Monitor (rank-bounded)
+
+```redis
+ZRANGE timeline start stop WITHSCORES
+```
+
+### Timeline Monitor (score-bounded)
+
+```redis
+ZRANGEBYSCORE timeline scoreFrom scoreTo WITHSCORES LIMIT 0 100
+```
+
+---
+
+## No Relational Database
+
+The scheduler intentionally uses **no SQL database**:
+
+- **Simplicity:** No ORM, no migrations, no connection pools
+- **Performance:** Redis atomic operations are faster than SQL transactions
+- **Trade-off:** No persistent history, no complex queries
+- **Mitigation:** Events provide observability; admin API provides bounded queries
+
+For audit trails or historical data, consumers should subscribe to `ScheduleEvent` and persist externally.
