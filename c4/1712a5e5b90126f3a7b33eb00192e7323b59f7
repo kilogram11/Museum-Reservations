@@ -1,0 +1,31 @@
+project-docs-1/福建星网-Java开发工程师-JD解析与证据映射.md
+  s_e756c3dc789c2b::t_b7e225f1b171a3 1-50,52-72,74-93,95
+  s_e756c3dc789c2b::t_4324bbe2d96649 51,73,94
+project-docs-1/福建星网-Java开发工程师-简历.md
+  s_e756c3dc789c2b::t_4324bbe2d96649 24,37-38,64
+  s_e756c3dc789c2b::t_b7e225f1b171a3 1-23,25-36,39-63
+project-docs-1/经历库.md
+  s_e756c3dc789c2b::t_4324bbe2d96649 35,119-144,152,160,167,178,338,347
+project-docs-1/福建星网-Java开发工程师-投递说明.md
+  s_e756c3dc789c2b::t_b7e225f1b171a3 1-17,19-22,24-25
+  s_e756c3dc789c2b::t_4324bbe2d96649 18,23
+project-docs-1/resume-evidence-workflow执行记录.md
+  s_e756c3dc789c2b::t_b7e225f1b171a3 30-38
+  s_e756c3dc789c2b::t_4324bbe2d96649 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "c41712a5e5b90126f3a7b33eb00192e7323b59f7",
+  "prompts": {},
+  "sessions": {
+    "s_e756c3dc789c2b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a03c09-bdd8-72e3-8d58-a9261c002137",
+        "model": "gpt-5.5"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    }
+  }
+}
