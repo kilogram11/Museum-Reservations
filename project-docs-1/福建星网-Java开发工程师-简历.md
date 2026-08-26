@@ -1,0 +1,64 @@
+# 万霈瑶 - Java 开发工程师 - 福建星网
+
+## 基本信息
+
+- 电话：18109070502
+- 邮箱：18109070502@163.com
+- 求职意向：Java 开发工程师
+
+## 教育背景
+
+**合肥工业大学 | 软件工程 | 本科**  
+2023.09 - 2027.06
+
+- 主修课程：Java 程序设计、数据结构、软件安全、面向对象分析与设计、互联网开发实训、网站设计与开发技术、Python 语言与系统设计
+- 课程成绩：网站设计与开发技术 4.0/4.3，Python 语言与系统设计 4.0/4.3
+- 荣誉/证书：CET-4、上海英语复旦社杯
+
+## 专业技能
+
+- **后端开发**：Java、Spring Boot、MyBatis-Plus、REST/SOA 接口设计、业务异常处理、JWT 鉴权。
+- **数据库与缓存**：MySQL、Redis ZSET/HASH、Redis Lua、事务一致性、库存扣减、任务队列建模。
+- **测试与质量**：JMeter 压测、单元测试/集成测试、异常/边界/降级/并发场景验证、接口文档沉淀。
+- **前端与协作**：Vue 3、Vite、Element Plus、微信小程序、Taro 4、React 18、Zustand、Capacitor，具备前后端联调和跨端项目经验。
+- **AI 应用与编码工具**：Spring AI、OpenAI-compatible ChatClient、DeepSeek、Tool Calling、轻量 RAG、ONNX Runtime；熟悉使用 Codex、Cursor、Claude Code 辅助需求澄清、方案规划、编码实现、测试生成和验收。
+
+## 实习经历
+
+### 携程集团 | 大住宿事业群 | Java 后端开发实习生
+
+2026.06 - 2026.08
+
+参与酒店业务轻量级定时调度器建设，面向批量任务注册、按时触发、优先级执行、失败重试和运维观测场景，基于 Spring Boot + Trip FX + CDubbo 提供 SOA/REST 接入，底层使用 CRedis ZSET/HASH 构建应用内嵌式调度内核，支持 HTTP/gRPC 外调业务 Action。
+
+- **调度内核建模**：参与设计 `timeline` + `executeline` 双队列模型，将“触发时间”和“执行优先级”解耦；基于 Redis ZSET score 分别维护任务到期时间与执行优先级，通过 TimeLineTrigger + TaskWorker 完成任务推进、消费和回写，支持 once、interval、cron、fixed_delay 4 类调度语义。
+- **高并发推进与可靠性设计**：针对大量任务同时到期场景，使用 Redis `MULTI/EXEC` 保证 timeline 到 executeline 的状态迁移一致性；针对 fixed_delay 设计 timeout backup + 成功 callback 覆盖机制，确保 Action 失败时任务不会永久丢失，并可在兜底时间到期后重新进入调度。
+- **执行链路与降级机制**：封装 HTTP/gRPC 外调执行与 Policy 动态算分机制，策略服务失败或超时时降级为内置优先级，避免弱依赖阻塞调度主链路；建设任务注册、取消、查询、详情定位、Dashboard、Monitor 等运维观测能力。
+- **AI 辅助开发与质量保障**：使用 Codex 建立项目上下文、澄清边界并拆解 Master Plan，结合 Cursor / Claude Code 分阶段执行开发，再通过人工 Review、Verify、Handoff 更新和 Rules 沉淀控制交付质量；AI 参与超过 70% 编码工作，辅助生成 188 个自动化测试用例、4 份压测脚本和 1 套管理前端。
+- **压测验证与性能基准**：在 2 核 4G FAT 环境完成压测，5 万个 once 任务同时到期可 45s 排空，消费吞吐超 1100 task/s，timeline/executeline 流转能力超 25000 task/s；接口基准达到 registerTask / cancelTask 约 250/s、getTask 约 437/s。
+
+## 项目经历
+
+### 博物馆预约管理与 AI 助手平台
+
+技术栈：Spring Boot 3、Java 17、MyBatis-Plus、MySQL、Redis、Lua、Spring AI、DeepSeek、Vue 3、微信小程序、ONNX Runtime
+
+项目介绍：面向博物馆预约、核销、馆规咨询和运营管理的一体化平台，包含微信小程序、Vue 管理端与 Spring Boot 后端。用户侧支持场馆/活动浏览、预约下单、二维码入馆、预约记录、AI 咨询与文物识别；管理侧支持排期配置、预约核销、黑名单、公告、统计看板和 Excel 导出。
+
+- **AI 预约 Agent**：设计单 Agent + 双 ChatClient + 5 Tool 的预约助手，将预约查票/下单/取消与馆规问答拆分为不同链路；封装 `queryDays`、`queryTimes`、`submitBooking`、`listRecords`、`cancelBooking` 5 个 Tool，复用真实预约 Service，避免 AI 绕过业务校验直接读写数据。
+- **权限安全与 RAG 问答**：实现轻量级馆规 RAG，基于本地 384 维字符 n-gram 哈希向量和内存向量库检索公告/馆规，未命中返回固定兜底以降低编造风险；通过 `UserContext(ThreadLocal)` 绑定 JWT 登录态，AI 写 Tool 不接受外部 `userId`，防止越权预约/取消。
+- **高并发库存一致性**：设计 Redis Lua 原子预扣 + MySQL 事务落单链路，使用 `booking:stock:{timeMark}` 管理时段库存、`booking:booked:{day}:{identityId}` 实现一证一约，MySQL 侧通过 `SUCC_CNT += delta` 原子记账，并在落单失败/取消预约时用 Lua 回补库存。
+- **压测与业务闭环**：基于 JMeter 验证 80 并发抢 `LIMIT_CNT=50` 时成功 50 单且 0 超卖、同一身份 10 并发仅 1 单成功；实现二维码核销、预约消息、爽约扫描、自动拉黑/解禁和管理端统计看板，形成预约、履约、核销、风控完整闭环。
+
+### 易宿酒店预订系统（跨端移动应用）
+
+技术栈：Taro 4、React 18、Zustand、SCSS、Capacitor、Spring Boot 3
+
+- **跨端前端开发**：基于 Taro 4 与 React 18 搭建跨端移动应用底层架构，引入 Zustand 管理跨页预订流转等核心状态，自研自适应 TabBar 与转场动画组件，提升多端渲染一致性与交互体验。
+- **接口协作与请求治理**：二次封装 API 请求，内置全局异常拦截、静默 Loading 与网络重试机制，实现 JWT 无感续签；配合后端接口联调房型预订、订单流转等业务流程，提升接口安全性与用户体验。
+
+## 个人优势
+
+- 具备 Java 后端、Redis、MySQL、Spring Boot 平台开发实践，做过高并发库存扣减、定时调度内核、AI Tool Calling 与 RAG 等工程场景。
+- 有 Vue/React/微信小程序/Taro 等前端与跨端项目经验，能够理解 Web 前端模块开发、接口契约和前后端联调成本。
+- 习惯使用 AI 工具辅助规划、编码、测试生成和文档沉淀，并通过压测、自动化测试、接口文档和运维监控验证系统质量。

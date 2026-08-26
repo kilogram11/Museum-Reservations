@@ -27,3 +27,13 @@
 ## 后续建议
 
 拿到具体 JD 后，优先使用 `经历库.md` 做 requirement-to-evidence matrix，再从 `基础简历.md` 裁剪。当前最大待确认项是求职意向是否正式切换为 Java 后端开发，以及携程/博物馆项目中哪些动作可写“负责”而不是“参与”。
+
+## JD 1：福建星网 Java 开发工程师
+
+更新日期：2026-08-26
+
+- 已完成 Stage B：JD 解码和要求到证据映射，见 `福建星网-Java开发工程师-JD解析与证据映射.md`。
+- 已完成 Stage C：主方法选 `industry-resume-toolkit`，辅助参考 `tech-resume-optimizer` 与 `resume-tailor`。
+- 已完成 Stage D 草案：见 `福建星网-Java开发工程师-简历.md`。
+- 未执行 Stage E：等待用户确认投递版是否接受后，再决定是否把“福建星网/Java 开发工程师”作为复用模块写回。
+- 2026-08-26 更新：用户补充携程实习 P12 AI Coding 口播材料，已写入 `经历库.md`，并更新福建星网定制版中“AI 工具编码”相关表达。
