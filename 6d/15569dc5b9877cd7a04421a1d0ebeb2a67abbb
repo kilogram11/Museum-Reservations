@@ -1,0 +1,25 @@
+project-docs-1/经历库.md
+  s_e756c3dc789c2b::t_80337b793d6c2c 1-325
+project-docs-1/基础简历.md
+  s_e756c3dc789c2b::t_80337b793d6c2c 1-76
+project-docs-1/简历版式档案.md
+  s_e756c3dc789c2b::t_80337b793d6c2c 1-60
+project-docs-1/resume-evidence-workflow执行记录.md
+  s_e756c3dc789c2b::t_873d16b42b2a3e 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.43-trip",
+  "base_commit_sha": "6d15569dc5b9877cd7a04421a1d0ebeb2a67abbb",
+  "prompts": {},
+  "sessions": {
+    "s_e756c3dc789c2b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a03c09-bdd8-72e3-8d58-a9261c002137",
+        "model": "gpt-5.5"
+      },
+      "human_author": "kilogram11 <3238194350@qq.com>"
+    }
+  }
+}
